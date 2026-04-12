@@ -96,6 +96,16 @@ export default function Practice() {
     }
   }, [chordSession.stepIndex, view])
 
+  useEffect(() => {
+    let timeoutId: number
+    if (view === 'scale_session' && scaleSession.status === 'complete') {
+      timeoutId = window.setTimeout(() => {
+        goToNextScaleExercise()
+      }, 1500)
+    }
+    return () => { clearTimeout(timeoutId) }
+  }, [scaleSession.status, view])
+
   const activeScaleExercise = SCALE_EXERCISES[scaleIndex]
   const activeChordExercise = CHORD_EXERCISES[chordIndex]
 
