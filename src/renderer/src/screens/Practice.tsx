@@ -85,6 +85,16 @@ export default function Practice() {
   const lastMidiLogRef = useRef<{ pitch: number; at: number } | null>(null)
   const isMountedRef = useRef(true)
   const midiStatusRef = useRef<'checking' | 'connected' | 'unavailable' | 'error'>('checking')
+  const carouselRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (view === 'chord_session' && carouselRef.current) {
+      const targetChild = carouselRef.current.children[chordSession.stepIndex] as HTMLElement
+      if (targetChild) {
+        targetChild.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+      }
+    }
+  }, [chordSession.stepIndex, view])
 
   const activeScaleExercise = SCALE_EXERCISES[scaleIndex]
   const activeChordExercise = CHORD_EXERCISES[chordIndex]
@@ -594,7 +604,9 @@ export default function Practice() {
           </div>
 
           <div style={practiceSummaryRowStyle}>
-            <span style={{ color: '#8be9fd' }}>{midiMonitorLabel}</span>
+            <span style={{ color: '#8be9fd', fontWeight: 700 }}>
+              {lastMidiLabel ? `Entrando: ${lastMidiLabel}` : 'Toca cualquier tecla de tu periférico'}
+            </span>
             <span style={{ color: '#8892a4' }}>
               {monitorPressedNotes.size > 0
                 ? `${monitorPressedNotes.size} tecla(s) activas`
@@ -602,6 +614,11 @@ export default function Practice() {
                   ? `Última actividad: ${new Date(lastMidiActivityAt).toLocaleTimeString()}`
                   : 'Sin actividad todavía'}
             </span>
+          </div>
+
+          <div style={keyboardLegendStyle}>
+            <LegendPill label="Detectada" background="#06d6a0" color="#ffffff" />
+            <LegendPill label="Inactiva" background="rgba(255,255,255,0.08)" color="#c8d1e8" />
           </div>
 
           {midiState.status !== 'connected' && (
@@ -717,7 +734,19 @@ export default function Practice() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: '8px' }}>
+          <div
+            ref={carouselRef}
+            className="hide-scrollbar"
+            style={{
+              display: 'flex',
+              gap: '24px',
+              overflowX: 'auto',
+              scrollSnapType: 'x mandatory',
+              scrollBehavior: 'smooth',
+              padding: '16px 24px',
+              margin: '0 -16px'
+            }}
+          >
             {exercise.progression.map((prompt, index) => {
               const completed = index < session.stepIndex || session.status === 'complete'
               const current = index === session.stepIndex && session.status !== 'complete'
@@ -726,19 +755,26 @@ export default function Practice() {
                 <div
                   key={`${exercise.id}-${prompt.barIndex}`}
                   style={{
-                    padding: '8px 12px',
-                    borderRadius: '10px',
-                    border: current ? '1px solid #f72585' : '1px solid #2d3a56',
-                    background: completed ? 'rgba(6,214,160,0.18)' : current ? 'rgba(247,37,133,0.12)' : 'rgba(255,255,255,0.03)'
+                    flexShrink: 0,
+                    width: '260px',
+                    scrollSnapAlign: 'center',
+                    padding: '24px',
+                    borderRadius: '20px',
+                    border: current ? '2px solid var(--neon-pink)' : '1px solid var(--border-glass)',
+                    background: completed ? 'rgba(6,214,160,0.1)' : current ? 'rgba(247,37,133,0.15)' : 'rgba(255,255,255,0.03)',
+                    boxShadow: current ? '0 0 32px rgba(247,37,133,0.2)' : 'none',
+                    transform: current ? 'scale(1.02)' : 'scale(0.98)',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    opacity: current || completed ? 1 : 0.6
                   }}
                 >
-                  <div style={{ color: '#8892a4', fontSize: '11px', marginBottom: '2px' }}>
+                  <div style={{ color: current ? 'var(--neon-pink)' : '#8892a4', fontSize: '13px', marginBottom: '8px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>
                     Compás {prompt.barIndex + 1}
                   </div>
-                  <div style={{ color: 'var(--text)', fontSize: '16px', fontWeight: 800 }}>
+                  <div style={{ color: 'var(--text)', fontSize: '36px', fontWeight: 800, textShadow: current ? '0 0 20px rgba(255,255,255,0.4)' : 'none' }}>
                     {prompt.chordName}
                   </div>
-                  <div style={{ color: 'var(--slate-300)', fontSize: '11px', marginTop: '2px' }}>
+                  <div style={{ color: 'var(--slate-300)', fontSize: '15px', marginTop: '8px' }}>
                     {formatPracticeNotes(prompt.targetNotes)}
                   </div>
                 </div>
@@ -763,26 +799,7 @@ export default function Practice() {
 
   function renderKeyboardGuide() {
     if (view === 'practice_home') {
-      return (
-        <div style={keyboardGuideStyle}>
-          <div style={{ display: 'grid', gap: '6px' }}>
-            <div style={{ color: '#8be9fd', fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              Monitor del teclado
-            </div>
-            <div style={{ color: '#fff', fontSize: '24px', fontWeight: 800 }}>
-              {lastMidiLabel ? `Entrando: ${lastMidiLabel}` : 'Toca cualquier tecla para verificar MIDI'}
-            </div>
-            <div style={{ color: '#8892a4', fontSize: '14px' }}>
-              El teclado inferior se ilumina en tiempo real cuando llega una nota MIDI.
-            </div>
-          </div>
-          <div style={keyboardLegendStyle}>
-            <LegendPill label="Objetivo" background="#ffd166" color="#18131a" />
-            <LegendPill label="Correcta" background="#06d6a0" color="#ffffff" />
-            <LegendPill label="Incorrecta" background="#ff6b81" color="#ffffff" />
-          </div>
-        </div>
-      )
+      return null
     }
 
     if (view === 'scale_session') {
@@ -826,43 +843,8 @@ export default function Practice() {
       )
     }
 
-    const currentPrompt = activeChordExercise.progression[Math.min(chordSession.stepIndex, activeChordExercise.progression.length - 1)]
-
-    return (
-      <div style={keyboardGuideStyle}>
-        <div style={{ display: 'grid', gap: '8px' }}>
-          <div style={{ color: '#ff7ab6', fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-            Guía del teclado
-          </div>
-          <div style={{ color: '#fff', fontSize: '24px', fontWeight: 800 }}>
-            {chordSession.status === 'complete'
-              ? 'Progresión terminada'
-              : `Toca ${currentPrompt.chordName} con una sola mano`}
-          </div>
-          <div style={{ color: '#c8d1e8', fontSize: '14px' }}>
-            {chordSession.status === 'complete'
-              ? 'Puedes reiniciar para volver a practicar la progresión.'
-              : 'Pulsa juntas las tres notas amarillas del voicing actual.'}
-          </div>
-        </div>
-
-        <div style={keyboardGuideNotesRowStyle}>
-          {currentPrompt.targetNotes.map(pitch => (
-            <NoteGuideChip
-              key={`chord-guide-${currentPrompt.chordName}-${pitch}`}
-              label={pitchToPracticeLabel(pitch)}
-              tone={correctPressedNotes.has(pitch) ? 'correct' : activeSession?.wrongNotes.has(pitch) ? 'wrong' : 'target'}
-            />
-          ))}
-        </div>
-
-        <div style={keyboardLegendStyle}>
-          <LegendPill label="Notas a tocar" background="#ffd166" color="#18131a" />
-          <LegendPill label="Ya presionada" background="#06d6a0" color="#ffffff" />
-          <LegendPill label="Nota extra" background="#ff6b81" color="#ffffff" />
-        </div>
-      </div>
-    )
+    // For chord_session, we let the new Carousel handle all UI prompting.
+    return null
   }
 
   return (
