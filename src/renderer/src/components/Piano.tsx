@@ -95,8 +95,15 @@ export default function Piano({
         ? '#56ccf2'
         : TRACK_COLORS[track % TRACK_COLORS.length]
     }
-    if (hintNotes.has(pitch)) return inWindow ? '#ffd166' : '#f4a261'
-    return isWhite ? '#f6f2e8' : '#0d1324'
+    if (isWhite) {
+      if (activeNotes.has(pitch) && !inWindow) return TRACK_COLORS[(noteTrackMap?.get(pitch) ?? 0) % TRACK_COLORS.length]
+      if (activeNotes.has(pitch)) return 'url(#whiteKeyDown)'
+      return 'url(#whiteKeyGlow)'
+    } else {
+      if (activeNotes.has(pitch) && !inWindow) return TRACK_COLORS[(noteTrackMap?.get(pitch) ?? 0) % TRACK_COLORS.length]
+      if (activeNotes.has(pitch)) return 'url(#blackKeyDown)'
+      return 'url(#blackKeyGlow)'
+    }
   }
 
   function strokeColor(key: KeyInfo): string {
@@ -122,31 +129,71 @@ export default function Piano({
   return (
     <div style={{
       position: 'relative',
-      height: compactView ? '236px' : '220px',
-      background: 'linear-gradient(180deg, #0f1728 0%, #090d18 100%)',
-      borderTop: '1px solid #2d3a56',
-      borderRadius: '18px',
-      border: '1px solid #24324f',
-      overflow: 'hidden',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05), 0 12px 30px rgba(0,0,0,0.25)',
+      height: compactView ? '180px' : '160px',
+      background: 'linear-gradient(180deg, #182030 0%, #0d121c 100%)',
+      borderRadius: '16px 16px 0 0',
+      padding: '16px 16px 16px 16px',
+      boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.06), inset 0 -6px 12px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.6)',
+      border: '1px solid #2d3b5e',
+      borderBottom: '4px solid #06090e',
       flexShrink: 0
     }}>
-      <svg
-        viewBox={`${viewBounds.x} 0 ${viewBounds.width} ${SVG_HEIGHT}`}
-        preserveAspectRatio="none"
-        style={{ width: '100%', height: '100%', display: 'block' }}
-      >
+      <div style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        background: '#090d18',
+        borderRadius: '10px',
+        overflow: 'hidden',
+        boxShadow: 'inset 0 4px 16px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05)',
+        border: '1px solid #000'
+      }}>
+        <svg
+          viewBox={`${viewBounds.x - 0.4} -0.2 ${viewBounds.width + 0.8} ${SVG_HEIGHT + 0.6}`}
+          style={{ width: '100%', height: '100%', display: 'block' }}
+          shapeRendering="geometricPrecision"
+        >
+          <defs>
+            <linearGradient id="whiteKeyGlow" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#ffffff" />
+              <stop offset="90%" stopColor="#f0f2f5" />
+              <stop offset="100%" stopColor="#d1d5db" />
+            </linearGradient>
+            <linearGradient id="blackKeyGlow" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#1e293b" />
+              <stop offset="85%" stopColor="#0f172a" />
+              <stop offset="100%" stopColor="#020617" />
+            </linearGradient>
+            <linearGradient id="whiteKeyDown" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#e2e8f0" />
+              <stop offset="100%" stopColor="#cbd5e1" />
+            </linearGradient>
+            <linearGradient id="blackKeyDown" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#0f172a" />
+              <stop offset="100%" stopColor="#020617" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="0.2" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <filter id="keyShadow" x="-10%" y="-10%" width="120%" height="120%">
+              <feDropShadow dx="0" dy="0.1" stdDeviation="0.1" floodColor="#000" floodOpacity="0.4"/>
+            </filter>
+          </defs>
         <rect
-          x={viewBounds.x}
-          y={0}
-          width={viewBounds.width}
-          height={SVG_HEIGHT}
+          x={viewBounds.x - 0.4}
+          y={-0.2}
+          width={viewBounds.width + 0.8}
+          height={SVG_HEIGHT + 0.6}
           fill="#0b1020"
         />
         <rect
-          x={viewBounds.x}
-          y={0}
-          width={viewBounds.width}
+          x={viewBounds.x - 0.4}
+          y={-0.2}
+          width={viewBounds.width + 0.8}
           height={1.55}
           fill="rgba(76, 201, 240, 0.08)"
         />
@@ -255,10 +302,11 @@ export default function Piano({
             y={KEY_TOP}
             width={0.94}
             height={WHITE_KEY_HEIGHT}
-            rx={0.1}
+            rx={0.15}
             fill={keyColor(key)}
-            stroke={strokeColor(key)}
+            stroke={activeNotes.has(key.pitch) ? 'none' : strokeColor(key)}
             strokeWidth={strokeWidth(key)}
+            vectorEffect="non-scaling-stroke"
             style={{ cursor: 'pointer' }}
             onMouseDown={() => onNoteOn(key.pitch)}
             onMouseUp={() => onNoteOff(key.pitch)}
@@ -279,10 +327,12 @@ export default function Piano({
               y={KEY_TOP}
               width={w}
               height={h}
-              rx={0.1}
+              rx={0.12}
               fill={keyColor(key)}
-              stroke={strokeColor(key)}
+              stroke={activeNotes.has(key.pitch) ? 'none' : strokeColor(key)}
               strokeWidth={strokeWidth(key)}
+              vectorEffect="non-scaling-stroke"
+              filter="url(#keyShadow)"
               style={{ cursor: 'pointer' }}
               onMouseDown={e => { e.stopPropagation(); onNoteOn(key.pitch) }}
               onMouseUp={e => { e.stopPropagation(); onNoteOff(key.pitch) }}
@@ -335,6 +385,7 @@ export default function Piano({
           </text>
         )}
       </svg>
+      </div>
     </div>
   )
 }

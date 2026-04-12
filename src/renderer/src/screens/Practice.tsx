@@ -717,7 +717,7 @@ export default function Practice() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: '8px' }}>
             {exercise.progression.map((prompt, index) => {
               const completed = index < session.stepIndex || session.status === 'complete'
               const current = index === session.stepIndex && session.status !== 'complete'
@@ -726,19 +726,19 @@ export default function Practice() {
                 <div
                   key={`${exercise.id}-${prompt.barIndex}`}
                   style={{
-                    padding: '12px',
-                    borderRadius: '12px',
+                    padding: '8px 12px',
+                    borderRadius: '10px',
                     border: current ? '1px solid #f72585' : '1px solid #2d3a56',
                     background: completed ? 'rgba(6,214,160,0.18)' : current ? 'rgba(247,37,133,0.12)' : 'rgba(255,255,255,0.03)'
                   }}
                 >
-                  <div style={{ color: '#8892a4', fontSize: '12px', marginBottom: '6px' }}>
+                  <div style={{ color: '#8892a4', fontSize: '11px', marginBottom: '2px' }}>
                     Compás {prompt.barIndex + 1}
                   </div>
-                  <div style={{ color: '#fff', fontSize: '18px', fontWeight: 800 }}>
+                  <div style={{ color: 'var(--text)', fontSize: '16px', fontWeight: 800 }}>
                     {prompt.chordName}
                   </div>
-                  <div style={{ color: '#c8d1e8', fontSize: '12px', marginTop: '6px' }}>
+                  <div style={{ color: 'var(--slate-300)', fontSize: '11px', marginTop: '2px' }}>
                     {formatPracticeNotes(prompt.targetNotes)}
                   </div>
                 </div>
@@ -869,8 +869,8 @@ export default function Practice() {
     <div style={rootStyle}>
       <div style={titleBarStyle}>
         <div>
-          <h1 style={{ margin: 0, fontSize: '32px', color: '#fff', fontWeight: 800 }}>PianoHero</h1>
-          <p style={{ margin: '6px 0 0', color: '#8892a4', fontSize: '14px' }}>
+          <h1 style={{ margin: 0, fontSize: '32px', color: 'var(--text)', fontWeight: 800, letterSpacing: '-0.02em', textShadow: '0 0 20px rgba(6, 182, 212, 0.4)' }}>PianoHero</h1>
+          <p style={{ margin: '6px 0 0', color: 'var(--slate-400)', fontSize: '15px' }}>
             Practica las escalas y acordes clave de C Jam Blues.
           </p>
         </div>
@@ -896,7 +896,7 @@ export default function Practice() {
         </div>
       </div>
 
-      <div style={{ padding: '24px', display: 'grid', gap: '18px', minHeight: 0 }}>
+      <div style={{ padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: 0, overflowY: 'auto' }}>
         {view === 'practice_home'
           ? renderHome()
           : (
@@ -910,7 +910,9 @@ export default function Practice() {
           )}
 
         {renderKeyboardGuide()}
+      </div>
 
+      <div style={{ padding: '0 24px 0 24px', flexShrink: 0 }}>
         <Piano
           activeNotes={pianoActiveNotes}
           hintNotes={view === 'practice_home' ? new Set() : targetNotes}
@@ -1029,13 +1031,10 @@ function PracticeCard({
   return (
     <button
       onClick={onClick}
+      className="glass-panel hover-lift"
       style={{
-        background: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
-        border: '1px solid #2d3a56',
-        borderRadius: '20px',
-        padding: '24px',
+        padding: '28px',
         textAlign: 'left',
-        cursor: 'pointer',
         display: 'grid',
         gap: '12px'
       }}
@@ -1043,10 +1042,10 @@ function PracticeCard({
       <div style={{ color: accent, fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1.2px' }}>
         {subtitle}
       </div>
-      <div style={{ color: '#fff', fontSize: '28px', fontWeight: 800 }}>
+      <div style={{ color: 'var(--text)', fontSize: '28px', fontWeight: 800 }}>
         {title}
       </div>
-      <div style={{ color: '#c8d1e8', fontSize: '15px', lineHeight: 1.5 }}>
+      <div style={{ color: 'var(--slate-300)', fontSize: '15px', lineHeight: 1.5 }}>
         {description}
       </div>
       <span style={{ color: accent, fontWeight: 700 }}>
@@ -1098,15 +1097,19 @@ function SessionControls({
 
 const rootStyle: CSSProperties = {
   minHeight: '100vh',
-  background: '#1a1a2e',
-  color: '#fff',
+  maxHeight: '100vh',
+  background: 'transparent',
+  color: 'var(--text)',
   display: 'grid',
-  gridTemplateRows: 'auto minmax(0, 1fr)'
+  gridTemplateRows: 'auto minmax(0, 1fr) auto'
 }
 
 const titleBarStyle: CSSProperties = {
-  padding: '24px 24px 16px',
-  borderBottom: '1px solid #223',
+  padding: '10px 24px 8px',
+  borderBottom: '1px solid var(--border-glass)',
+  background: 'rgba(11, 17, 32, 0.4)',
+  backdropFilter: 'blur(16px)',
+  WebkitBackdropFilter: 'blur(16px)',
   display: 'flex',
   alignItems: 'flex-start',
   justifyContent: 'space-between',
@@ -1116,18 +1119,21 @@ const titleBarStyle: CSSProperties = {
 
 const homeGridStyle: CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-  gap: '18px',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+  gap: '24px',
   alignContent: 'start'
 }
 
 const panelStyle: CSSProperties = {
-  padding: '18px',
-  borderRadius: '18px',
-  border: '1px solid #223',
-  background: 'rgba(255,255,255,0.03)',
+  padding: '16px',
+  borderRadius: '16px',
+  border: '1px solid var(--border-glass)',
+  background: 'var(--bg-panel)',
+  backdropFilter: 'blur(16px)',
+  WebkitBackdropFilter: 'blur(16px)',
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
   display: 'grid',
-  gap: '16px'
+  gap: '12px'
 }
 
 const panelHeaderStyle: CSSProperties = {
@@ -1141,13 +1147,14 @@ const panelHeaderStyle: CSSProperties = {
 const panelTitleStyle: CSSProperties = {
   margin: 0,
   fontSize: '24px',
-  fontWeight: 800
+  fontWeight: 800,
+  letterSpacing: '-0.02em'
 }
 
 const panelBodyStyle: CSSProperties = {
   margin: '8px 0 0',
-  color: '#c8d1e8',
-  fontSize: '14px',
+  color: 'var(--slate-300)',
+  fontSize: '15px',
   lineHeight: 1.5
 }
 
@@ -1157,14 +1164,17 @@ const practiceSummaryRowStyle: CSSProperties = {
   justifyContent: 'space-between',
   gap: '12px',
   flexWrap: 'wrap',
-  fontSize: '14px'
+  fontSize: '14px',
+  fontWeight: 500
 }
 
 const keyboardGuideStyle: CSSProperties = {
-  padding: '18px 20px',
-  borderRadius: '18px',
-  border: '1px solid #263758',
-  background: 'linear-gradient(180deg, rgba(12,19,36,0.96), rgba(9,14,28,0.96))',
+  padding: '12px 24px',
+  borderRadius: '16px',
+  border: '1px solid var(--border-glass)',
+  background: 'rgba(15, 23, 42, 0.6)',
+  backdropFilter: 'blur(12px)',
+  WebkitBackdropFilter: 'blur(12px)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',

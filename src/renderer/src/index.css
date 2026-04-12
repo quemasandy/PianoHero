@@ -1,13 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap');
+
 :root {
-  --bg-dark: #1a1a2e;
-  --bg-mid: #16213e;
-  --bg-panel: #0f3460;
-  --accent: #e94560;
-  --accent2: #4cc9f0;
-  --green: #06d6a0;
-  --text: #eaeaea;
-  --text-dim: #8892a4;
-  --track-colors: #4cc9f0, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0;
+  /* Core Colors */
+  --slate-900: #0B1120;
+  --slate-800: #0F172A;
+  --slate-700: #1E293B;
+  --slate-600: #334155;
+  --slate-400: #94A3B8;
+  --slate-300: #CBD5E1;
+  --text: #F8FAFC;
+
+  /* Neons */
+  --neon-cyan: #06B6D4;
+  --neon-pink: #F43F5E;
+  --neon-yellow: #FACC15;
+  --neon-green: #10B981;
+
+  /* Backgrounds & Panels */
+  --bg-app: linear-gradient(135deg, var(--slate-900) 0%, #060912 100%);
+  --bg-panel: rgba(30, 41, 59, 0.4);
+  --border-glass: rgba(255, 255, 255, 0.08);
+
+  --track-colors: var(--neon-cyan), var(--neon-pink), #8b5cf6, #d946ef;
 }
 
 * {
@@ -17,19 +31,48 @@
 }
 
 body {
-  background: var(--bg-dark);
+  background: var(--bg-app);
   color: var(--text);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   overflow: hidden;
   user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
 }
 
 button {
   cursor: pointer;
   border: none;
   font-family: inherit;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:active {
+  transform: scale(0.96);
 }
 
 input[type="range"] {
   cursor: pointer;
+}
+
+/* Base Utility Classes for Redesign */
+.glass-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.hover-lift {
+  transition: all 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.15);
 }

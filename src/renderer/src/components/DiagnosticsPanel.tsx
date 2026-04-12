@@ -3,8 +3,9 @@ import type { DiagnosticsSnapshot, DiagnosticEntry } from '../types'
 
 const panelStyle: React.CSSProperties = {
   position: 'fixed',
-  right: '16px',
-  bottom: '16px',
+  top: '24px',
+  left: '50%',
+  transform: 'translateX(-50%)',
   zIndex: 9999,
   width: 'min(560px, calc(100vw - 32px))',
   maxHeight: '60vh',
@@ -55,7 +56,7 @@ export default function DiagnosticsPanel() {
 
   return (
     <div style={panelStyle}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
         <button
           onClick={() => setOpen(prev => !prev)}
           style={{
@@ -64,7 +65,8 @@ export default function DiagnosticsPanel() {
             borderRadius: '999px',
             padding: '8px 14px',
             fontSize: '12px',
-            fontWeight: 700
+            fontWeight: 700,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
           }}
         >
           {open ? 'Ocultar logs' : `Logs${errorCount > 0 ? ` (${errorCount})` : ''}`}

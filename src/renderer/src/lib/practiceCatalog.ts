@@ -25,8 +25,8 @@ export function formatPracticeNotes(notes: number[]) {
 }
 
 export const PRACTICE_KEYBOARD_WINDOW: KeyboardWindow = {
-  startPitch: 55,
-  endPitch: 79,
+  startPitch: 60,
+  endPitch: 84,
   targetPitches: [60, 64, 65, 67, 69, 70, 71, 75, 77],
   outOfRange: false
 }
