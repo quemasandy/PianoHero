@@ -129,10 +129,10 @@ export default function Piano({
   return (
     <div style={{
       position: 'relative',
-      height: compactView ? '180px' : '160px',
+      height: compactView ? '280px' : '260px',
       background: 'linear-gradient(180deg, #182030 0%, #0d121c 100%)',
-      borderRadius: '16px 16px 0 0',
-      padding: '16px 16px 16px 16px',
+      borderRadius: '24px 24px 0 0',
+      padding: '24px 24px 24px 24px',
       boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.06), inset 0 -6px 12px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.6)',
       border: '1px solid #2d3b5e',
       borderBottom: '4px solid #06090e',

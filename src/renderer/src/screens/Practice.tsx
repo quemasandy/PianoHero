@@ -651,20 +651,16 @@ export default function Practice() {
           onSwitchToChords={openChordSession}
         />
 
-        <div style={panelStyle}>
-          <div style={panelHeaderStyle}>
-            <div>
-              <h2 style={panelTitleStyle}>{exercise.name}</h2>
-              <p style={panelBodyStyle}>{exercise.description}</p>
-            </div>
-            <div style={metaBadgeStyle('#4cc9f0')}>
-              {session.status === 'complete'
-                ? 'Completada'
-                : `Paso ${Math.min(session.stepIndex + 1, exercise.noteSequence.length)} / ${exercise.noteSequence.length}`}
-            </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
+          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{exercise.name}</h2>
+          <div style={metaBadgeStyle('#4cc9f0')}>
+            {session.status === 'complete'
+              ? 'Completada'
+              : `Paso ${Math.min(session.stepIndex + 1, exercise.noteSequence.length)} / ${exercise.noteSequence.length}`}
           </div>
+        </div>
 
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '16px' }}>
             {exercise.noteSequence.map((pitch, index) => {
               const completed = index < session.stepIndex || session.status === 'complete'
               const current = index === session.stepIndex && session.status !== 'complete'
@@ -688,18 +684,6 @@ export default function Practice() {
               )
             })}
           </div>
-
-          <div style={practiceSummaryRowStyle}>
-            <span style={{ color: '#8be9fd' }}>
-              {session.expectedNotes[0]
-                ? `Toca ahora: ${pitchToPracticeLabel(session.expectedNotes[0])}`
-                : 'Escala terminada'}
-            </span>
-            <span style={{ color: '#8892a4' }}>
-              Registro: {exercise.startLabel}–{exercise.endLabel}
-            </span>
-          </div>
-        </div>
       </>
     )
   }
@@ -721,18 +705,14 @@ export default function Practice() {
           onSwitchToChords={openChordSession}
         />
 
-        <div style={panelStyle}>
-          <div style={panelHeaderStyle}>
-            <div>
-              <h2 style={panelTitleStyle}>{exercise.name}</h2>
-              <p style={panelBodyStyle}>{exercise.description}</p>
-            </div>
-            <div style={metaBadgeStyle('#f72585')}>
-              {session.status === 'complete'
-                ? 'Progresión completa'
-                : `Compás ${Math.min(session.stepIndex + 1, exercise.progression.length)} / ${exercise.progression.length}`}
-            </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
+          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{exercise.name}</h2>
+          <div style={metaBadgeStyle('#f72585')}>
+            {session.status === 'complete'
+              ? 'Progresión completa'
+              : `Compás ${Math.min(session.stepIndex + 1, exercise.progression.length)} / ${exercise.progression.length}`}
           </div>
+        </div>
 
           <div
             ref={carouselRef}
@@ -782,17 +762,7 @@ export default function Practice() {
             })}
           </div>
 
-          <div style={practiceSummaryRowStyle}>
-            <span style={{ color: '#ff7ab6' }}>
-              {session.status === 'complete'
-                ? 'Progresión terminada'
-                : `Toca: ${currentPrompt.chordName} · ${formatPracticeNotes(currentPrompt.targetNotes)}`}
-            </span>
-            <span style={{ color: '#8892a4' }}>
-              Tolerancia: {CHORD_SIMULTANEITY_MS} ms
-            </span>
-          </div>
-        </div>
+        {/* Resumen redundante removido para maximizar limpieza visual */}
       </>
     )
   }
@@ -849,15 +819,17 @@ export default function Practice() {
 
   return (
     <div style={rootStyle}>
-      <div style={titleBarStyle}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: '32px', color: 'var(--text)', fontWeight: 800, letterSpacing: '-0.02em', textShadow: '0 0 20px rgba(6, 182, 212, 0.4)' }}>PianoHero</h1>
-          <p style={{ margin: '6px 0 0', color: 'var(--slate-400)', fontSize: '15px' }}>
-            Practica las escalas y acordes clave de C Jam Blues.
-          </p>
-        </div>
+      <div style={view === 'practice_home' ? titleBarStyle : { ...titleBarStyle, padding: '16px 24px', borderBottom: 'none' }}>
+        {view === 'practice_home' && (
+          <div>
+            <h1 style={{ margin: 0, fontSize: '32px', color: 'var(--text)', fontWeight: 800, letterSpacing: '-0.02em', textShadow: '0 0 20px rgba(6, 182, 212, 0.4)' }}>PianoHero</h1>
+            <p style={{ margin: '6px 0 0', color: 'var(--slate-400)', fontSize: '15px' }}>
+              Practica las escalas y acordes clave de C Jam Blues.
+            </p>
+          </div>
+        )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end', width: view === 'practice_home' ? 'auto' : '100%' }}>
           {midiState.status !== 'connected' && (
             <button
               onClick={() => { void refreshMidiConnection('manual') }}
