@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import Piano from '../components/Piano'
+import SheetMusic from '../components/SheetMusic'
 import { useMidiDevice } from '../hooks/useMidiDevice'
+import { useBackingTrack } from '../hooks/useBackingTrack'
 import { logRendererEvent } from '../lib/diagnostics'
 import {
   CHORD_EXERCISES,
@@ -80,6 +82,8 @@ export default function Practice() {
   const [lastMidiNote, setLastMidiNote] = useState<number | null>(null)
   const [lastMidiActivityAt, setLastMidiActivityAt] = useState<number | null>(null)
 
+  const rhythm = useBackingTrack(120)
+
   const chordNoteTimesRef = useRef<Map<number, number>>(new Map())
   const lastScaleAdvanceRef = useRef<{ pitch: number; at: number } | null>(null)
   const lastMidiLogRef = useRef<{ pitch: number; at: number } | null>(null)
@@ -98,13 +102,22 @@ export default function Practice() {
 
   useEffect(() => {
     let timeoutId: number
+    
+    // Si la banda está encendida, forzamos musicalidad: evaluamos el compás siguiente en tiempo musical.
+    // Asumiremos 1 compás entero (4/4) para avanzar
+    const delayMs = rhythm.isPlaying ? (60000 / rhythm.bpm) * 4 : 1500
+
     if (view === 'scale_session' && scaleSession.status === 'complete') {
       timeoutId = window.setTimeout(() => {
         goToNextScaleExercise()
-      }, 1500)
+      }, delayMs)
+    } else if (view === 'chord_session' && chordSession.status === 'complete') {
+      timeoutId = window.setTimeout(() => {
+        goToNextChordExercise()
+      }, delayMs)
     }
     return () => { clearTimeout(timeoutId) }
-  }, [scaleSession.status, view])
+  }, [scaleSession.status, chordSession.status, view, rhythm.isPlaying, rhythm.bpm])
 
   const activeScaleExercise = SCALE_EXERCISES[scaleIndex]
   const activeChordExercise = CHORD_EXERCISES[chordIndex]
@@ -236,6 +249,26 @@ export default function Practice() {
     resetScaleSession(nextIndex)
     logRendererEvent('info', 'practice.scale.next', 'Moved to next scale exercise', {
       exerciseId: SCALE_EXERCISES[nextIndex].id
+    })
+  }
+
+  function goToPreviousChordExercise() {
+    const nextIndex = (chordIndex - 1 + CHORD_EXERCISES.length) % CHORD_EXERCISES.length
+    setChordIndex(nextIndex)
+    setView('chord_session')
+    resetChordSession(nextIndex)
+    logRendererEvent('info', 'practice.chord.previous', 'Moved to previous chord exercise', {
+      exerciseId: CHORD_EXERCISES[nextIndex].id
+    })
+  }
+
+  function goToNextChordExercise() {
+    const nextIndex = (chordIndex + 1) % CHORD_EXERCISES.length
+    setChordIndex(nextIndex)
+    setView('chord_session')
+    resetChordSession(nextIndex)
+    logRendererEvent('info', 'practice.chord.next', 'Moved to next chord exercise', {
+      exerciseId: CHORD_EXERCISES[nextIndex].id
     })
   }
 
@@ -706,11 +739,11 @@ export default function Practice() {
         <SessionControls
           mode="chords"
           onBack={openHome}
-          onPrevious={() => {}}
-          onNext={() => {}}
+          onPrevious={goToPreviousChordExercise}
+          onNext={goToNextChordExercise}
           onReset={restartActiveSession}
-          nextDisabled={true}
-          previousDisabled={true}
+          nextDisabled={false}
+          previousDisabled={false}
           onSwitchToScales={openScaleSession}
           onSwitchToChords={openChordSession}
         />
@@ -761,11 +794,11 @@ export default function Practice() {
                   <div style={{ color: current ? 'var(--neon-pink)' : '#8892a4', fontSize: '13px', marginBottom: '8px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>
                     Compás {prompt.barIndex + 1}
                   </div>
-                  <div style={{ color: 'var(--text)', fontSize: '36px', fontWeight: 800, textShadow: current ? '0 0 20px rgba(255,255,255,0.4)' : 'none' }}>
+
+                  <SheetMusic notes={prompt.targetNotes} active={current || completed} />
+
+                  <div style={{ color: 'var(--text)', fontSize: '36px', fontWeight: 800, textShadow: current ? '0 0 20px rgba(255,255,255,0.4)' : 'none', marginTop: '-10px', textAlign: 'center' }}>
                     {prompt.chordName}
-                  </div>
-                  <div style={{ color: 'var(--slate-300)', fontSize: '15px', marginTop: '8px' }}>
-                    {formatPracticeNotes(prompt.targetNotes)}
                   </div>
                 </div>
               )
@@ -848,10 +881,38 @@ export default function Practice() {
               Reconectar MIDI
             </button>
           )}
-          <span style={{ color: '#ffd166', fontSize: '12px', fontWeight: 700 }}>
-            Audio interno: OFF · Usa GarageBand
-          </span>
-          <span style={{ color: '#4cc9f0', fontSize: '12px', fontWeight: 700 }}>
+          
+          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: '12px', padding: '4px 12px', gap: '12px', border: '1px solid var(--border-glass)' }}>
+            <span style={{ color: 'var(--slate-300)', fontSize: '13px', fontWeight: 600 }}>Ensamble Jazz:</span>
+            
+            <button
+              onClick={() => rhythm.togglePlay()}
+              style={{
+                ...buttonStyle(rhythm.isPlaying ? 'var(--neon-pink)' : '#06d6a0', '#000'),
+                padding: '4px 12px',
+                fontSize: '12px',
+                minWidth: '70px'
+              }}
+            >
+              {rhythm.isPlaying ? 'STOP' : 'PLAY'}
+            </button>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input 
+                type="range" 
+                min="60" 
+                max="240" 
+                value={rhythm.bpm}
+                onChange={(e) => rhythm.updateBpm(Number(e.target.value))}
+                style={{ width: '80px', accentColor: '#4cc9f0' }}
+              />
+              <span style={{ color: '#4cc9f0', fontSize: '12px', fontWeight: 800, width: '45px' }}>
+                {rhythm.bpm} BPM
+              </span>
+            </div>
+          </div>
+
+          <span style={{ color: '#4cc9f0', fontSize: '12px', fontWeight: 700, marginLeft: '8px' }}>
             {RANGE_STATUS_LABEL}
           </span>
           <span style={{ color: midiStatusColor, fontSize: '12px', fontWeight: 700 }}>

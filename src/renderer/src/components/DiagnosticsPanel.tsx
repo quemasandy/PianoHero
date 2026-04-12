@@ -3,16 +3,15 @@ import type { DiagnosticsSnapshot, DiagnosticEntry } from '../types'
 
 const panelStyle: React.CSSProperties = {
   position: 'fixed',
-  top: '24px',
-  left: '50%',
-  transform: 'translateX(-50%)',
+  bottom: '24px',
+  right: '24px',
   zIndex: 9999,
-  width: 'min(560px, calc(100vw - 32px))',
-  maxHeight: '60vh',
   display: 'flex',
-  flexDirection: 'column',
-  gap: '8px',
-  WebkitAppRegion: 'no-drag' as never
+  flexDirection: 'column-reverse',
+  alignItems: 'flex-end',
+  gap: '12px',
+  WebkitAppRegion: 'no-drag' as never,
+  maxWidth: 'min(560px, calc(100vw - 32px))'
 }
 
 const emptySnapshot: DiagnosticsSnapshot = {
@@ -56,20 +55,31 @@ export default function DiagnosticsPanel() {
 
   return (
     <div style={panelStyle}>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
         <button
           onClick={() => setOpen(prev => !prev)}
+          title="Logs del Sistema"
           style={{
-            background: errorCount > 0 ? '#f72585' : '#223',
-            color: '#fff',
-            borderRadius: '999px',
-            padding: '8px 14px',
+            background: errorCount > 0 ? 'rgba(247, 37, 133, 0.8)' : 'rgba(255, 255, 255, 0.05)',
+            color: errorCount > 0 ? '#fff' : 'rgba(255,255,255,0.3)',
+            borderRadius: '50%',
+            width: '32px',
+            height: '32px',
+            padding: 0,
             fontSize: '12px',
             fontWeight: 700,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+            border: '1px solid rgba(255,255,255,0.05)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.3s ease-in-out',
+            opacity: open ? 1 : 0.5
           }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = open ? '1' : '0.5'}
         >
-          {open ? 'Ocultar logs' : `Logs${errorCount > 0 ? ` (${errorCount})` : ''}`}
+          {errorCount > 0 ? '!' : '⚙'}
         </button>
       </div>
 

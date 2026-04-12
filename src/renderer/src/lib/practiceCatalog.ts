@@ -55,6 +55,22 @@ export const SCALE_EXERCISES: ScaleExerciseDefinition[] = [
     noteSequence: createScaleSequence([60, 62, 64, 67, 69, 72]),
     startLabel: 'C4',
     endLabel: 'C5'
+  },
+  {
+    id: 'lick-bebop-c-1',
+    name: 'Lick de Bebop sobre II-V-I (En Do)',
+    description: 'Fraseo idiomático estilo Charlie Parker sobre Dm7 -> G7 -> Cmaj7',
+    noteSequence: [62, 65, 67, 68, 69, 72, 71, 67, 65, 62, 64, 60],
+    startLabel: 'D4',
+    endLabel: 'C4'
+  },
+  {
+    id: 'lick-bebop-f-1',
+    name: 'Lick de Bebop clásico (En Fa)',
+    description: 'Línea de corcheas ininterrumpida que descansa en la tercera mayor de la tónica.',
+    noteSequence: [67, 69, 68, 67, 65, 64, 63, 62, 60, 65, 61, 62],
+    startLabel: 'G4',
+    endLabel: 'D4'
   }
 ]
 
@@ -76,6 +92,39 @@ export const CHORD_EXERCISES: ChordExerciseDefinition[] = [
       createPrompt(9, 'F7', [65, 69, 75]),
       createPrompt(10, 'C7', [60, 64, 70]),
       createPrompt(11, 'G7', [67, 71, 77])
+    ]
+  },
+  {
+    id: 'ii-v-i-c-maj',
+    name: 'Cadencia II-V-I (Do Mayor)',
+    description: 'La progresión fundamental del Jazz en la tonalidad de Do Mayor usando Shell Voicings con conducción de voces perfecta.',
+    progression: [
+      createPrompt(0, 'Dm7', [62, 65, 72]),
+      createPrompt(1, 'G7', [67, 71, 77]),
+      createPrompt(2, 'Cmaj7', [60, 64, 71]),
+      createPrompt(3, 'Cmaj7', [60, 64, 71])
+    ]
+  },
+  {
+    id: 'ii-v-i-f-maj',
+    name: 'Cadencia II-V-I (Fa Mayor)',
+    description: 'La progresión fundamental del Jazz en la tonalidad de Fa Mayor usando Shell Voicings.',
+    progression: [
+      createPrompt(0, 'Gm7', [67, 70, 77]),
+      createPrompt(1, 'C7', [60, 64, 70]),
+      createPrompt(2, 'Fmaj7', [65, 69, 76]),
+      createPrompt(3, 'Fmaj7', [65, 69, 76])
+    ]
+  },
+  {
+    id: 'ii-v-i-bb-maj',
+    name: 'Cadencia II-V-I (Si bemol Mayor)',
+    description: 'La progresión fundamental del Jazz en la tonalidad de Bb Mayor.',
+    progression: [
+      createPrompt(0, 'Cm7', [60, 63, 70]),
+      createPrompt(1, 'F7', [65, 69, 75]),
+      createPrompt(2, 'Bbmaj7', [58, 62, 69]),
+      createPrompt(3, 'Bbmaj7', [58, 62, 69])
     ]
   }
 ]
