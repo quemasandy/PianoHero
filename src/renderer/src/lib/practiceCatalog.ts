@@ -71,6 +71,54 @@ export const SCALE_EXERCISES: ScaleExerciseDefinition[] = [
     noteSequence: [67, 69, 68, 67, 65, 64, 63, 62, 60, 65, 61, 62],
     startLabel: 'G4',
     endLabel: 'D4'
+  },
+  {
+    id: 'd-dorian',
+    name: 'D Dórico',
+    description: 'Modo Dórico en Re (Escala fundamental para acordes m7). Una octava.',
+    noteSequence: createScaleSequence([62, 64, 65, 67, 69, 71, 72, 74]),
+    startLabel: 'D4',
+    endLabel: 'D5'
+  },
+  {
+    id: 'g-mixolydian',
+    name: 'G Mixolidio',
+    description: 'Modo Mixolidio en Sol (Escala fundamental para acordes dominantes). Una octava.',
+    noteSequence: createScaleSequence([67, 69, 71, 72, 74, 76, 77, 79]),
+    startLabel: 'G4',
+    endLabel: 'G5'
+  },
+  {
+    id: 'c-lydian',
+    name: 'C Lidio',
+    description: 'Modo Lidio en Do (El modo preferido en el jazz para acordes maj7, contiene #4).',
+    noteSequence: createScaleSequence([60, 62, 64, 66, 67, 69, 71, 72]),
+    startLabel: 'C4',
+    endLabel: 'C5'
+  },
+  {
+    id: 'g-altered',
+    name: 'G Alterada (Super Locria)',
+    description: 'Escala Alterada en Sol (Genera máxima tensión sobre el acorde V para resolver al I).',
+    noteSequence: createScaleSequence([67, 68, 70, 71, 73, 75, 77, 79]),
+    startLabel: 'G4',
+    endLabel: 'G5'
+  },
+  {
+    id: 'c-diminished-hw',
+    name: 'C Escala Disminuida (Medio Tono / Tono)',
+    description: 'Escala simétrica para crear tensión y resolución cromática sobre dominantes alterados.',
+    noteSequence: createScaleSequence([60, 61, 63, 64, 66, 67, 69, 70, 72]),
+    startLabel: 'C4',
+    endLabel: 'C5'
+  },
+  {
+    id: 'c-major-bebop',
+    name: 'C Bebop Mayor',
+    description: 'Escala mayor tradicional con un paso cromático (b6) clave del Fraseo Bebop.',
+    noteSequence: createScaleSequence([60, 62, 64, 65, 67, 68, 69, 71, 72]),
+    startLabel: 'C4',
+    endLabel: 'C5'
   }
 ]
 
@@ -125,6 +173,50 @@ export const CHORD_EXERCISES: ChordExerciseDefinition[] = [
       createPrompt(1, 'F7', [65, 69, 75]),
       createPrompt(2, 'Bbmaj7', [58, 62, 69]),
       createPrompt(3, 'Bbmaj7', [58, 62, 69])
+    ]
+  },
+  {
+    id: 'ii-v-i-c-minor',
+    name: 'Cadencia II-V-I (Do Menor)',
+    description: 'La cadencia menor más común. Incluye el acorde semidisminuido y el dominante alterado.',
+    progression: [
+      createPrompt(0, 'Dm7b5', [62, 65, 68, 72]),
+      createPrompt(1, 'G7alt', [67, 71, 75, 80]),
+      createPrompt(2, 'Cm6', [60, 63, 67, 69]),
+      createPrompt(3, 'Cm6', [60, 63, 67, 69])
+    ]
+  },
+  {
+    id: 'turnaround-c-maj',
+    name: 'Turnaround Clásico (Do Mayor)',
+    description: 'Progresión I - VI - II - V. Utilizada para repetir la métrica.',
+    progression: [
+      createPrompt(0, 'Cmaj7', [60, 64, 71]),
+      createPrompt(1, 'Am7', [69, 72, 79]),
+      createPrompt(2, 'Dm7', [62, 65, 72]),
+      createPrompt(3, 'G7', [67, 71, 77])
+    ]
+  },
+  {
+    id: 'rhythm-changes-bb',
+    name: 'Rhythm Changes 4. Compases (Bb)',
+    description: 'Los primeros 4 compases de ritmo del mítico “I Got Rhythm”.',
+    progression: [
+      createPrompt(0, 'Bbmaj7', [70, 74, 81]),
+      createPrompt(1, 'G7', [67, 71, 77]),
+      createPrompt(2, 'Cm7', [60, 63, 70]),
+      createPrompt(3, 'F7', [65, 69, 75])
+    ]
+  },
+  {
+    id: 'rootless-ii-v-i-c-maj',
+    name: 'Voicings Rootless II-V-I (Do Mayor)',
+    description: 'Acordes modernos (Tipo A) usando las tensiones avanzadas 9, y 13 en la mano derecha.',
+    progression: [
+      createPrompt(0, 'Dm9', [65, 69, 72, 76]),
+      createPrompt(1, 'G13', [65, 69, 71, 76]),
+      createPrompt(2, 'Cmaj9', [64, 67, 71, 74]),
+      createPrompt(3, 'Cmaj9', [64, 67, 71, 74])
     ]
   }
 ]
