@@ -33,7 +33,7 @@ function getWindowForPitches(pitches: number[]): { startPitch: number; endPitch:
 const WORLDDE_DEVICE_PATTERN = /worldde|easykey/i
 
 export default function SongPractice() {
-  const [song] = useState<Song>(SONG_CATALOG[0]) // Play first song
+  const [song, setSong] = useState<Song>(SONG_CATALOG[0]) // Play first song
   const [state, setState] = useState<PracticeState>({
     measureIndex: 0,
     eventIndex: 0,
@@ -229,7 +229,32 @@ export default function SongPractice() {
           </button>
           <div>
             <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: '#fff', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>Práctica de Canción</h1>
-            <span style={{ color: '#4cc9f0', fontWeight: 600, fontSize: '15px' }}>{song.title}</span>
+            <select 
+              value={song.id} 
+              onChange={(e) => {
+                const s = SONG_CATALOG.find(s => s.id === e.target.value)
+                if (s) {
+                  setSong(s)
+                  setState(prev => ({ ...prev, measureIndex: 0, eventIndex: 0, pressedNotes: new Set(), mousePressedNotes: new Set() }))
+                }
+              }}
+              style={{
+                background: 'rgba(0,0,0,0.4)',
+                color: '#4cc9f0',
+                border: '1px solid rgba(76, 201, 240, 0.3)',
+                padding: '4px 8px',
+                borderRadius: '8px',
+                fontSize: '15px',
+                fontWeight: 600,
+                outline: 'none',
+                cursor: 'pointer',
+                marginTop: '4px'
+              }}
+            >
+              {SONG_CATALOG.map(s => (
+                <option key={s.id} value={s.id} style={{ color: '#000' }}>{s.title}</option>
+              ))}
+            </select>
           </div>
         </div>
         
