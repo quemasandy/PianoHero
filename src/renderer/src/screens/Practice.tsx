@@ -638,8 +638,8 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
           }}>
             PianoHero
           </h1>
-          <p style={{ margin: '16px 0 0', color: '#c8d1e8', fontSize: '22px', fontWeight: 500, maxWidth: '600px', lineHeight: 1.4 }}>
-            Practica las escalas y acordes clave de C Jam Blues.
+          <p style={{ margin: '16px 0 0', color: '#c8d1e8', fontSize: '22px', fontWeight: 500, lineHeight: 1.4, whiteSpace: 'nowrap' }}>
+            Tu estudio interactivo. Domina el piano y siente la música.
           </p>
         </div>
 
