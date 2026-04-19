@@ -617,9 +617,11 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
         <div style={{ padding: '32px 0 48px 0', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <h1 style={{ 
             margin: 0, 
+            padding: '0 20px',
             fontSize: '64px', 
             fontWeight: 900, 
             letterSpacing: '-0.04em', 
+            lineHeight: 1.2,
             background: 'linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -659,47 +661,43 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
           />
         </div>
 
-        <div style={panelStyle}>
-          <div style={panelHeaderStyle}>
-            <div>
-              <h2 style={panelTitleStyle}>Prueba tu teclado MIDI</h2>
-              <p style={panelBodyStyle}>
-                Esta vista ya escucha el teclado aunque todavía no hayas entrado en un ejercicio.
-              </p>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+          <div style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: '12px', 
+            padding: '8px 16px', 
+            background: 'rgba(255,255,255,0.03)', 
+            border: '1px solid var(--border-glass)', 
+            borderRadius: '999px',
+            fontSize: '13px',
+            color: '#8892a4',
+            backdropFilter: 'blur(10px)',
+            transition: 'all 0.2s'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', width: '100px' }}>
+              <div style={{ 
+                width: 8, 
+                height: 8, 
+                borderRadius: '50%', 
+                background: midiState.status === 'connected' ? '#06d6a0' : '#ff6b81',
+                boxShadow: `0 0 8px ${midiState.status === 'connected' ? 'rgba(6,214,160,0.5)' : 'rgba(255,107,129,0.5)'}`
+              }} />
+              <span style={{ fontWeight: 600 }}>{midiState.status === 'connected' ? 'MIDI Listo' : 'MIDI Inactivo'}</span>
             </div>
-            <div style={metaBadgeStyle(midiStatusColor)}>
-              {midiMonitorBadgeLabel}
+            
+            <div style={{ width: 1, height: 12, background: 'rgba(255,255,255,0.15)' }} />
+            
+            <div style={{ width: '70px', textAlign: 'center', color: lastMidiLabel ? '#8be9fd' : '#8892a4', fontWeight: lastMidiLabel ? 700 : 500 }}>
+              {lastMidiLabel ? `Nota: ${lastMidiLabel}` : 'Nota: --'}
+            </div>
+
+            <div style={{ width: 1, height: 12, background: 'rgba(255,255,255,0.15)' }} />
+            
+            <div style={{ width: '70px', textAlign: 'center', fontWeight: monitorPressedNotes.size > 0 ? 600 : 500, color: monitorPressedNotes.size > 0 ? '#fff' : '#8892a4' }}>
+              {monitorPressedNotes.size} activa{monitorPressedNotes.size !== 1 ? 's' : ''}
             </div>
           </div>
-
-          <div style={practiceSummaryRowStyle}>
-            <span style={{ color: '#8be9fd', fontWeight: 700 }}>
-              {lastMidiLabel ? `Entrando: ${lastMidiLabel}` : 'Toca cualquier tecla de tu periférico'}
-            </span>
-            <span style={{ color: '#8892a4' }}>
-              {monitorPressedNotes.size > 0
-                ? `${monitorPressedNotes.size} tecla(s) activas`
-                : lastMidiActivityAt
-                  ? `Última actividad: ${new Date(lastMidiActivityAt).toLocaleTimeString()}`
-                  : 'Sin actividad todavía'}
-            </span>
-          </div>
-
-          <div style={keyboardLegendStyle}>
-            <LegendPill label="Detectada" background="#06d6a0" color="#ffffff" />
-            <LegendPill label="Inactiva" background="rgba(255,255,255,0.08)" color="#c8d1e8" />
-          </div>
-
-          {midiState.status !== 'connected' && (
-            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-              <button
-                onClick={() => { void refreshMidiConnection('manual') }}
-                style={buttonStyle('#4cc9f0', '#001219')}
-              >
-                Reconectar MIDI
-              </button>
-            </div>
-          )}
         </div>
       </>
     )
@@ -938,7 +936,7 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
         </div>
       </div>
 
-      <div style={{ padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: 0, overflowY: 'auto' }}>
+      <div style={{ padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: '24px', minHeight: 0, overflowY: 'auto' }}>
         {view === 'practice_home'
           ? renderHome()
           : (
@@ -954,7 +952,7 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
         {renderKeyboardGuide()}
       </div>
 
-      <div style={{ padding: '0 24px 0 24px', flexShrink: 0 }}>
+      <div style={{ padding: '12px 24px 24px 24px', flexShrink: 0 }}>
         <Piano
           activeNotes={pianoActiveNotes}
           hintNotes={view === 'practice_home' ? new Set() : targetNotes}
