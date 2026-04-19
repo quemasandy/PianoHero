@@ -179,6 +179,20 @@ export default function SongPractice() {
     handleNoteAction(pitch, 'midi', isOn)
   }, [handleNoteAction]))
 
+  useEffect(() => {
+    if (state.measureIndex >= song.measures.length) {
+      const timer = setTimeout(() => {
+        setState({
+          measureIndex: 0,
+          eventIndex: 0,
+          pressedNotes: new Set(),
+          mousePressedNotes: new Set()
+        })
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [state.measureIndex, song.measures.length])
+
   const hintNotes = new Set(expectedPitches)
 
   return (
