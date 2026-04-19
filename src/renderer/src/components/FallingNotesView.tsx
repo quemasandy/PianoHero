@@ -81,6 +81,28 @@ export default function FallingNotesView({
         preserveAspectRatio="none"
         style={{ width: '100%', height: '100%', display: 'block' }}
       >
+        <defs>
+          {/* Gradient for standard unplayed notes (Trail effect: faint top, solid bottom) */}
+          <linearGradient id="neonBlue" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#4cc9f0" stopOpacity="0.1" />
+            <stop offset="80%" stopColor="#4cc9f0" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#8be9fd" stopOpacity="1" />
+          </linearGradient>
+          {/* Gradient for active/target notes */}
+          <linearGradient id="neonPink" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#f72585" stopOpacity="0.2" />
+            <stop offset="70%" stopColor="#f72585" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#ffb3c6" stopOpacity="1" />
+          </linearGradient>
+          {/* Subtle glow filter */}
+          <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="0.4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
         <g
           style={{
             transform: `translateY(${currentTick * TICK_HEIGHT}px)`,
@@ -110,16 +132,16 @@ export default function FallingNotesView({
               if (!bounds) return null
 
               return (
-                <rect
-                  key={`${ev.measureIndex}-${ev.eventIndex}-${pitch}`}
-                  x={bounds.x + 0.1}
-                  y={yTopAbsolute}
-                  width={bounds.width - 0.2}
-                  height={noteHeight}
-                  rx={0.2}
-                  fill={isActive ? 'var(--neon-pink, #f72585)' : isPlayed ? 'rgba(255,255,255,0.1)' : '#4cc9f0'}
-                  opacity={isActive ? 1 : isPlayed ? 0.4 : 0.8}
-                />
+                  <rect
+                    key={`${ev.measureIndex}-${ev.eventIndex}-${pitch}`}
+                    x={bounds.x + 0.15}
+                    y={yTopAbsolute}
+                    width={bounds.width - 0.3}
+                    height={noteHeight}
+                    rx={0.25}
+                    fill={isActive ? 'url(#neonPink)' : isPlayed ? 'rgba(255,255,255,0.05)' : 'url(#neonBlue)'}
+                    opacity={isActive ? 1 : isPlayed ? 0.3 : 0.95}
+                  />
               )
             })
           })}
@@ -128,9 +150,9 @@ export default function FallingNotesView({
         {/* Target line inside the SVG, aligned with the top edge of the piano keys (does NOT transform with the group) */}
         <line
           x1={viewBounds.x - 0.4}
-          y1={VIEW_HEIGHT}
+          y1={VIEW_HEIGHT - 0.8}
           x2={viewBounds.x + viewBounds.width + 0.4}
-          y2={VIEW_HEIGHT}
+          y2={VIEW_HEIGHT - 0.8}
           stroke="rgba(76, 201, 240, 0.85)"
           strokeWidth={1.2}
           vectorEffect="non-scaling-stroke"

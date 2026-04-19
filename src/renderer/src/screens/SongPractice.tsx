@@ -272,7 +272,7 @@ export default function SongPractice({
       </AppNavigation>
 
       {/* Sheet Music Section */}
-      <div style={{ flexShrink: 0, height: '180px', marginBottom: '16px', padding: '0 24px' }}>
+      <div style={{ flexShrink: 0, height: '220px', marginBottom: '8px', padding: '0 24px' }}>
         {currentMeasure ? (
            <SongSheetMusic measure={currentMeasure} currentEventIndex={state.eventIndex} />
         ) : (

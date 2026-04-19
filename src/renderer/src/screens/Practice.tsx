@@ -119,11 +119,11 @@ export default function Practice({
 
     if (view === 'scale_session' && scaleSession.status === 'complete') {
       timeoutId = window.setTimeout(() => {
-        goToNextScaleExercise()
+        resetScaleSession(scaleIndex)
       }, delayMs)
     } else if (view === 'chord_session' && chordSession.status === 'complete') {
       timeoutId = window.setTimeout(() => {
-        goToNextChordExercise()
+        resetChordSession(chordIndex)
       }, delayMs)
     }
     return () => { clearTimeout(timeoutId) }

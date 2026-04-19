@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { Renderer, Stave, StaveNote, Accidental, Formatter, Voice } from 'vexflow'
+import { Renderer, Stave, StaveNote, Accidental, Formatter, Voice, Dot } from 'vexflow'
 import { SongMeasure } from '../lib/songCatalog'
 
 interface SongSheetMusicProps {
@@ -18,7 +18,7 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
     containerRef.current.innerHTML = ''
 
     const width = 600
-    const height = 180
+    const height = 220
     const renderer = new Renderer(containerRef.current, Renderer.Backends.SVG)
     renderer.resize(width, height)
     const context = renderer.getContext()
@@ -26,7 +26,8 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
 
     context.setFillStyle('#cbd5e1')
     context.setStrokeStyle('#cbd5e1')
-    const stave = new Stave(10, 20, width / 1.5 - 20)
+    // El pentagrama se dibuja más abajo (y=45) para centrarlo y dejar espacio a líneas adicionales
+    const stave = new Stave(10, 45, width / 1.5 - 20)
     stave.addClef(measure.clef)
     stave.setContext(context).draw()
 
@@ -42,11 +43,23 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
         })
       }
 
+      let durStr = ev.durationNotation
+      const hasDot = durStr.includes('.')
+      if (hasDot) {
+        durStr = durStr.replace('.', '')
+      }
+
       const staveNote = new StaveNote({
         clef: measure.clef,
         keys: keys,
-        duration: ev.pitches.length === 0 ? ev.durationNotation + 'r' : ev.durationNotation
+        duration: ev.pitches.length === 0 ? durStr + 'r' : durStr
       })
+
+      if (hasDot) {
+        keys.forEach((_, idx) => {
+          staveNote.addModifier(new Dot(), idx)
+        })
+      }
 
       // Add accidentals
       if (ev.pitches.length > 0) {
@@ -64,7 +77,8 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
       const isPlayed = i < currentEventIndex
 
       if (isCurrent) {
-        staveNote.setStyle({ fillStyle: "var(--neon-pink, #f72585)", strokeStyle: "#ffffff" })
+        // Enfoque anatómico: Brillamos la propia cabeza de la nota intensificando el color
+        staveNote.setStyle({ fillStyle: "var(--neon-pink, #f72585)", strokeStyle: "var(--neon-pink, #f72585)", shadowColor: "#f72585", shadowBlur: 10 })
       } else if (isPlayed) {
          staveNote.setStyle({ fillStyle: "#3a465c", strokeStyle: "#3a465c" })
       } else {
@@ -95,15 +109,16 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
         const scaledGroup = svgEl?.lastElementChild as SVGGElement | null
         if (bbox && scaledGroup && scaledGroup.tagName.toLowerCase() === 'g') {
           const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-          rect.setAttribute('x', String(bbox.x - 6))
-          rect.setAttribute('y', String(bbox.y - 10))
-          rect.setAttribute('width', String(bbox.w + 12))
-          rect.setAttribute('height', String(bbox.h + 20))
-          rect.setAttribute('rx', '6')
-          rect.setAttribute('fill', 'rgba(247, 37, 133, 0.18)')
-          rect.setAttribute('stroke', 'rgba(247, 37, 133, 0.55)')
-          rect.setAttribute('stroke-width', '1')
-          rect.setAttribute('filter', 'drop-shadow(0 0 6px rgba(247, 37, 133, 0.55))')
+          rect.setAttribute('x', String(bbox.x - 12))
+          rect.setAttribute('y', String(bbox.y - 8))
+          rect.setAttribute('width', String(bbox.w + 24))
+          rect.setAttribute('height', String(bbox.h + 16))
+          rect.setAttribute('rx', '12') // Curvas pronunciadas tipo píldora
+          rect.setAttribute('fill', 'rgba(247, 37, 133, 0.12)')
+          // Sin bordes rectos (stroke='none')
+          rect.setAttribute('stroke', 'none')
+          // Glow intensificado simulando neon
+          rect.setAttribute('filter', 'drop-shadow(0 0 8px rgba(247, 37, 133, 0.8))')
           scaledGroup.insertBefore(rect, scaledGroup.firstChild)
         }
       } catch {
