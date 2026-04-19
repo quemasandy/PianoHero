@@ -726,10 +726,16 @@ export default function Practice({
   function renderScaleSession(exercise: ScaleExerciseDefinition, session: PracticeSessionState) {
     return (
       <>
-
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px', flexWrap: 'wrap', gap: '16px' }}>
           <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{exercise.name}</h2>
+          
+          {/* Controles de Ejercicio Reubicados Abajo */}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button onClick={goToPreviousScaleExercise} disabled={false} style={buttonStyle('#334', '#fff', false)}>← Ejercicio</button>
+            <button onClick={restartActiveSession} style={buttonStyle('#4cc9f0', '#001219')}>Reiniciar</button>
+            <button onClick={goToNextScaleExercise} disabled={false} style={buttonStyle('#334', '#fff', false)}>Ejercicio →</button>
+          </div>
+
           <div style={metaBadgeStyle('#4cc9f0')}>
             {session.status === 'complete'
               ? 'Completada'
@@ -771,10 +777,16 @@ export default function Practice({
 
     return (
       <>
-
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px', flexWrap: 'wrap', gap: '16px' }}>
           <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{exercise.name}</h2>
+          
+          {/* Controles de Ejercicio Reubicados Abajo */}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button onClick={goToPreviousChordExercise} disabled={isFirst} style={buttonStyle('#334', '#fff', isFirst)}>← Ejercicio</button>
+            <button onClick={restartActiveSession} style={buttonStyle('#4cc9f0', '#001219')}>Reiniciar</button>
+            <button onClick={goToNextChordExercise} disabled={isLast} style={buttonStyle('#334', '#fff', isLast)}>Ejercicio →</button>
+          </div>
+
           <div style={metaBadgeStyle('#f72585')}>
             {session.status === 'complete'
               ? 'Progresión completa'
@@ -885,6 +897,58 @@ export default function Practice({
     return null
   }
 
+  function renderGlobalStatusControls() {
+    return (
+      <>
+        {midiState.status !== 'connected' && (
+          <button
+            onClick={() => { void refreshMidiConnection('manual') }}
+            style={buttonStyle('#223a5e', '#8be9fd')}
+          >
+            Reconectar MIDI
+          </button>
+        )}
+        
+        <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: '12px', padding: '4px 12px', gap: '12px', border: '1px solid var(--border-glass)' }}>
+          <span style={{ color: 'var(--slate-300)', fontSize: '13px', fontWeight: 600 }}>Ensamble Jazz:</span>
+          
+          <button
+            onClick={() => rhythm.togglePlay()}
+            style={{
+              ...buttonStyle(rhythm.isPlaying ? 'var(--neon-pink)' : '#06d6a0', '#000'),
+              padding: '4px 12px',
+              fontSize: '12px',
+              minWidth: '70px'
+            }}
+          >
+            {rhythm.isPlaying ? 'STOP' : 'PLAY'}
+          </button>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <input 
+              type="range" 
+              min="60" 
+              max="240" 
+              value={rhythm.bpm}
+              onChange={(e) => rhythm.updateBpm(Number(e.target.value))}
+              style={{ width: '80px', accentColor: '#4cc9f0' }}
+            />
+            <span style={{ color: '#4cc9f0', fontSize: '12px', fontWeight: 800, width: '45px' }}>
+              {rhythm.bpm} BPM
+            </span>
+          </div>
+        </div>
+
+        <span style={{ color: '#4cc9f0', fontSize: '12px', fontWeight: 700, marginLeft: '8px' }}>
+          {RANGE_STATUS_LABEL}
+        </span>
+        <span style={{ color: midiStatusColor, fontSize: '12px', fontWeight: 700 }}>
+          {midiStatusLabel}
+        </span>
+      </>
+    )
+  }
+
   return (
     <div style={rootStyle}>
       
@@ -895,73 +959,18 @@ export default function Practice({
           onNavigateHome={openHome}
           onNavigateMode={onNavigateMode}
         >
-          {view === 'scale_session' && (
-            <>
-              <button onClick={goToPreviousScaleExercise} disabled={false} style={buttonStyle('#334', '#fff', false)}>← Ejercicio</button>
-              <button onClick={restartActiveSession} style={buttonStyle('#4cc9f0', '#001219')}>Reiniciar</button>
-              <button onClick={goToNextScaleExercise} disabled={false} style={buttonStyle('#334', '#fff', false)}>Ejercicio →</button>
-            </>
-          )}
-          {view === 'chord_session' && (
-            <>
-              <button onClick={goToPreviousChordExercise} disabled={chordIndex === 0} style={buttonStyle('#334', '#fff', chordIndex === 0)}>← Ejercicio</button>
-              <button onClick={restartActiveSession} style={buttonStyle('#4cc9f0', '#001219')}>Reiniciar</button>
-              <button onClick={goToNextChordExercise} disabled={chordIndex === CHORD_EXERCISES.length - 1} style={buttonStyle('#334', '#fff', chordIndex === CHORD_EXERCISES.length - 1)}>Ejercicio →</button>
-            </>
-          )}
+          {renderGlobalStatusControls()}
         </AppNavigation>
       )}
 
       {/* Legacy status bar shifts layout when in Home vs nested modes */}
-      <div style={{ ...titleBarStyle, padding: view === 'practice_home' ? '24px 40px 8px 80px' : '0 24px 8px 24px', borderBottom: 'none' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end', width: '100%' }}>
-          {midiState.status !== 'connected' && (
-            <button
-              onClick={() => { void refreshMidiConnection('manual') }}
-              style={buttonStyle('#223a5e', '#8be9fd')}
-            >
-              Reconectar MIDI
-            </button>
-          )}
-          
-          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: '12px', padding: '4px 12px', gap: '12px', border: '1px solid var(--border-glass)' }}>
-            <span style={{ color: 'var(--slate-300)', fontSize: '13px', fontWeight: 600 }}>Ensamble Jazz:</span>
-            
-            <button
-              onClick={() => rhythm.togglePlay()}
-              style={{
-                ...buttonStyle(rhythm.isPlaying ? 'var(--neon-pink)' : '#06d6a0', '#000'),
-                padding: '4px 12px',
-                fontSize: '12px',
-                minWidth: '70px'
-              }}
-            >
-              {rhythm.isPlaying ? 'STOP' : 'PLAY'}
-            </button>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <input 
-                type="range" 
-                min="60" 
-                max="240" 
-                value={rhythm.bpm}
-                onChange={(e) => rhythm.updateBpm(Number(e.target.value))}
-                style={{ width: '80px', accentColor: '#4cc9f0' }}
-              />
-              <span style={{ color: '#4cc9f0', fontSize: '12px', fontWeight: 800, width: '45px' }}>
-                {rhythm.bpm} BPM
-              </span>
-            </div>
+      {view === 'practice_home' && (
+        <div style={{ ...titleBarStyle, padding: '24px 40px 8px 80px', borderBottom: 'none' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end', width: '100%' }}>
+            {renderGlobalStatusControls()}
           </div>
-
-          <span style={{ color: '#4cc9f0', fontSize: '12px', fontWeight: 700, marginLeft: '8px' }}>
-            {RANGE_STATUS_LABEL}
-          </span>
-          <span style={{ color: midiStatusColor, fontSize: '12px', fontWeight: 700 }}>
-            {midiStatusLabel}
-          </span>
         </div>
-      </div>
+      )}
 
       <div style={{ padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: '24px', minHeight: 0, overflowY: 'auto' }}>
         {view === 'practice_home'
