@@ -384,13 +384,15 @@ export default function Piano({
           ? visibleWhiteKeys.map(key => (
             <text
               key={`label-${key.pitch}`}
-              x={key.whiteIndex + 0.5}
-              y={KEY_TOP + WHITE_KEY_HEIGHT - 0.55}
+              x={0}
+              y={0}
               textAnchor="middle"
-              fontSize={0.38}
-              fontWeight={hintNotes.has(key.pitch) ? 800 : 600}
+              fontSize={songMode ? 0.75 : 0.65}
+              textRendering="geometricPrecision"
+              fontWeight={hintNotes.has(key.pitch) ? 900 : 700}
               fill={hintNotes.has(key.pitch) ? '#0b1020' : '#66738f'}
               style={{ pointerEvents: 'none', userSelect: 'none' }}
+              transform={`translate(${key.whiteIndex + 0.5}, ${KEY_TOP + WHITE_KEY_HEIGHT - 0.55}) scale(${songMode ? 0.3 : 1}, 1)`}
             >
               {pitchToPracticeLabel(key.pitch)}
             </text>
