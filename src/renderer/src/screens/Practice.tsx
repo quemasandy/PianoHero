@@ -614,6 +614,24 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
   function renderHome() {
     return (
       <>
+        <div style={{ padding: '32px 0 48px 0', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <h1 style={{ 
+            margin: 0, 
+            fontSize: '64px', 
+            fontWeight: 900, 
+            letterSpacing: '-0.04em', 
+            background: 'linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            filter: 'drop-shadow(0 10px 20px rgba(76, 201, 240, 0.4))'
+          }}>
+            PianoHero
+          </h1>
+          <p style={{ margin: '16px 0 0', color: '#c8d1e8', fontSize: '22px', fontWeight: 500, maxWidth: '600px', lineHeight: 1.4 }}>
+            Practica las escalas y acordes clave de C Jam Blues.
+          </p>
+        </div>
+
         <div style={homeGridStyle}>
           <PracticeCard
             title="Escalas"
@@ -870,17 +888,8 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
 
   return (
     <div style={rootStyle}>
-      <div style={view === 'practice_home' ? titleBarStyle : { ...titleBarStyle, padding: '16px 320px 8px 80px', borderBottom: 'none' }}>
-        {view === 'practice_home' && (
-          <div>
-            <h1 style={{ margin: 0, fontSize: '32px', color: 'var(--text)', fontWeight: 800, letterSpacing: '-0.02em', textShadow: '0 0 20px rgba(6, 182, 212, 0.4)' }}>PianoHero</h1>
-            <p style={{ margin: '6px 0 0', color: 'var(--slate-400)', fontSize: '15px' }}>
-              Practica las escalas y acordes clave de C Jam Blues.
-            </p>
-          </div>
-        )}
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end', width: view === 'practice_home' ? 'auto' : '100%' }}>
+      <div style={{ ...titleBarStyle, padding: '16px 40px 8px 80px', borderBottom: 'none' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end', width: '100%' }}>
           {midiState.status !== 'connected' && (
             <button
               onClick={() => { void refreshMidiConnection('manual') }}
