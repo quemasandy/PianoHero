@@ -8,6 +8,23 @@ import { installRendererDiagnostics, logRendererEvent } from './lib/diagnostics'
 installRendererDiagnostics()
 logRendererEvent('info', 'renderer.bootstrap', 'Bootstrapping React root')
 
+// -- EMULADOR BROWSER STANDALONE (Para validaciones visuales del agente Antigravity) --
+if (typeof window !== 'undefined' && !window.electronAPI) {
+  window.electronAPI = {
+    listMidiDevices: async () => ['Simulated Web MIDI Device'],
+    connectMidiDevice: async (index) => true,
+    disconnectMidiDevice: async () => true,
+    getDiagnosticsSnapshot: async () => ({ entries: [], logPath: '', startTimes: { renderer: 0, platform: 0 } }),
+    clearRendererLogs: async () => {},
+    onDiagnosticsUpdated: () => () => {},
+    onMidiMessage: () => () => {},
+    onMidiNote: () => () => {},
+    onMidiDevicesUpdated: () => () => {},
+    platform: 'mock-web'
+  } as any
+}
+// ------------------------------------------------------------------------------------------
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <ErrorBoundary>
     <App />
