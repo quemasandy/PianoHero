@@ -4,6 +4,12 @@ import SongSheetMusic from '../components/SongSheetMusic'
 import FallingNotesView from '../components/FallingNotesView'
 import { useMidiDevice } from '../hooks/useMidiDevice'
 import { SONG_CATALOG, Song } from '../lib/songCatalog'
+import {
+  prepareSong,
+  type PreparedSong,
+  type TrackEvent
+} from '../lib/songPreparation'
+import AppNavigation, { AppMode } from '../components/AppNavigation'
 import { logRendererEvent } from '../lib/diagnostics'
 
 interface PracticeState {
@@ -32,7 +38,13 @@ function getWindowForPitches(pitches: number[]): { startPitch: number; endPitch:
 
 const WORLDDE_DEVICE_PATTERN = /worldde|easykey/i
 
-export default function SongPractice({ onNavigateBack }: { onNavigateBack?: () => void }) {
+export default function SongPractice({ 
+  onNavigateHome, 
+  onNavigateMode 
+}: { 
+  onNavigateHome: () => void
+  onNavigateMode: (mode: AppMode) => void 
+}) {
   const [song, setSong] = useState<Song>(SONG_CATALOG[0]) // Play first song
   const [state, setState] = useState<PracticeState>({
     measureIndex: 0,
@@ -197,38 +209,16 @@ export default function SongPractice({ onNavigateBack }: { onNavigateBack?: () =
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#000814', padding: '16px', boxSizing: 'border-box' }}>
-      
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px', paddingLeft: '80px', paddingRight: '220px', minHeight: '60px' }}>
-        
-        {/* Left Side: Title and Back */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flex: 1 }}>
-          <button 
-            style={{ 
-              background: 'rgba(255,255,255,0.05)', 
-              color: '#c8d1e8', 
-              border: '1px solid rgba(255,255,255,0.1)', 
-              width: '44px', 
-              height: '44px', 
-              borderRadius: '22px', 
-              display: 'flex', 
-              justifyContent: 'center', 
-              alignItems: 'center', 
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-            }} 
-            onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff' }}
-            onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#c8d1e8' }}
-            onClick={() => onNavigateBack ? onNavigateBack() : window.history.back()}
-            title="Volver"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-          </button>
-          <div>
-            <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: '#fff', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>Práctica de Canción</h1>
+      <AppNavigation
+        currentMode="songs"
+        onNavigateHome={onNavigateHome}
+        onNavigateMode={onNavigateMode}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: '#8892a4' }}>Canción:</span>
             <select 
               value={song.id} 
               onChange={(e) => {
@@ -239,16 +229,15 @@ export default function SongPractice({ onNavigateBack }: { onNavigateBack?: () =
                 }
               }}
               style={{
-                background: 'rgba(0,0,0,0.4)',
+                background: '#101a2d',
                 color: '#4cc9f0',
                 border: '1px solid rgba(76, 201, 240, 0.3)',
-                padding: '4px 8px',
+                padding: '6px 12px',
                 borderRadius: '8px',
-                fontSize: '15px',
+                fontSize: '14px',
                 fontWeight: 600,
                 outline: 'none',
-                cursor: 'pointer',
-                marginTop: '4px'
+                cursor: 'pointer'
               }}
             >
               {SONG_CATALOG.map(s => (
@@ -256,36 +245,31 @@ export default function SongPractice({ onNavigateBack }: { onNavigateBack?: () =
               ))}
             </select>
           </div>
-        </div>
-        
-        {/* Dynamic Window Hint */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '12px', 
-          backgroundColor: '#0a101d', 
-          padding: '8px 16px', 
-          borderRadius: '16px',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
-        }}>
-          <span style={{ fontSize: '12px', color: '#8892a4', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 800 }}>Octava Requerida</span>
-          <span style={{ 
-            color: '#fff', 
-            background: 'linear-gradient(135deg, #f72585 0%, #b5179e 100%)', 
-            padding: '4px 12px', 
-            borderRadius: '10px', 
-            fontWeight: 800, 
-            fontSize: '14px',
-            boxShadow: '0 2px 10px rgba(247, 37, 133, 0.3)'
+          
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px', 
+            backgroundColor: '#0a101d', 
+            padding: '6px 12px', 
+            borderRadius: '12px',
+            border: '1px solid rgba(255,255,255,0.08)'
           }}>
-            {`C${Math.floor(activeWindow.startPitch/12)-1} a C${Math.floor(activeWindow.endPitch/12)-1}`}
-          </span>
-        </div>
+            <span style={{ fontSize: '11px', color: '#8892a4', textTransform: 'uppercase', fontWeight: 800 }}>Octava</span>
+            <span style={{ 
+              color: '#fff', 
+              background: '#f72585', 
+              padding: '2px 8px', 
+              borderRadius: '6px', 
+              fontWeight: 800, 
+              fontSize: '12px'
+            }}>
+              {`C${Math.floor(activeWindow.startPitch/12)-1}-C${Math.floor(activeWindow.endPitch/12)-1}`}
+            </span>
+          </div>
 
-        {/* Right Space to avoid collision with absolute global buttons */}
-        <div style={{ flex: 1 }}></div>
-      </div>
+        </div>
+      </AppNavigation>
 
       {/* Sheet Music Section */}
       <div style={{ flexShrink: 0, height: '180px', marginBottom: '16px' }}>

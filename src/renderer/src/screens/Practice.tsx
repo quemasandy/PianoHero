@@ -27,6 +27,7 @@ import type {
   ScaleExerciseDefinition
 } from '../types'
 import { detectChord } from '../lib/chordDetection'
+import AppNavigation, { AppMode, buttonStyle } from '../components/AppNavigation'
 
 const WORLDDE_DEVICE_PATTERN = /worldde|easykey/i
 const WORLDDE_KEY_COUNT = 25
@@ -60,8 +61,16 @@ function clearLiveSessionState(session: PracticeSessionState): PracticeSessionSt
   }
 }
 
-export default function Practice({ onNavigateSong }: { onNavigateSong?: () => void }) {
-  const [view, setView] = useState<PracticeView>('practice_home')
+export default function Practice({ 
+  currentView, 
+  onViewChange, 
+  onNavigateMode 
+}: { 
+  currentView: PracticeView
+  onViewChange: (view: PracticeView) => void
+  onNavigateMode: (mode: AppMode) => void 
+}) {
+  const view = currentView
   const [scaleIndex, setScaleIndex] = useState(0)
   const [chordIndex, setChordIndex] = useState(0)
   const [scaleSession, setScaleSession] = useState(() => createScaleSession(SCALE_EXERCISES[0]))
@@ -215,7 +224,7 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
 
   function openHome() {
     clearLiveStateAcrossSessions()
-    setView('practice_home')
+    onViewChange('practice_home')
     setFeedback({
       kind: 'neutral',
       message: 'Selecciona si quieres practicar escalas o acordes para C Jam Blues.'
@@ -225,7 +234,7 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
 
   function openScaleSession() {
     clearLiveStateAcrossSessions()
-    setView('scale_session')
+    onViewChange('scale_session')
     resetScaleSession(scaleIndex)
     logRendererEvent('info', 'practice.view.scales', 'Opened scale practice session', {
       exerciseId: activeScaleExercise.id
@@ -234,7 +243,7 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
 
   function openChordSession() {
     clearLiveStateAcrossSessions()
-    setView('chord_session')
+    onViewChange('chord_session')
     resetChordSession(chordIndex)
     logRendererEvent('info', 'practice.view.chords', 'Opened chord practice session', {
       exerciseId: activeChordExercise.id
@@ -666,7 +675,7 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
             description="Aprende a leer partituras tocando canciones completas con acompañamiento."
             actionLabel="Practicar lectura"
             accent="#06d6a0"
-            onClick={() => onNavigateSong?.()}
+            onClick={() => onNavigateMode('songs')}
           />
         </div>
 
@@ -717,17 +726,7 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
   function renderScaleSession(exercise: ScaleExerciseDefinition, session: PracticeSessionState) {
     return (
       <>
-        <SessionControls
-          mode="scales"
-          onBack={openHome}
-          onPrevious={goToPreviousScaleExercise}
-          onNext={goToNextScaleExercise}
-          onReset={restartActiveSession}
-          nextDisabled={false}
-          previousDisabled={false}
-          onSwitchToScales={openScaleSession}
-          onSwitchToChords={openChordSession}
-        />
+
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
           <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{exercise.name}</h2>
@@ -767,21 +766,12 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
   }
 
   function renderChordSession(exercise: ChordExerciseDefinition, session: PracticeSessionState) {
-    const currentPrompt = exercise.progression[Math.min(session.stepIndex, exercise.progression.length - 1)]
+    const isFirst = chordIndex === 0
+    const isLast = chordIndex === CHORD_EXERCISES.length - 1
 
     return (
       <>
-        <SessionControls
-          mode="chords"
-          onBack={openHome}
-          onPrevious={goToPreviousChordExercise}
-          onNext={goToNextChordExercise}
-          onReset={restartActiveSession}
-          nextDisabled={false}
-          previousDisabled={false}
-          onSwitchToScales={openScaleSession}
-          onSwitchToChords={openChordSession}
-        />
+
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
           <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{exercise.name}</h2>
@@ -897,7 +887,33 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
 
   return (
     <div style={rootStyle}>
-      <div style={{ ...titleBarStyle, padding: '16px 40px 8px 80px', borderBottom: 'none' }}>
+      
+      {/* AppNavigation at the absolute top for sessions to perfectly match SongPractice alignment */}
+      {view !== 'practice_home' && (
+        <AppNavigation
+          currentMode={view === 'scale_session' ? 'scales' : 'chords'}
+          onNavigateHome={openHome}
+          onNavigateMode={onNavigateMode}
+        >
+          {view === 'scale_session' && (
+            <>
+              <button onClick={goToPreviousScaleExercise} disabled={false} style={buttonStyle('#334', '#fff', false)}>← Ejercicio</button>
+              <button onClick={restartActiveSession} style={buttonStyle('#4cc9f0', '#001219')}>Reiniciar</button>
+              <button onClick={goToNextScaleExercise} disabled={false} style={buttonStyle('#334', '#fff', false)}>Ejercicio →</button>
+            </>
+          )}
+          {view === 'chord_session' && (
+            <>
+              <button onClick={goToPreviousChordExercise} disabled={chordIndex === 0} style={buttonStyle('#334', '#fff', chordIndex === 0)}>← Ejercicio</button>
+              <button onClick={restartActiveSession} style={buttonStyle('#4cc9f0', '#001219')}>Reiniciar</button>
+              <button onClick={goToNextChordExercise} disabled={chordIndex === CHORD_EXERCISES.length - 1} style={buttonStyle('#334', '#fff', chordIndex === CHORD_EXERCISES.length - 1)}>Ejercicio →</button>
+            </>
+          )}
+        </AppNavigation>
+      )}
+
+      {/* Legacy status bar shifts layout when in Home vs nested modes */}
+      <div style={{ ...titleBarStyle, padding: view === 'practice_home' ? '24px 40px 8px 80px' : '0 24px 8px 24px', borderBottom: 'none' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end', width: '100%' }}>
           {midiState.status !== 'connected' && (
             <button
@@ -1106,45 +1122,6 @@ function PracticeCard({
   )
 }
 
-function SessionControls({
-  mode,
-  onBack,
-  onPrevious,
-  onNext,
-  onReset,
-  previousDisabled,
-  nextDisabled,
-  onSwitchToScales,
-  onSwitchToChords
-}: {
-  mode: 'scales' | 'chords'
-  onBack: () => void
-  onPrevious: () => void
-  onNext: () => void
-  onReset: () => void
-  previousDisabled: boolean
-  nextDisabled: boolean
-  onSwitchToScales: () => void
-  onSwitchToChords: () => void
-}) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-        <button onClick={onBack} style={buttonStyle('#334')}>← Volver</button>
-        <div style={{ display: 'flex', gap: '6px', padding: '4px', borderRadius: '999px', background: '#101a2d', border: '1px solid #223' }}>
-          <button onClick={onSwitchToScales} style={modeTabStyle(mode === 'scales')}>Escalas</button>
-          <button onClick={onSwitchToChords} style={modeTabStyle(mode === 'chords')}>Acordes</button>
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-        <button onClick={onPrevious} disabled={previousDisabled} style={buttonStyle('#334', '#fff', previousDisabled)}>← Ejercicio</button>
-        <button onClick={onReset} style={buttonStyle('#4cc9f0', '#001219')}>Reiniciar</button>
-        <button onClick={onNext} disabled={nextDisabled} style={buttonStyle('#334', '#fff', nextDisabled)}>Ejercicio →</button>
-      </div>
-    </div>
-  )
-}
 
 const rootStyle: CSSProperties = {
   minHeight: '100vh',
@@ -1258,29 +1235,4 @@ function metaBadgeStyle(color: string): CSSProperties {
   }
 }
 
-function buttonStyle(background: string, color = '#fff', disabled = false): CSSProperties {
-  return {
-    background,
-    color,
-    border: 'none',
-    borderRadius: '10px',
-    padding: '10px 14px',
-    fontSize: '13px',
-    fontWeight: 700,
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    opacity: disabled ? 0.4 : 1
-  }
-}
 
-function modeTabStyle(active: boolean): CSSProperties {
-  return {
-    background: active ? '#4cc9f0' : 'transparent',
-    color: active ? '#001219' : '#c8d1e8',
-    border: 'none',
-    borderRadius: '999px',
-    padding: '8px 14px',
-    fontSize: '13px',
-    fontWeight: 700,
-    cursor: 'pointer'
-  }
-}
