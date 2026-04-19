@@ -26,6 +26,7 @@ import type {
   PracticeView,
   ScaleExerciseDefinition
 } from '../types'
+import { detectChord } from '../lib/chordDetection'
 
 const WORLDDE_DEVICE_PATTERN = /worldde|easykey/i
 const WORLDDE_KEY_COUNT = 25
@@ -146,6 +147,14 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
     return next
   }, [activeSession, monitorPressedNotes])
   const lastMidiLabel = lastMidiNote === null ? null : pitchToPracticeLabel(lastMidiNote)
+  
+  const activeChordName = useMemo(() => {
+    if (monitorPressedNotes.size >= 2) {
+      return detectChord(Array.from(monitorPressedNotes))
+    }
+    return null
+  }, [monitorPressedNotes])
+
   const midiMonitorLabel = lastMidiLabel
     ? `Última nota MIDI: ${lastMidiLabel}`
     : midiState.status === 'connected'
@@ -688,8 +697,10 @@ export default function Practice({ onNavigateSong }: { onNavigateSong?: () => vo
             
             <div style={{ width: 1, height: 12, background: 'rgba(255,255,255,0.15)' }} />
             
-            <div style={{ width: '70px', textAlign: 'center', color: lastMidiLabel ? '#8be9fd' : '#8892a4', fontWeight: lastMidiLabel ? 700 : 500 }}>
-              {lastMidiLabel ? `Nota: ${lastMidiLabel}` : 'Nota: --'}
+            <div style={{ width: '100px', textAlign: 'center', color: (activeChordName || lastMidiLabel) ? '#8be9fd' : '#8892a4', fontWeight: (activeChordName || lastMidiLabel) ? 700 : 500 }}>
+              <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {activeChordName ? activeChordName : (lastMidiLabel ? `Nota: ${lastMidiLabel}` : 'Nota: --')}
+              </div>
             </div>
 
             <div style={{ width: 1, height: 12, background: 'rgba(255,255,255,0.15)' }} />
