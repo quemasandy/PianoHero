@@ -45,7 +45,7 @@ export default function AppNavigation({
   children
 }: AppNavigationProps) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', marginBottom: '24px', paddingLeft: '80px', paddingTop: '8px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', marginBottom: '24px', paddingLeft: '32px', paddingRight: '32px', paddingTop: '16px' }}>
       
       {/* Lado Izquierdo: Navegación Principal */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>

@@ -25,8 +25,21 @@ export default function App() {
   }
 
   return (
-    <>
-      {route === 'practice' ? (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', overflow: 'hidden' }}>
+      {/* Title Bar nativo global de la app para controles de macOS */}
+      <div 
+        style={{ 
+          height: '38px', 
+          width: '100%', 
+          backgroundColor: 'transparent',
+          WebkitAppRegion: 'drag', 
+          flexShrink: 0,
+          zIndex: 9999
+        } as React.CSSProperties} 
+      />
+      
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        {route === 'practice' ? (
         <Practice 
           currentView={practiceView} 
           onViewChange={setPracticeView}
@@ -38,7 +51,8 @@ export default function App() {
           onNavigateMode={handleNavigateMode}
         />
       )}
+      </div>
       <DiagnosticsPanel />
-    </>
+    </div>
   )
 }

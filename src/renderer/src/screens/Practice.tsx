@@ -899,26 +899,27 @@ export default function Practice({
 
   function renderGlobalStatusControls() {
     return (
-      <>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
         {midiState.status !== 'connected' && (
           <button
             onClick={() => { void refreshMidiConnection('manual') }}
-            style={buttonStyle('#223a5e', '#8be9fd')}
+            style={{...buttonStyle('#223a5e', '#8be9fd'), padding: '6px 16px'}}
           >
             Reconectar MIDI
           </button>
         )}
         
-        <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: '12px', padding: '4px 12px', gap: '12px', border: '1px solid var(--border-glass)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: '12px', padding: '6px 16px', gap: '12px', border: '1px solid var(--border-glass)' }}>
           <span style={{ color: 'var(--slate-300)', fontSize: '13px', fontWeight: 600 }}>Ensamble Jazz:</span>
           
           <button
             onClick={() => rhythm.togglePlay()}
             style={{
               ...buttonStyle(rhythm.isPlaying ? 'var(--neon-pink)' : '#06d6a0', '#000'),
-              padding: '4px 12px',
+              padding: '2px 10px',
               fontSize: '12px',
-              minWidth: '70px'
+              minWidth: '70px',
+              borderRadius: '8px'
             }}
           >
             {rhythm.isPlaying ? 'STOP' : 'PLAY'}
@@ -933,19 +934,24 @@ export default function Practice({
               onChange={(e) => rhythm.updateBpm(Number(e.target.value))}
               style={{ width: '80px', accentColor: '#4cc9f0' }}
             />
-            <span style={{ color: '#4cc9f0', fontSize: '12px', fontWeight: 800, width: '45px' }}>
+            <span style={{ color: '#4cc9f0', fontSize: '12px', fontWeight: 800, width: '50px' }}>
               {rhythm.bpm} BPM
             </span>
           </div>
         </div>
 
-        <span style={{ color: '#4cc9f0', fontSize: '12px', fontWeight: 700, marginLeft: '8px' }}>
-          {RANGE_STATUS_LABEL}
-        </span>
-        <span style={{ color: midiStatusColor, fontSize: '12px', fontWeight: 700 }}>
-          {midiStatusLabel}
-        </span>
-      </>
+        <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: '12px', padding: '6px 16px', border: '1px solid var(--border-glass)' }}>
+          <span style={{ color: '#4cc9f0', fontSize: '12px', fontWeight: 700 }}>
+            {RANGE_STATUS_LABEL}
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: '12px', padding: '6px 16px', border: '1px solid var(--border-glass)' }}>
+          <span style={{ color: midiStatusColor, fontSize: '12px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px' }} title={midiStatusLabel}>
+            {midiStatusLabel}
+          </span>
+        </div>
+      </div>
     )
   }
 
@@ -965,14 +971,14 @@ export default function Practice({
 
       {/* Legacy status bar shifts layout when in Home vs nested modes */}
       {view === 'practice_home' && (
-        <div style={{ ...titleBarStyle, padding: '24px 40px 8px 80px', borderBottom: 'none' }}>
+        <div style={{ ...titleBarStyle, padding: '24px 40px 8px 40px', borderBottom: 'none' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end', width: '100%' }}>
             {renderGlobalStatusControls()}
           </div>
         </div>
       )}
 
-      <div style={{ padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: '24px', minHeight: 0, overflowY: 'auto' }}>
+      <div style={{ padding: '24px 32px', display: 'flex', flexDirection: 'column', gap: '40px', minHeight: 0, overflowY: 'auto' }}>
         {view === 'practice_home'
           ? renderHome()
           : (
@@ -988,7 +994,7 @@ export default function Practice({
         {renderKeyboardGuide()}
       </div>
 
-      <div style={{ padding: '12px 24px 24px 24px', flexShrink: 0 }}>
+      <div style={{ padding: '16px 32px 32px 32px', flexShrink: 0 }}>
         <Piano
           activeNotes={pianoActiveNotes}
           hintNotes={view === 'practice_home' ? new Set() : targetNotes}
@@ -1133,8 +1139,7 @@ function PracticeCard({
 
 
 const rootStyle: CSSProperties = {
-  minHeight: '100vh',
-  maxHeight: '100vh',
+  height: '100%',
   background: 'transparent',
   color: 'var(--text)',
   display: 'grid',

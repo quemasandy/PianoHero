@@ -208,7 +208,7 @@ export default function SongPractice({
   const hintNotes = new Set(expectedPitches)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#000814', padding: '16px', boxSizing: 'border-box' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#000814', boxSizing: 'border-box' }}>
       {/* Header */}
       <AppNavigation
         currentMode="songs"
@@ -272,7 +272,7 @@ export default function SongPractice({
       </AppNavigation>
 
       {/* Sheet Music Section */}
-      <div style={{ flexShrink: 0, height: '180px', marginBottom: '16px' }}>
+      <div style={{ flexShrink: 0, height: '180px', marginBottom: '16px', padding: '0 24px' }}>
         {currentMeasure ? (
            <SongSheetMusic measure={currentMeasure} currentEventIndex={state.eventIndex} />
         ) : (
