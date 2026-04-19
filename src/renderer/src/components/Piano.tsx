@@ -17,6 +17,8 @@ interface PianoProps {
   wrongNotes?: Set<number>
   keyboardWindow?: KeyboardWindow | null
   compactView?: boolean
+  /** Synthesia-style: hide top band/markers, stretch to container, add neon glow on hint keys */
+  songMode?: boolean
   onNoteOn: (pitch: number) => void
   onNoteOff: (pitch: number) => void
   /** Track index per active note, for coloring */
@@ -56,6 +58,7 @@ export default function Piano({
   wrongNotes,
   keyboardWindow,
   compactView = false,
+  songMode = false,
   onNoteOn,
   onNoteOff,
   noteTrackMap
@@ -95,6 +98,9 @@ export default function Piano({
         ? '#56ccf2'
         : TRACK_COLORS[track % TRACK_COLORS.length]
     }
+    if (songMode && hintNotes.has(pitch)) {
+      return isWhite ? 'url(#hintKeyGlowWhite)' : 'url(#hintKeyGlowBlack)'
+    }
     if (isWhite) {
       if (activeNotes.has(pitch) && !inWindow) return TRACK_COLORS[(noteTrackMap?.get(pitch) ?? 0) % TRACK_COLORS.length]
       if (activeNotes.has(pitch)) return 'url(#whiteKeyDown)'
@@ -129,27 +135,30 @@ export default function Piano({
   return (
     <div style={{
       position: 'relative',
-      height: compactView ? '280px' : '260px',
-      background: 'linear-gradient(180deg, #182030 0%, #0d121c 100%)',
-      borderRadius: '24px 24px 0 0',
-      padding: '24px 24px 24px 24px',
-      boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.06), inset 0 -6px 12px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.6)',
-      border: '1px solid #2d3b5e',
-      borderBottom: '4px solid #06090e',
+      height: songMode ? '220px' : compactView ? '280px' : '260px',
+      background: songMode ? 'transparent' : 'linear-gradient(180deg, #182030 0%, #0d121c 100%)',
+      borderRadius: songMode ? '0' : '24px 24px 0 0',
+      padding: songMode ? '0' : '24px 24px 24px 24px',
+      boxShadow: songMode ? 'none' : 'inset 0 2px 4px rgba(255,255,255,0.06), inset 0 -6px 12px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.6)',
+      border: songMode ? 'none' : '1px solid #2d3b5e',
+      borderBottom: songMode ? 'none' : '4px solid #06090e',
       flexShrink: 0
     }}>
       <div style={{
         position: 'relative',
         width: '100%',
         height: '100%',
-        background: '#090d18',
-        borderRadius: '10px',
+        background: songMode ? 'transparent' : '#090d18',
+        borderRadius: songMode ? '0' : '10px',
         overflow: 'hidden',
-        boxShadow: 'inset 0 4px 16px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05)',
-        border: '1px solid #000'
+        boxShadow: songMode ? 'none' : 'inset 0 4px 16px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05)',
+        border: songMode ? 'none' : '1px solid #000'
       }}>
         <svg
-          viewBox={`${viewBounds.x - 0.4} -0.2 ${viewBounds.width + 0.8} ${SVG_HEIGHT + 0.6}`}
+          viewBox={songMode
+            ? `${viewBounds.x - 0.4} ${KEY_TOP} ${viewBounds.width + 0.8} ${SVG_HEIGHT - KEY_TOP}`
+            : `${viewBounds.x - 0.4} -0.2 ${viewBounds.width + 0.8} ${SVG_HEIGHT + 0.6}`}
+          preserveAspectRatio={songMode ? 'none' : undefined}
           style={{ width: '100%', height: '100%', display: 'block' }}
           shapeRendering="geometricPrecision"
         >
@@ -179,26 +188,47 @@ export default function Piano({
                 <feMergeNode in="SourceGraphic"/>
               </feMerge>
             </filter>
+            <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="0.35" result="colouredBlur"/>
+              <feMerge>
+                <feMergeNode in="colouredBlur"/>
+                <feMergeNode in="colouredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <linearGradient id="hintKeyGlowWhite" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#ff8fce" />
+              <stop offset="60%" stopColor="#f72585" />
+              <stop offset="100%" stopColor="#b5179e" />
+            </linearGradient>
+            <linearGradient id="hintKeyGlowBlack" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#f72585" />
+              <stop offset="100%" stopColor="#7209b7" />
+            </linearGradient>
             <filter id="keyShadow" x="-10%" y="-10%" width="120%" height="120%">
               <feDropShadow dx="0" dy="0.1" stdDeviation="0.1" floodColor="#000" floodOpacity="0.4"/>
             </filter>
           </defs>
-        <rect
-          x={viewBounds.x - 0.4}
-          y={-0.2}
-          width={viewBounds.width + 0.8}
-          height={SVG_HEIGHT + 0.6}
-          fill="#0b1020"
-        />
-        <rect
-          x={viewBounds.x - 0.4}
-          y={-0.2}
-          width={viewBounds.width + 0.8}
-          height={1.55}
-          fill="rgba(76, 201, 240, 0.08)"
-        />
+        {!songMode && (
+          <rect
+            x={viewBounds.x - 0.4}
+            y={-0.2}
+            width={viewBounds.width + 0.8}
+            height={SVG_HEIGHT + 0.6}
+            fill="#0b1020"
+          />
+        )}
+        {!songMode && (
+          <rect
+            x={viewBounds.x - 0.4}
+            y={-0.2}
+            width={viewBounds.width + 0.8}
+            height={1.55}
+            fill="rgba(76, 201, 240, 0.08)"
+          />
+        )}
 
-        {!compactView && windowBounds && (
+        {!compactView && !songMode && windowBounds && (
           <rect
             x={windowBounds.x - 0.08}
             y={0.16}
@@ -212,7 +242,7 @@ export default function Piano({
           />
         )}
 
-        {compactView && (
+        {compactView && !songMode && (
           <rect
             x={viewBounds.x + 0.1}
             y={1.45}
@@ -226,29 +256,33 @@ export default function Piano({
           />
         )}
 
-        <text
-          x={viewBounds.x + 0.25}
-          y={0.95}
-          fontSize={0.6}
-          fontWeight={700}
-          fill="#8be9fd"
-          style={{ pointerEvents: 'none', userSelect: 'none' }}
-        >
-          {compactView ? 'Teclado 25 teclas' : 'Piano'}
-        </text>
-        <text
-          x={viewBounds.x + viewBounds.width - 0.25}
-          y={0.95}
-          textAnchor="end"
-          fontSize={0.54}
-          fontWeight={700}
-          fill={keyboardWindow?.outOfRange ? '#ffd166' : '#c8d1e8'}
-          style={{ pointerEvents: 'none', userSelect: 'none' }}
-        >
-          {visibleRangeLabel}
-        </text>
+        {!songMode && (
+          <>
+            <text
+              x={viewBounds.x + 0.25}
+              y={0.95}
+              fontSize={0.6}
+              fontWeight={700}
+              fill="#8be9fd"
+              style={{ pointerEvents: 'none', userSelect: 'none' }}
+            >
+              {compactView ? 'Teclado 25 teclas' : 'Piano'}
+            </text>
+            <text
+              x={viewBounds.x + viewBounds.width - 0.25}
+              y={0.95}
+              textAnchor="end"
+              fontSize={0.54}
+              fontWeight={700}
+              fill={keyboardWindow?.outOfRange ? '#ffd166' : '#c8d1e8'}
+              style={{ pointerEvents: 'none', userSelect: 'none' }}
+            >
+              {visibleRangeLabel}
+            </text>
+          </>
+        )}
 
-        {targetPitches.map((pitch, index) => {
+        {!songMode && targetPitches.map((pitch, index) => {
           const key = ALL_KEYS.find(candidate => candidate.pitch === pitch)
           if (!key) return null
 
@@ -295,24 +329,28 @@ export default function Piano({
         })}
 
         {/* White keys */}
-        {whiteKeys.map(key => (
-          <rect
-            key={key.pitch}
-            x={key.whiteIndex + 0.03}
-            y={KEY_TOP}
-            width={0.94}
-            height={WHITE_KEY_HEIGHT}
-            rx={0.15}
-            fill={keyColor(key)}
-            stroke={activeNotes.has(key.pitch) ? 'none' : strokeColor(key)}
-            strokeWidth={strokeWidth(key)}
-            vectorEffect="non-scaling-stroke"
-            style={{ cursor: 'pointer' }}
-            onMouseDown={() => onNoteOn(key.pitch)}
-            onMouseUp={() => onNoteOff(key.pitch)}
-            onMouseLeave={() => onNoteOff(key.pitch)}
-          />
-        ))}
+        {whiteKeys.map(key => {
+          const isHintGlow = songMode && hintNotes.has(key.pitch)
+          return (
+            <rect
+              key={key.pitch}
+              x={key.whiteIndex + 0.03}
+              y={KEY_TOP}
+              width={0.94}
+              height={WHITE_KEY_HEIGHT}
+              rx={0.15}
+              fill={keyColor(key)}
+              stroke={activeNotes.has(key.pitch) ? 'none' : strokeColor(key)}
+              strokeWidth={strokeWidth(key)}
+              vectorEffect="non-scaling-stroke"
+              filter={isHintGlow ? 'url(#neonGlow)' : undefined}
+              style={{ cursor: 'pointer' }}
+              onMouseDown={() => onNoteOn(key.pitch)}
+              onMouseUp={() => onNoteOff(key.pitch)}
+              onMouseLeave={() => onNoteOff(key.pitch)}
+            />
+          )
+        })}
 
         {/* Black keys (rendered on top) */}
         {blackKeys.map(key => {
@@ -320,6 +358,7 @@ export default function Piano({
           const x = key.whiteIndex + 0.65
           const w = 0.7
           const h = BLACK_KEY_HEIGHT
+          const isHintGlow = songMode && hintNotes.has(key.pitch)
           return (
             <rect
               key={key.pitch}
@@ -332,7 +371,7 @@ export default function Piano({
               stroke={activeNotes.has(key.pitch) ? 'none' : strokeColor(key)}
               strokeWidth={strokeWidth(key)}
               vectorEffect="non-scaling-stroke"
-              filter="url(#keyShadow)"
+              filter={isHintGlow ? 'url(#neonGlow)' : 'url(#keyShadow)'}
               style={{ cursor: 'pointer' }}
               onMouseDown={e => { e.stopPropagation(); onNoteOn(key.pitch) }}
               onMouseUp={e => { e.stopPropagation(); onNoteOff(key.pitch) }}

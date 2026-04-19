@@ -862,7 +862,7 @@ export default function Practice() {
 
   return (
     <div style={rootStyle}>
-      <div style={view === 'practice_home' ? titleBarStyle : { ...titleBarStyle, padding: '16px 24px', borderBottom: 'none' }}>
+      <div style={view === 'practice_home' ? titleBarStyle : { ...titleBarStyle, padding: '16px 320px 8px 80px', borderBottom: 'none' }}>
         {view === 'practice_home' && (
           <div>
             <h1 style={{ margin: 0, fontSize: '32px', color: 'var(--text)', fontWeight: 800, letterSpacing: '-0.02em', textShadow: '0 0 20px rgba(6, 182, 212, 0.4)' }}>PianoHero</h1>
@@ -1130,7 +1130,7 @@ const rootStyle: CSSProperties = {
 }
 
 const titleBarStyle: CSSProperties = {
-  padding: '10px 24px 8px',
+  padding: '16px 320px 8px 80px',
   borderBottom: '1px solid var(--border-glass)',
   background: 'rgba(11, 17, 32, 0.4)',
   backdropFilter: 'blur(16px)',
