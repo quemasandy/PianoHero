@@ -59,7 +59,7 @@ function clearLiveSessionState(session: PracticeSessionState): PracticeSessionSt
   }
 }
 
-export default function Practice() {
+export default function Practice({ onNavigateSong }: { onNavigateSong?: () => void }) {
   const [view, setView] = useState<PracticeView>('practice_home')
   const [scaleIndex, setScaleIndex] = useState(0)
   const [chordIndex, setChordIndex] = useState(0)
@@ -630,6 +630,14 @@ export default function Practice() {
             actionLabel="Practicar acordes"
             accent="#f72585"
             onClick={openChordSession}
+          />
+          <PracticeCard
+            title="Lectura musical"
+            subtitle="Práctica de canciones"
+            description="Aprende a leer partituras tocando canciones completas con acompañamiento."
+            actionLabel="Practicar lectura"
+            accent="#06d6a0"
+            onClick={() => onNavigateSong?.()}
           />
         </div>
 

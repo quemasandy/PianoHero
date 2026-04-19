@@ -32,7 +32,7 @@ function getWindowForPitches(pitches: number[]): { startPitch: number; endPitch:
 
 const WORLDDE_DEVICE_PATTERN = /worldde|easykey/i
 
-export default function SongPractice() {
+export default function SongPractice({ onNavigateBack }: { onNavigateBack?: () => void }) {
   const [song, setSong] = useState<Song>(SONG_CATALOG[0]) // Play first song
   const [state, setState] = useState<PracticeState>({
     measureIndex: 0,
@@ -220,7 +220,7 @@ export default function SongPractice() {
             }} 
             onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff' }}
             onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#c8d1e8' }}
-            onClick={() => window.history.back()}
+            onClick={() => onNavigateBack ? onNavigateBack() : window.history.back()}
             title="Volver"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
