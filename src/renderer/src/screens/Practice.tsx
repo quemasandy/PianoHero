@@ -856,32 +856,45 @@ export default function Practice({
       const targetNote = scaleSession.expectedNotes[0]
 
       return (
-        <div style={{ ...keyboardGuideStyle, padding: '16px 24px' }}>
-          {targetNote !== undefined && (
-            <div style={{ 
-              flex: 2,
-              minWidth: '300px',
-              maxWidth: '600px',
-              background: 'rgba(255,255,255,0.03)', 
-              borderRadius: '20px', 
-              border: '1px solid var(--border-glass)',
-              overflowX: 'auto',
-              overflowY: 'hidden',
-              display: 'flex',
-              justifyContent: 'center'
-            }}>
-              <SheetMusic 
-                notes={activeScaleExercise.noteSequence} 
-                mode="sequence"
-                currentIndex={scaleSession.stepIndex}
-                active={true} 
-                color="#ffd166" 
-                width={Math.max(300, activeScaleExercise.noteSequence.length * 45)}
-              />
-            </div>
-          )}
+        <div style={{ 
+          ...keyboardGuideStyle, 
+          padding: '16px 32px',
+          display: 'grid',
+          gridTemplateColumns: '1fr auto 1fr',
+          gap: '32px',
+          alignItems: 'center',
+          width: '100%' 
+        }}>
+          {/* Spacer izquierdo para centrar perfectamente el pentagrama */}
+          <div />
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: '300px', alignItems: 'flex-end', textAlign: 'right' }}>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            {targetNote !== undefined && (
+              <div style={{ 
+                width: '100%',
+                minWidth: '400px',
+                maxWidth: '600px',
+                background: 'rgba(255,255,255,0.03)', 
+                borderRadius: '20px', 
+                border: '1px solid var(--border-glass)',
+                overflowX: 'auto',
+                overflowY: 'hidden',
+                display: 'flex',
+                justifyContent: 'center'
+              }}>
+                <SheetMusic 
+                  notes={activeScaleExercise.noteSequence} 
+                  mode="sequence"
+                  currentIndex={scaleSession.stepIndex}
+                  active={true} 
+                  color="#ffd166" 
+                  width={Math.max(300, activeScaleExercise.noteSequence.length * 45)}
+                />
+              </div>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end', textAlign: 'right' }}>
             <div style={{ color: '#8be9fd', fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               Lectura en Pentagrama
             </div>
