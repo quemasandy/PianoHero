@@ -853,41 +853,54 @@ export default function Practice({
     }
 
     if (view === 'scale_session') {
-      const nextNotes = activeScaleExercise.noteSequence.slice(scaleSession.stepIndex, scaleSession.stepIndex + 4)
+      const targetNote = scaleSession.expectedNotes[0]
 
       return (
-        <div style={keyboardGuideStyle}>
-          <div style={{ display: 'grid', gap: '8px' }}>
+        <div style={{ ...keyboardGuideStyle, padding: '16px 24px' }}>
+          {targetNote !== undefined && (
+            <div style={{ 
+              flex: 2,
+              minWidth: '300px',
+              maxWidth: '600px',
+              background: 'rgba(255,255,255,0.03)', 
+              borderRadius: '20px', 
+              border: '1px solid var(--border-glass)',
+              overflowX: 'auto',
+              overflowY: 'hidden',
+              display: 'flex',
+              justifyContent: 'center'
+            }}>
+              <SheetMusic 
+                notes={activeScaleExercise.noteSequence} 
+                mode="sequence"
+                currentIndex={scaleSession.stepIndex}
+                active={true} 
+                color="#ffd166" 
+                width={Math.max(300, activeScaleExercise.noteSequence.length * 45)}
+              />
+            </div>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: '300px', alignItems: 'flex-end', textAlign: 'right' }}>
             <div style={{ color: '#8be9fd', fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              Guía del teclado
+              Lectura en Pentagrama
             </div>
             <div style={{ color: '#fff', fontSize: '24px', fontWeight: 800 }}>
               {scaleSession.status === 'complete'
                 ? 'Escala terminada'
-                : `Siguiente nota: ${pitchToPracticeLabel(scaleSession.expectedNotes[0])}`}
+                : `Siguiente nota: ${pitchToPracticeLabel(targetNote)}`}
             </div>
             <div style={{ color: '#c8d1e8', fontSize: '14px' }}>
               {scaleSession.status === 'complete'
                 ? 'Puedes reiniciar o pasar a la siguiente escala.'
-                : 'La nota objetivo aparece marcada en amarillo sobre el teclado.'}
+                : 'La nota objetivo aparece también en el pentagrama.'}
             </div>
-          </div>
-
-          <div style={keyboardGuideNotesRowStyle}>
-            {nextNotes.map((pitch, index) => (
-              <NoteGuideChip
-                key={`scale-guide-${pitch}-${index}`}
-                label={pitchToPracticeLabel(pitch)}
-                tone={index === 0 ? 'target' : 'muted'}
-              />
-            ))}
-          </div>
-
-          <div style={keyboardLegendStyle}>
-            <LegendPill label="Objetivo actual" background="#ffd166" color="#18131a" />
-            <LegendPill label="Próximas" background="rgba(255,255,255,0.08)" color="#c8d1e8" />
-            <LegendPill label="Correcta" background="#06d6a0" color="#ffffff" />
-            <LegendPill label="Incorrecta" background="#ff6b81" color="#ffffff" />
+            
+            <div style={{ ...keyboardLegendStyle, marginTop: '8px', justifyContent: 'flex-end' }}>
+              <LegendPill label="Objetivo actual" background="#ffd166" color="#18131a" />
+              <LegendPill label="Correcta" background="#06d6a0" color="#ffffff" />
+              <LegendPill label="Incorrecta" background="#ff6b81" color="#ffffff" />
+            </div>
           </div>
         </div>
       )
