@@ -916,31 +916,33 @@ export default function Practice({
             </div>
           </div>
 
-          {/* Controles de Ejercicio Reubicados Abajo */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <button
-              onClick={goToPreviousScaleExercise}
-              disabled={false}
-              style={buttonStyle('#334', '#fff', false)}
-            >
-              ← Ejercicio
-            </button>
-            <button onClick={restartActiveSession} style={buttonStyle('#4cc9f0', '#001219')}>
-              Reiniciar
-            </button>
-            <button
-              onClick={goToNextScaleExercise}
-              disabled={false}
-              style={buttonStyle('#334', '#fff', false)}
-            >
-              Ejercicio →
-            </button>
-          </div>
+          {/* Controles y Meta agolpados a la derecha */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <button
+                onClick={goToPreviousScaleExercise}
+                disabled={false}
+                style={buttonStyle('#334', '#fff', false)}
+              >
+                ← Ejercicio
+              </button>
+              <button onClick={restartActiveSession} style={buttonStyle('#4cc9f0', '#001219')}>
+                Reiniciar
+              </button>
+              <button
+                onClick={goToNextScaleExercise}
+                disabled={false}
+                style={buttonStyle('#334', '#fff', false)}
+              >
+                Ejercicio →
+              </button>
+            </div>
 
-          <div style={metaBadgeStyle('#4cc9f0')}>
-            {session.status === 'complete'
-              ? 'Completada'
-              : `Paso ${Math.min(session.stepIndex + 1, exercise.noteSequence.length)} / ${exercise.noteSequence.length}`}
+            <div style={metaBadgeStyle('#4cc9f0')}>
+              {session.status === 'complete'
+                ? 'Completada'
+                : `Paso ${Math.min(session.stepIndex + 1, exercise.noteSequence.length)} / ${exercise.noteSequence.length}`}
+            </div>
           </div>
         </div>
 
@@ -994,31 +996,33 @@ export default function Practice({
         >
           <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{exercise.name}</h2>
 
-          {/* Controles de Ejercicio Reubicados Abajo */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <button
-              onClick={goToPreviousChordExercise}
-              disabled={isFirst}
-              style={buttonStyle('#334', '#fff', isFirst)}
-            >
-              ← Ejercicio
-            </button>
-            <button onClick={restartActiveSession} style={buttonStyle('#4cc9f0', '#001219')}>
-              Reiniciar
-            </button>
-            <button
-              onClick={goToNextChordExercise}
-              disabled={isLast}
-              style={buttonStyle('#334', '#fff', isLast)}
-            >
-              Ejercicio →
-            </button>
-          </div>
+          {/* Controles y Meta agolpados a la derecha */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <button
+                onClick={goToPreviousChordExercise}
+                disabled={isFirst}
+                style={buttonStyle('#334', '#fff', isFirst)}
+              >
+                ← Ejercicio
+              </button>
+              <button onClick={restartActiveSession} style={buttonStyle('#4cc9f0', '#001219')}>
+                Reiniciar
+              </button>
+              <button
+                onClick={goToNextChordExercise}
+                disabled={isLast}
+                style={buttonStyle('#334', '#fff', isLast)}
+              >
+                Ejercicio →
+              </button>
+            </div>
 
-          <div style={metaBadgeStyle('#f72585')}>
-            {session.status === 'complete'
-              ? 'Progresión completa'
-              : `Compás ${Math.min(session.stepIndex + 1, exercise.progression.length)} / ${exercise.progression.length}`}
+            <div style={metaBadgeStyle('#f72585')}>
+              {session.status === 'complete'
+                ? 'Progresión completa'
+                : `Compás ${Math.min(session.stepIndex + 1, exercise.progression.length)} / ${exercise.progression.length}`}
+            </div>
           </div>
         </div>
 

@@ -14,3 +14,4 @@ playwright-report/
 test-results/
 tmp/
 *.tmp
+.agent/skills/ui-ux-pro-max/*
