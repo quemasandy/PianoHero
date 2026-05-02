@@ -305,7 +305,7 @@ export default function SongPractice({
             <span
               style={{
                 color: '#fff',
-                background: '#f72585',
+                background: 'var(--neon-cyan)',
                 padding: '2px 8px',
                 borderRadius: '6px',
                 fontWeight: 800,

@@ -94,9 +94,9 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
       if (isCurrent) {
         // Enfoque anatómico: Brillamos la propia cabeza de la nota intensificando el color
         staveNote.setStyle({
-          fillStyle: 'var(--neon-pink, #f72585)',
-          strokeStyle: 'var(--neon-pink, #f72585)',
-          shadowColor: '#f72585',
+          fillStyle: 'var(--neon-cyan, #06b6d4)',
+          strokeStyle: 'var(--neon-cyan, #06b6d4)',
+          shadowColor: '#06b6d4',
           shadowBlur: 10,
         })
       } else if (isPlayed) {
@@ -134,11 +134,11 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
           rect.setAttribute('width', String(bbox.w + 24))
           rect.setAttribute('height', String(bbox.h + 16))
           rect.setAttribute('rx', '12') // Curvas pronunciadas tipo píldora
-          rect.setAttribute('fill', 'rgba(247, 37, 133, 0.12)')
+          rect.setAttribute('fill', 'rgba(6, 182, 212, 0.12)')
           // Sin bordes rectos (stroke='none')
           rect.setAttribute('stroke', 'none')
           // Glow intensificado simulando neon
-          rect.setAttribute('filter', 'drop-shadow(0 0 8px rgba(247, 37, 133, 0.8))')
+          rect.setAttribute('filter', 'drop-shadow(0 0 8px rgba(6, 182, 212, 0.8))')
           scaledGroup.insertBefore(rect, scaledGroup.firstChild)
         }
       } catch {

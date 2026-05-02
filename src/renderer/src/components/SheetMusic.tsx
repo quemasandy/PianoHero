@@ -96,7 +96,7 @@ export default function SheetMusic({
               noteColor = '#06d6a0' // played correct (green)
               strokeColor = '#06d6a0'
             } else if (index === currentIndex) {
-              noteColor = color || 'var(--neon-pink)' // current
+              noteColor = color || 'var(--neon-green)' // current
               strokeColor = '#ffffff'
             }
           }
@@ -132,7 +132,7 @@ export default function SheetMusic({
 
         if (active) {
           staveNote.setStyle({
-            fillStyle: color || 'var(--neon-pink)',
+            fillStyle: color || 'var(--neon-green)',
             strokeStyle: '#ffffff',
           })
         } else {

@@ -219,12 +219,12 @@ export default function Piano({
             </filter>
             <linearGradient id="hintKeyGlowWhite" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#ffffff" />
-              <stop offset="60%" stopColor="var(--neon-pink)" />
-              <stop offset="100%" stopColor="var(--neon-purple)" />
+              <stop offset="60%" stopColor="var(--neon-cyan)" />
+              <stop offset="100%" stopColor="#0891b2" />
             </linearGradient>
             <linearGradient id="hintKeyGlowBlack" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--neon-pink)" />
-              <stop offset="100%" stopColor="var(--neon-purple)" />
+              <stop offset="0%" stopColor="var(--neon-cyan)" />
+              <stop offset="100%" stopColor="#0891b2" />
             </linearGradient>
             <filter id="keyShadow" x="-10%" y="-10%" width="120%" height="120%">
               <feDropShadow

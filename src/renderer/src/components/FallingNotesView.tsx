@@ -84,15 +84,9 @@ export default function FallingNotesView({
       >
         <defs>
           {/* Gradient for standard unplayed notes (Trail effect: faint top, solid bottom) */}
-          <linearGradient id="neonBlue" x1="0%" y1="0%" x2="0%" y2="100%">
+          <linearGradient id="neonCyan" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="var(--neon-cyan)" stopOpacity="0.1" />
             <stop offset="80%" stopColor="var(--neon-cyan)" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#fff" stopOpacity="1" />
-          </linearGradient>
-          {/* Gradient for active/target notes */}
-          <linearGradient id="neonPink" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="var(--neon-pink)" stopOpacity="0.2" />
-            <stop offset="70%" stopColor="var(--neon-pink)" stopOpacity="0.9" />
             <stop offset="100%" stopColor="#fff" stopOpacity="1" />
           </linearGradient>
           {/* Subtle glow filter */}
@@ -141,14 +135,8 @@ export default function FallingNotesView({
                   width={bounds.width - 0.3}
                   height={noteHeight}
                   rx={0.25}
-                  fill={
-                    isActive
-                      ? 'url(#neonPink)'
-                      : isPlayed
-                        ? 'rgba(255,255,255,0.05)'
-                        : 'url(#neonBlue)'
-                  }
-                  opacity={isActive ? 1 : isPlayed ? 0.3 : 0.95}
+                  fill={isPlayed ? 'rgba(255,255,255,0.05)' : 'url(#neonCyan)'}
+                  opacity={isActive ? 1 : isPlayed ? 0.3 : 0.5}
                   filter={isActive ? 'url(#neonGlow)' : undefined}
                 />
               )

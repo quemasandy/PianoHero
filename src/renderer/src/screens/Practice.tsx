@@ -794,7 +794,7 @@ export default function Practice({
             subtitle="C Blues, Pentatónica Menor y Pentatónica Mayor"
             description="Práctica guiada de una octava subiendo y bajando, validando cada nota en orden."
             actionLabel="Practicar escalas"
-            accent="#4cc9f0"
+            accent="var(--neon-cyan)"
             onClick={openScaleSession}
           />
           <PracticeCard
@@ -802,7 +802,7 @@ export default function Practice({
             subtitle="Shell voicings 1-3-b7 del blues estándar"
             description="Recorre los 12 compases de C Jam Blues y no avances hasta tocar el acorde correcto."
             actionLabel="Practicar acordes"
-            accent="#f72585"
+            accent="var(--neon-cyan)"
             onClick={openChordSession}
           />
           <PracticeCard
@@ -810,7 +810,7 @@ export default function Practice({
             subtitle="Práctica de canciones"
             description="Aprende a leer partituras tocando canciones completas con acompañamiento."
             actionLabel="Practicar lectura"
-            accent="#06d6a0"
+            accent="var(--neon-cyan)"
             onClick={() => onNavigateMode('songs')}
           />
         </div>
@@ -1014,7 +1014,7 @@ export default function Practice({
             </button>
             <button
               onClick={restartActiveSession}
-              style={buttonStyle('var(--neon-pink)', '#0F0F23')}
+              style={buttonStyle('var(--neon-green)', '#0F0F23')}
             >
               Reiniciar
             </button>
@@ -1028,7 +1028,7 @@ export default function Practice({
           </div>
 
           <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-            <div style={metaBadgeStyle('var(--neon-pink)')}>
+            <div style={metaBadgeStyle('var(--neon-green)')}>
               {session.status === 'complete'
                 ? 'Progresión completa'
                 : `Compás ${Math.min(session.stepIndex + 1, exercise.progression.length)} / ${exercise.progression.length}`}
@@ -1062,13 +1062,13 @@ export default function Practice({
                   scrollSnapAlign: 'center',
                   padding: '24px',
                   borderRadius: '20px',
-                  border: current ? '2px solid var(--neon-pink)' : '1px solid var(--border-glass)',
+                  border: current ? '2px solid var(--neon-green)' : '1px solid var(--border-glass)',
                   background: completed
                     ? 'rgba(16,185,129,0.1)'
                     : current
-                      ? 'rgba(244,63,94,0.15)'
+                      ? 'rgba(16,185,129,0.15)'
                       : 'var(--bg-panel)',
-                  boxShadow: current ? '0 0 32px rgba(244,63,94,0.3)' : 'none',
+                  boxShadow: current ? '0 0 32px rgba(16,185,129,0.3)' : 'none',
                   transform: current ? 'scale(1.04)' : 'scale(0.98)',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   opacity: current || completed ? 1 : 0.6,
@@ -1076,7 +1076,7 @@ export default function Practice({
               >
                 <div
                   style={{
-                    color: current ? 'var(--neon-pink)' : '#8892a4',
+                    color: current ? 'var(--neon-green)' : '#8892a4',
                     fontSize: '13px',
                     marginBottom: '8px',
                     fontWeight: 800,
