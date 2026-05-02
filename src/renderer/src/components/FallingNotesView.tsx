@@ -68,19 +68,16 @@ export default function FallingNotesView({
 
   return (
     <div
-      style={{
-        width: '100%',
-        height: '100%',
-        backgroundColor: '#050810',
-        overflow: 'hidden',
-        position: 'relative',
-        boxSizing: 'border-box',
-      }}
+      className="ph-falling-notes"
+      data-current-event-index={currentEventIndex}
+      data-current-measure-index={currentMeasureIndex}
+      data-ui="falling-notes"
     >
       <svg
+        className="ph-falling-notes__svg"
+        data-ui="falling-notes-svg"
         viewBox={`${viewBounds.x - 0.4} 0 ${viewBounds.width + 0.8} ${VIEW_HEIGHT}`}
         preserveAspectRatio="none"
-        style={{ width: '100%', height: '100%', display: 'block' }}
       >
         <defs>
           {/* Gradient for standard unplayed notes (Trail effect: faint top, solid bottom) */}
@@ -99,6 +96,7 @@ export default function FallingNotesView({
           </filter>
         </defs>
         <g
+          data-ui="falling-notes-track"
           style={{
             transform: `translateY(${currentTick * TICK_HEIGHT}px)`,
             transition: 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)',
@@ -130,6 +128,12 @@ export default function FallingNotesView({
               return (
                 <rect
                   key={`${ev.measureIndex}-${ev.eventIndex}-${pitch}`}
+                  className="ph-falling-notes__note"
+                  data-event-index={ev.eventIndex}
+                  data-measure-index={ev.measureIndex}
+                  data-pitch={pitch}
+                  data-state={isActive ? 'active' : isPlayed ? 'played' : 'upcoming'}
+                  data-ui="falling-note"
                   x={bounds.x + 0.15}
                   y={yTopAbsolute}
                   width={bounds.width - 0.3}
@@ -146,6 +150,8 @@ export default function FallingNotesView({
 
         {/* Target line inside the SVG, aligned with the top edge of the piano keys (does NOT transform with the group) */}
         <line
+          className="ph-falling-notes__target-line"
+          data-ui="falling-notes-target-line"
           x1={viewBounds.x - 0.4}
           y1={VIEW_HEIGHT - 0.8}
           x2={viewBounds.x + viewBounds.width + 0.4}

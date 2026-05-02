@@ -30,7 +30,8 @@ import type {
   ScaleExerciseDefinition,
 } from '../types'
 import { detectChord } from '../lib/chordDetection'
-import AppNavigation, { AppMode, buttonStyle } from '../components/AppNavigation'
+import AppNavigation, { AppMode } from '../components/AppNavigation'
+import { buttonStyle } from '../components/uiStyles'
 
 const WORLDDE_DEVICE_PATTERN = /worldde|easykey/i
 const WORLDDE_KEY_COUNT = 25
@@ -751,6 +752,8 @@ export default function Practice({
     return (
       <>
         <div
+          className="ph-practice-home__hero"
+          data-ui="practice-home-hero"
           style={{
             padding: '0 0 16px 0',
             textAlign: 'center',
@@ -760,6 +763,8 @@ export default function Practice({
           }}
         >
           <h1
+            className="ph-practice-home__title"
+            data-ui="practice-home-title"
             style={{
               margin: 0,
               padding: '0 20px',
@@ -775,6 +780,8 @@ export default function Practice({
             PianoHero
           </h1>
           <p
+            className="ph-practice-home__subtitle"
+            data-ui="practice-home-subtitle"
             style={{
               margin: '24px 0 0',
               color: 'var(--slate-300)',
@@ -788,8 +795,13 @@ export default function Practice({
           </p>
         </div>
 
-        <div style={homeGridStyle}>
+        <section
+          className="ph-practice-home__grid"
+          data-ui="practice-card-grid"
+          style={homeGridStyle}
+        >
           <PracticeCard
+            mode="scales"
             title="Escalas"
             subtitle="C Blues, Pentatónica Menor y Pentatónica Mayor"
             description="Práctica guiada de una octava subiendo y bajando, validando cada nota en orden."
@@ -798,6 +810,7 @@ export default function Practice({
             onClick={openScaleSession}
           />
           <PracticeCard
+            mode="chords"
             title="Acordes"
             subtitle="Shell voicings 1-3-b7 del blues estándar"
             description="Recorre los 12 compases de C Jam Blues y no avances hasta tocar el acorde correcto."
@@ -806,6 +819,7 @@ export default function Practice({
             onClick={openChordSession}
           />
           <PracticeCard
+            mode="songs"
             title="Lectura musical"
             subtitle="Práctica de canciones"
             description="Aprende a leer partituras tocando canciones completas con acompañamiento."
@@ -813,10 +827,13 @@ export default function Practice({
             accent="var(--neon-cyan)"
             onClick={() => onNavigateMode('songs')}
           />
-        </div>
+        </section>
 
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
+        <div className="ph-practice-home__monitor-row" data-ui="practice-monitor-row">
           <div
+            className="ph-practice-monitor"
+            data-midi-status={midiState.status}
+            data-ui="practice-monitor"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -831,8 +848,11 @@ export default function Practice({
               transition: 'all 0.2s',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', width: '100px' }}>
+            <div className="ph-practice-monitor__midi" data-ui="practice-monitor-midi">
               <div
+                className="ph-practice-monitor__status-dot"
+                data-state={midiState.status === 'connected' ? 'connected' : 'inactive'}
+                data-ui="midi-status-dot"
                 style={{
                   width: 8,
                   height: 8,
@@ -841,14 +861,18 @@ export default function Practice({
                   boxShadow: `0 0 8px ${midiState.status === 'connected' ? 'rgba(6,214,160,0.5)' : 'rgba(255,107,129,0.5)'}`,
                 }}
               />
-              <span style={{ fontWeight: 600 }}>
+              <span className="ph-practice-monitor__label" data-ui="midi-status-label">
                 {midiState.status === 'connected' ? 'MIDI Listo' : 'MIDI Inactivo'}
               </span>
             </div>
 
-            <div style={{ width: 1, height: 12, background: 'rgba(255,255,255,0.15)' }} />
+            <div className="ph-practice-monitor__separator" data-ui="practice-monitor-separator" />
 
             <div
+              className="ph-practice-monitor__note"
+              data-note={activeChordName || lastMidiLabel || ''}
+              data-state={activeChordName || lastMidiLabel ? 'active' : 'idle'}
+              data-ui="practice-monitor-note"
               style={{
                 width: '100px',
                 textAlign: 'center',
@@ -856,7 +880,7 @@ export default function Practice({
                 fontWeight: activeChordName || lastMidiLabel ? 700 : 500,
               }}
             >
-              <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div className="ph-truncate">
                 {activeChordName
                   ? activeChordName
                   : lastMidiLabel
@@ -865,9 +889,13 @@ export default function Practice({
               </div>
             </div>
 
-            <div style={{ width: 1, height: 12, background: 'rgba(255,255,255,0.15)' }} />
+            <div className="ph-practice-monitor__separator" data-ui="practice-monitor-separator" />
 
             <div
+              className="ph-practice-monitor__active-count"
+              data-count={monitorPressedNotes.size}
+              data-state={monitorPressedNotes.size > 0 ? 'active' : 'idle'}
+              data-ui="practice-monitor-active-count"
               style={{
                 width: '70px',
                 textAlign: 'center',
@@ -885,8 +913,15 @@ export default function Practice({
 
   function renderScaleSession(exercise: ScaleExerciseDefinition, session: PracticeSessionState) {
     return (
-      <>
+      <section
+        className="ph-practice-session ph-practice-session--scale"
+        data-exercise-id={exercise.id}
+        data-state={session.status}
+        data-ui="scale-session"
+      >
         <div
+          className="ph-practice-session__header"
+          data-ui="scale-session-header"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -896,12 +931,36 @@ export default function Practice({
             gap: '16px',
           }}
         >
-          <div style={{ ...scaleTitleGroupStyle, flex: 1 }}>
-            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{exercise.name}</h2>
-            <div style={scaleRootControlStyle}>
-              <span style={scaleRootLabelStyle}>Tonalidad</span>
+          <div
+            className="ph-practice-session__title-group"
+            data-ui="scale-title-group"
+            style={{ ...scaleTitleGroupStyle, flex: 1 }}
+          >
+            <h2
+              className="ph-practice-session__title"
+              data-ui="scale-title"
+              style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}
+            >
+              {exercise.name}
+            </h2>
+            <label
+              className="ph-scale-root-control"
+              data-ui="scale-root-control"
+              style={scaleRootControlStyle}
+            >
+              <span
+                className="ph-scale-root-control__label"
+                data-ui="scale-root-label"
+                style={scaleRootLabelStyle}
+              >
+                Tonalidad
+              </span>
               <select
                 aria-label="Tonalidad de la escala"
+                className="ph-select ph-scale-root-control__select"
+                data-exercise-id={exercise.id}
+                data-root={selectedScaleRoot.pitchClass}
+                data-ui="scale-root-select"
                 value={selectedScaleRoot.pitchClass}
                 onChange={(event) => handleScaleRootChange(Number(event.target.value))}
                 style={scaleRootSelectStyle}
@@ -912,11 +971,14 @@ export default function Practice({
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+          <div className="ph-practice-session__actions" data-ui="scale-session-actions">
             <button
+              type="button"
+              className="ph-button"
+              data-ui="previous-scale-button"
               onClick={goToPreviousScaleExercise}
               disabled={false}
               style={buttonStyle('var(--bg-panel)', '#fff', false)}
@@ -924,12 +986,18 @@ export default function Practice({
               ← Ejercicio
             </button>
             <button
+              type="button"
+              className="ph-button"
+              data-ui="restart-scale-button"
               onClick={restartActiveSession}
               style={buttonStyle('var(--neon-cyan)', '#0F0F23')}
             >
               Reiniciar
             </button>
             <button
+              type="button"
+              className="ph-button"
+              data-ui="next-scale-button"
               onClick={goToNextScaleExercise}
               disabled={false}
               style={buttonStyle('var(--bg-panel)', '#fff', false)}
@@ -938,8 +1006,12 @@ export default function Practice({
             </button>
           </div>
 
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-            <div style={metaBadgeStyle('var(--neon-cyan)')}>
+          <div className="ph-practice-session__meta" data-ui="scale-session-meta">
+            <div
+              className="ph-meta-badge"
+              data-ui="scale-progress-badge"
+              style={metaBadgeStyle('var(--neon-cyan)')}
+            >
               {session.status === 'complete'
                 ? 'Completada'
                 : `Paso ${Math.min(session.stepIndex + 1, exercise.noteSequence.length)} / ${exercise.noteSequence.length}`}
@@ -947,7 +1019,7 @@ export default function Practice({
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '16px' }}>
+        <div className="ph-scale-note-list" data-ui="scale-note-list">
           {exercise.noteSequence.map((pitch, index) => {
             const completed = index < session.stepIndex || session.status === 'complete'
             const current = index === session.stepIndex && session.status !== 'complete'
@@ -955,6 +1027,12 @@ export default function Practice({
             return (
               <div
                 key={`${exercise.id}-${index}-${pitch}`}
+                className="ph-scale-note"
+                data-note={pitchToPracticeLabel(pitch)}
+                data-pitch={pitch}
+                data-state={completed ? 'completed' : current ? 'current' : 'pending'}
+                data-step-index={index}
+                data-ui="scale-note"
                 style={{
                   padding: '10px 12px',
                   borderRadius: '10px',
@@ -980,7 +1058,7 @@ export default function Practice({
             )
           })}
         </div>
-      </>
+      </section>
     )
   }
 
@@ -989,8 +1067,15 @@ export default function Practice({
     const isLast = chordIndex === CHORD_EXERCISES.length - 1
 
     return (
-      <>
+      <section
+        className="ph-practice-session ph-practice-session--chord"
+        data-exercise-id={exercise.id}
+        data-state={session.status}
+        data-ui="chord-session"
+      >
         <div
+          className="ph-practice-session__header"
+          data-ui="chord-session-header"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -1000,12 +1085,21 @@ export default function Practice({
             gap: '16px',
           }}
         >
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{exercise.name}</h2>
+          <div className="ph-practice-session__title-group" data-ui="chord-title-group">
+            <h2
+              className="ph-practice-session__title"
+              data-ui="chord-title"
+              style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}
+            >
+              {exercise.name}
+            </h2>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+          <div className="ph-practice-session__actions" data-ui="chord-session-actions">
             <button
+              type="button"
+              className="ph-button"
+              data-ui="previous-chord-button"
               onClick={goToPreviousChordExercise}
               disabled={isFirst}
               style={buttonStyle('var(--bg-panel)', '#fff', isFirst)}
@@ -1013,12 +1107,18 @@ export default function Practice({
               ← Ejercicio
             </button>
             <button
+              type="button"
+              className="ph-button"
+              data-ui="restart-chord-button"
               onClick={restartActiveSession}
               style={buttonStyle('var(--neon-cyan)', '#0F0F23')}
             >
               Reiniciar
             </button>
             <button
+              type="button"
+              className="ph-button"
+              data-ui="next-chord-button"
               onClick={goToNextChordExercise}
               disabled={isLast}
               style={buttonStyle('var(--bg-panel)', '#fff', isLast)}
@@ -1027,8 +1127,12 @@ export default function Practice({
             </button>
           </div>
 
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-            <div style={metaBadgeStyle('var(--neon-cyan)')}>
+          <div className="ph-practice-session__meta" data-ui="chord-session-meta">
+            <div
+              className="ph-meta-badge"
+              data-ui="chord-progress-badge"
+              style={metaBadgeStyle('var(--neon-cyan)')}
+            >
               {session.status === 'complete'
                 ? 'Progresión completa'
                 : `Compás ${Math.min(session.stepIndex + 1, exercise.progression.length)} / ${exercise.progression.length}`}
@@ -1038,7 +1142,8 @@ export default function Practice({
 
         <div
           ref={carouselRef}
-          className="hide-scrollbar"
+          className="ph-chord-carousel ph-hide-scrollbar"
+          data-ui="chord-carousel"
           style={{
             display: 'flex',
             gap: '24px',
@@ -1056,6 +1161,12 @@ export default function Practice({
             return (
               <div
                 key={`${exercise.id}-${prompt.barIndex}`}
+                className="ph-chord-card"
+                data-bar-index={prompt.barIndex}
+                data-chord-name={prompt.chordName}
+                data-exercise-id={exercise.id}
+                data-state={completed ? 'completed' : current ? 'current' : 'pending'}
+                data-ui="chord-card"
                 style={{
                   flexShrink: 0,
                   width: '260px',
@@ -1075,6 +1186,8 @@ export default function Practice({
                 }}
               >
                 <div
+                  className="ph-chord-card__bar"
+                  data-ui="chord-card-bar"
                   style={{
                     color: current ? 'var(--neon-cyan)' : '#8892a4',
                     fontSize: '13px',
@@ -1090,6 +1203,8 @@ export default function Practice({
                 <SheetMusic notes={prompt.targetNotes} active={current || completed} />
 
                 <div
+                  className="ph-chord-card__name"
+                  data-ui="chord-card-name"
                   style={{
                     color: 'var(--text)',
                     fontSize: '36px',
@@ -1107,7 +1222,7 @@ export default function Practice({
         </div>
 
         {/* Resumen redundante removido para maximizar limpieza visual */}
-      </>
+      </section>
     )
   }
 
@@ -1121,6 +1236,8 @@ export default function Practice({
 
       return (
         <div
+          className="ph-keyboard-guide ph-keyboard-guide--scale"
+          data-ui="keyboard-guide"
           style={{
             ...keyboardGuideStyle,
             padding: '16px 32px',
@@ -1134,9 +1251,11 @@ export default function Practice({
           {/* Spacer izquierdo para centrar perfectamente el pentagrama */}
           <div />
 
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div className="ph-keyboard-guide__sheet-wrap" data-ui="keyboard-guide-sheet-wrap">
             {targetNote !== undefined && (
               <div
+                className="ph-keyboard-guide__sheet"
+                data-ui="keyboard-guide-sheet"
                 style={{
                   width: '100%',
                   minWidth: '400px',
@@ -1163,6 +1282,8 @@ export default function Practice({
           </div>
 
           <div
+            className="ph-keyboard-guide__prompt"
+            data-ui="keyboard-guide-prompt"
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -1172,6 +1293,8 @@ export default function Practice({
             }}
           >
             <div
+              className="ph-keyboard-guide__eyebrow"
+              data-ui="keyboard-guide-eyebrow"
               style={{
                 color: '#8be9fd',
                 fontSize: '13px',
@@ -1182,18 +1305,22 @@ export default function Practice({
             >
               Lectura en Pentagrama
             </div>
-            <div style={{ color: '#fff', fontSize: '24px', fontWeight: 800 }}>
+            <div className="ph-keyboard-guide__target" data-ui="keyboard-guide-target">
               {scaleSession.status === 'complete'
                 ? 'Escala terminada'
                 : `Siguiente nota: ${pitchToPracticeLabel(targetNote)}`}
             </div>
-            <div style={{ color: '#c8d1e8', fontSize: '14px' }}>
+            <div className="ph-keyboard-guide__help" data-ui="keyboard-guide-help">
               {scaleSession.status === 'complete'
                 ? 'Puedes reiniciar o pasar a la siguiente escala.'
                 : 'La nota objetivo aparece también en el pentagrama.'}
             </div>
 
-            <div style={{ ...keyboardLegendStyle, marginTop: '8px', justifyContent: 'flex-end' }}>
+            <div
+              className="ph-keyboard-legend"
+              data-ui="keyboard-legend"
+              style={{ ...keyboardLegendStyle, marginTop: '8px', justifyContent: 'flex-end' }}
+            >
               <LegendPill label="Objetivo actual" background="var(--neon-cyan)" color="#ffffff" />
               <LegendPill label="Correcta" background="var(--neon-blue)" color="#ffffff" />
               <LegendPill label="Incorrecta" background="#ff6b81" color="#ffffff" />
@@ -1209,9 +1336,12 @@ export default function Practice({
 
   function renderGlobalStatusControls() {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+      <div className="ph-global-controls" data-ui="global-controls">
         {midiState.status !== 'connected' && (
           <button
+            type="button"
+            className="ph-button"
+            data-ui="reconnect-midi-button"
             onClick={() => {
               void refreshMidiConnection('manual')
             }}
@@ -1222,6 +1352,9 @@ export default function Practice({
         )}
 
         <div
+          className="ph-backing-track-control"
+          data-state={rhythm.isPlaying ? 'playing' : 'stopped'}
+          data-ui="backing-track-control"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -1232,11 +1365,16 @@ export default function Practice({
             border: '1px solid var(--border-glass)',
           }}
         >
-          <span style={{ color: 'var(--slate-300)', fontSize: '13px', fontWeight: 600 }}>
+          <span className="ph-backing-track-control__label" data-ui="backing-track-label">
             Ensamble Jazz:
           </span>
 
           <button
+            type="button"
+            aria-pressed={rhythm.isPlaying}
+            className="ph-button"
+            data-state={rhythm.isPlaying ? 'playing' : 'stopped'}
+            data-ui="backing-track-toggle"
             onClick={() => rhythm.togglePlay()}
             style={{
               ...buttonStyle(rhythm.isPlaying ? 'var(--neon-pink)' : '#06d6a0', '#000'),
@@ -1249,8 +1387,11 @@ export default function Practice({
             {rhythm.isPlaying ? 'STOP' : 'PLAY'}
           </button>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="ph-bpm-control" data-ui="bpm-control">
             <input
+              aria-label="Tempo de acompañamiento"
+              className="ph-bpm-control__slider"
+              data-ui="bpm-slider"
               type="range"
               min="60"
               max="240"
@@ -1258,28 +1399,15 @@ export default function Practice({
               onChange={(e) => rhythm.updateBpm(Number(e.target.value))}
               style={{ width: '80px', accentColor: '#4cc9f0' }}
             />
-            <span style={{ color: '#4cc9f0', fontSize: '12px', fontWeight: 800, width: '50px' }}>
+            <span className="ph-bpm-control__value" data-ui="bpm-value">
               {rhythm.bpm} BPM
             </span>
           </div>
         </div>
 
         <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0,0,0,0.4)',
-            borderRadius: '12px',
-            padding: '6px 16px',
-            border: '1px solid var(--border-glass)',
-          }}
-        >
-          <span style={{ color: '#4cc9f0', fontSize: '12px', fontWeight: 700 }}>
-            {RANGE_STATUS_LABEL}
-          </span>
-        </div>
-
-        <div
+          className="ph-status-pill"
+          data-ui="practice-range-status"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -1290,15 +1418,37 @@ export default function Practice({
           }}
         >
           <span
-            style={{
-              color: midiStatusColor,
-              fontSize: '12px',
-              fontWeight: 700,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              maxWidth: '180px',
-            }}
+            className="ph-status-text"
+            data-ui="range-status"
+            role="status"
+            style={{ '--ph-status-color': '#4cc9f0' } as CSSProperties}
+          >
+            {RANGE_STATUS_LABEL}
+          </span>
+        </div>
+
+        <div
+          className="ph-status-pill"
+          data-midi-status={midiState.status}
+          data-ui="practice-midi-status"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.4)',
+            borderRadius: '12px',
+            padding: '6px 16px',
+            border: '1px solid var(--border-glass)',
+          }}
+        >
+          <span
+            className="ph-status-text ph-status-text--truncate"
+            data-ui="midi-status"
+            role="status"
+            style={
+              {
+                '--ph-status-color': midiStatusColor,
+              } as CSSProperties
+            }
             title={midiStatusLabel}
           >
             {midiStatusLabel}
@@ -1309,7 +1459,7 @@ export default function Practice({
   }
 
   return (
-    <div style={rootStyle}>
+    <main className="ph-practice" data-ui="practice-screen" data-view={view} style={rootStyle}>
       {/* AppNavigation at the absolute top for sessions to perfectly match SongPractice alignment */}
       {view !== 'practice_home' && (
         <AppNavigation
@@ -1323,8 +1473,14 @@ export default function Practice({
 
       {/* Legacy status bar shifts layout when in Home vs nested modes */}
       {view === 'practice_home' && (
-        <div style={{ ...titleBarStyle, padding: '8px 40px 8px 40px', borderBottom: 'none' }}>
+        <header
+          className="ph-practice__home-statusbar"
+          data-ui="practice-home-statusbar"
+          style={{ ...titleBarStyle, padding: '8px 40px 8px 40px', borderBottom: 'none' }}
+        >
           <div
+            className="ph-practice__home-statusbar-inner"
+            data-ui="practice-home-statusbar-inner"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -1336,10 +1492,12 @@ export default function Practice({
           >
             {renderGlobalStatusControls()}
           </div>
-        </div>
+        </header>
       )}
 
-      <div
+      <section
+        className="ph-practice__content"
+        data-ui="practice-content"
         style={{
           padding: view === 'practice_home' ? '8px 32px' : '24px 32px',
           display: 'flex',
@@ -1362,9 +1520,13 @@ export default function Practice({
         )}
 
         {renderKeyboardGuide()}
-      </div>
+      </section>
 
-      <div style={{ padding: '4px 32px 8px 32px', flexShrink: 0 }}>
+      <section
+        className="ph-practice__piano"
+        data-ui="practice-piano-region"
+        style={{ padding: '4px 32px 8px 32px', flexShrink: 0 }}
+      >
         <Piano
           activeNotes={pianoActiveNotes}
           hintNotes={view === 'practice_home' ? new Set() : targetNotes}
@@ -1374,11 +1536,12 @@ export default function Practice({
           }
           keyboardWindow={PRACTICE_KEYBOARD_WINDOW}
           compactView={true}
+          centerFullKeyboard={true}
           onNoteOn={handlePianoNoteOn}
           onNoteOff={handlePianoNoteOff}
         />
-      </div>
-    </div>
+      </section>
+    </main>
   )
 }
 
@@ -1403,6 +1566,10 @@ function FeedbackBanner({ feedback }: { feedback: FeedbackState }) {
 
   return (
     <div
+      className="ph-feedback-banner"
+      data-kind={feedback.kind}
+      data-ui="feedback-banner"
+      role="status"
       style={{
         padding: '14px 16px',
         borderRadius: '14px',
@@ -1428,6 +1595,9 @@ function LegendPill({
 }) {
   return (
     <span
+      className="ph-legend-pill"
+      data-label={label}
+      data-ui="legend-pill"
       style={{
         padding: '8px 12px',
         borderRadius: '999px',
@@ -1443,6 +1613,7 @@ function LegendPill({
 }
 
 function PracticeCard({
+  mode,
   title,
   subtitle,
   description,
@@ -1450,6 +1621,7 @@ function PracticeCard({
   accent,
   onClick,
 }: {
+  mode: AppMode
   title: string
   subtitle: string
   description: string
@@ -1459,8 +1631,11 @@ function PracticeCard({
 }) {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className="glass-panel hover-lift"
+      className="ph-practice-card ph-glass-panel ph-hover-lift"
+      data-mode={mode}
+      data-ui="practice-card"
       style={{
         padding: '20px 24px',
         textAlign: 'left',
@@ -1473,6 +1648,8 @@ function PracticeCard({
       }}
     >
       <div
+        className="ph-practice-card__subtitle"
+        data-ui="practice-card-subtitle"
         style={{
           color: accent,
           fontSize: '12px',
@@ -1483,11 +1660,27 @@ function PracticeCard({
       >
         {subtitle}
       </div>
-      <div style={{ color: 'var(--text)', fontSize: '28px', fontWeight: 800 }}>{title}</div>
-      <div style={{ color: 'var(--slate-300)', fontSize: '15px', lineHeight: 1.6, flex: 1 }}>
+      <div
+        className="ph-practice-card__title"
+        data-ui="practice-card-title"
+        style={{ color: 'var(--text)', fontSize: '28px', fontWeight: 800 }}
+      >
+        {title}
+      </div>
+      <div
+        className="ph-practice-card__description"
+        data-ui="practice-card-description"
+        style={{ color: 'var(--slate-300)', fontSize: '15px', lineHeight: 1.6, flex: 1 }}
+      >
         {description}
       </div>
-      <span style={{ color: accent, fontWeight: 700, marginTop: '8px' }}>{actionLabel} →</span>
+      <span
+        className="ph-practice-card__action"
+        data-ui="practice-card-action"
+        style={{ color: accent, fontWeight: 700, marginTop: '8px' }}
+      >
+        {actionLabel} →
+      </span>
     </button>
   )
 }

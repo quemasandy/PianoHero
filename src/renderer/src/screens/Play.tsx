@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, type CSSProperties } from 'react'
 import type { KeyboardWindow, MidiControllerProfile, ParsedSong, PlayerState } from '../types'
 import { Scheduler } from '../lib/Scheduler'
 import Waterfall from '../components/Waterfall'
@@ -466,60 +466,48 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
   }
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        display: 'grid',
-        gridTemplateRows: 'auto minmax(0, 1fr) auto auto',
-        minHeight: 0,
-        overflow: 'hidden',
-        background: '#1a1a2e',
-      }}
-    >
+    <main className="ph-play" data-ui="play-screen">
       {/* Title bar */}
-      <div
-        style={{
-          padding: '8px 16px',
-          background: '#0f1b2d',
-          borderBottom: '1px solid #223',
-          fontSize: '14px',
-          color: '#8892a4',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '16px',
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          WebkitAppRegion: 'drag' as any,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <span style={{ color: '#fff', fontWeight: 600 }}>{song.title}</span>
-          <span style={{ color: '#ffd166', fontSize: '12px', fontWeight: 700 }}>
+      <header className="ph-play__titlebar" data-ui="play-titlebar">
+        <div className="ph-play__song-meta" data-ui="play-song-meta">
+          <span className="ph-play__song-title" data-ui="play-song-title">
+            {song.title}
+          </span>
+          <span className="ph-play__silent-mode" data-ui="silent-mode-label">
             {SILENT_MODE_LABEL}
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ color: midiStatusColor, fontSize: '12px', fontWeight: 700 }}>
+        <div className="ph-play__status-list" data-ui="play-status-list">
+          <span
+            className="ph-status-text"
+            data-ui="midi-status"
+            role="status"
+            style={{ '--ph-status-color': midiStatusColor } as CSSProperties}
+          >
             {midiStatusLabel}
           </span>
           {rangeStatusLabel && (
-            <span style={{ color: rangeStatusColor, fontSize: '12px', fontWeight: 700 }}>
+            <span
+              className="ph-status-text"
+              data-ui="range-status"
+              role="status"
+              style={{ '--ph-status-color': rangeStatusColor } as CSSProperties}
+            >
               {rangeStatusLabel}
             </span>
           )}
         </div>
-      </div>
+      </header>
 
       {/* Waterfall */}
-      <div style={{ minHeight: 0, overflow: 'hidden' }}>
+      <section className="ph-play__waterfall" data-ui="play-waterfall">
         <Waterfall
           song={song}
           playerState={playerState}
           keyboardWindow={visibleKeyboardWindow}
           compactView={compactWorlddeView}
         />
-      </div>
+      </section>
 
       {/* Piano keyboard */}
       <Piano
@@ -550,6 +538,6 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
         onToggleTrack={handleToggleTrack}
         onBack={onBack}
       />
-    </div>
+    </main>
   )
 }

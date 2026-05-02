@@ -1,22 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import type { DiagnosticsSnapshot, DiagnosticEntry } from '../types'
-
-const panelStyle: React.CSSProperties = {
-  position: 'fixed',
-  bottom: '24px',
-  right: '24px',
-  zIndex: 9999,
-  display: 'flex',
-  flexDirection: 'column-reverse',
-  alignItems: 'flex-end',
-  gap: '12px',
-  WebkitAppRegion: 'no-drag' as never,
-  maxWidth: 'min(560px, calc(100vw - 32px))'
-}
 
 const emptySnapshot: DiagnosticsSnapshot = {
   logPath: '',
-  entries: []
+  entries: [],
 }
 
 function entryColor(level: DiagnosticEntry['level']) {
@@ -32,13 +19,16 @@ export default function DiagnosticsPanel() {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    window.electronAPI.getDiagnosticsSnapshot().then(setSnapshot).catch(() => {})
+    window.electronAPI
+      .getDiagnosticsSnapshot()
+      .then(setSnapshot)
+      .catch(() => {})
     return window.electronAPI.onDiagnosticsUpdated(setSnapshot)
   }, [])
 
   const recentEntries = useMemo(() => snapshot.entries.slice(-30).reverse(), [snapshot.entries])
   const errorCount = useMemo(
-    () => snapshot.entries.filter(entry => entry.level === 'error').length,
+    () => snapshot.entries.filter((entry) => entry.level === 'error').length,
     [snapshot.entries]
   )
 
@@ -54,136 +44,95 @@ export default function DiagnosticsPanel() {
   }
 
   return (
-    <div style={panelStyle}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+    <aside
+      className="ph-diagnostics"
+      data-error-count={errorCount}
+      data-open={open ? 'true' : 'false'}
+      data-ui="diagnostics-panel"
+    >
+      <div className="ph-diagnostics__toggle-row" data-ui="diagnostics-toggle-row">
         <button
-          onClick={() => setOpen(prev => !prev)}
+          type="button"
+          aria-expanded={open}
+          aria-label="Logs del sistema"
+          className="ph-diagnostics__toggle"
+          data-has-errors={errorCount > 0 ? 'true' : 'false'}
+          data-state={open ? 'open' : 'closed'}
+          data-ui="diagnostics-toggle"
+          onClick={() => setOpen((prev) => !prev)}
           title="Logs del Sistema"
-          style={{
-            background: errorCount > 0 ? 'rgba(247, 37, 133, 0.8)' : 'rgba(255, 255, 255, 0.05)',
-            color: errorCount > 0 ? '#fff' : 'rgba(255,255,255,0.3)',
-            borderRadius: '50%',
-            width: '32px',
-            height: '32px',
-            padding: 0,
-            fontSize: '12px',
-            fontWeight: 700,
-            border: '1px solid rgba(255,255,255,0.05)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.3s ease-in-out',
-            opacity: open ? 1 : 0.5
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-          onMouseLeave={(e) => e.currentTarget.style.opacity = open ? '1' : '0.5'}
         >
           {errorCount > 0 ? '!' : '⚙'}
         </button>
       </div>
 
       {open && (
-        <div style={{
-          background: 'rgba(10, 15, 24, 0.96)',
-          color: '#fff',
-          border: '1px solid #334',
-          borderRadius: '16px',
-          boxShadow: '0 18px 48px rgba(0,0,0,0.35)',
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            padding: '14px 16px',
-            borderBottom: '1px solid #223',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '8px'
-          }}>
+        <div className="ph-diagnostics__panel" data-ui="diagnostics-log-panel">
+          <header className="ph-diagnostics__header" data-ui="diagnostics-header">
             <div>
-              <div style={{ fontWeight: 700 }}>Diagnóstico</div>
-              <div style={{ fontSize: '12px', color: '#8892a4' }}>
+              <div className="ph-diagnostics__title" data-ui="diagnostics-title">
+                Diagnóstico
+              </div>
+              <div className="ph-diagnostics__path" data-ui="diagnostics-log-path">
                 {snapshot.logPath || 'Ruta del log no disponible'}
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div className="ph-diagnostics__actions" data-ui="diagnostics-actions">
               <button
+                type="button"
+                className="ph-diagnostics__action"
+                data-state={copied ? 'copied' : 'idle'}
+                data-ui="copy-log-path-button"
                 onClick={handleCopyPath}
-                style={{
-                  background: '#223',
-                  color: '#fff',
-                  borderRadius: '8px',
-                  padding: '6px 10px',
-                  fontSize: '12px'
-                }}
               >
                 {copied ? 'Copiado' : 'Copiar ruta'}
               </button>
               <button
+                type="button"
+                className="ph-diagnostics__action"
+                data-ui="show-log-file-button"
                 onClick={() => window.electronAPI.showDiagnosticsLog().catch(() => {})}
-                style={{
-                  background: '#223',
-                  color: '#fff',
-                  borderRadius: '8px',
-                  padding: '6px 10px',
-                  fontSize: '12px'
-                }}
               >
                 Mostrar archivo
               </button>
             </div>
-          </div>
+          </header>
 
-          <div style={{
-            maxHeight: 'calc(60vh - 72px)',
-            overflow: 'auto',
-            padding: '10px 12px 12px'
-          }}>
+          <div className="ph-diagnostics__entries" data-ui="diagnostics-entry-list">
             {recentEntries.length === 0 ? (
-              <p style={{ color: '#8892a4', fontSize: '13px' }}>Todavía no hay eventos registrados.</p>
+              <p className="ph-diagnostics__empty" data-ui="diagnostics-empty">
+                Todavía no hay eventos registrados.
+              </p>
             ) : (
               recentEntries.map((entry, index) => (
                 <div
                   key={`${entry.timestamp}-${entry.event}-${index}`}
-                  style={{
-                    padding: '10px 12px',
-                    borderRadius: '10px',
-                    background: 'rgba(255,255,255,0.03)',
-                    marginBottom: '8px',
-                    border: `1px solid ${entryColor(entry.level)}33`
-                  }}
+                  className="ph-diagnostics__entry"
+                  data-event={entry.event}
+                  data-level={entry.level}
+                  data-source={entry.source}
+                  data-ui="diagnostics-entry"
+                  style={{ '--ph-entry-color': entryColor(entry.level) } as CSSProperties}
                 >
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    marginBottom: '4px',
-                    flexWrap: 'wrap'
-                  }}>
-                    <span style={{
-                      color: entryColor(entry.level),
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      textTransform: 'uppercase'
-                    }}>
+                  <div className="ph-diagnostics__entry-meta" data-ui="diagnostics-entry-meta">
+                    <span className="ph-diagnostics__entry-level" data-ui="diagnostics-entry-level">
                       {entry.level}
                     </span>
-                    <span style={{ fontSize: '11px', color: '#8892a4' }}>{entry.timestamp}</span>
-                    <span style={{ fontSize: '11px', color: '#8892a4' }}>{entry.source}</span>
-                    <span style={{ fontSize: '11px', color: '#8892a4' }}>{entry.event}</span>
+                    <span data-ui="diagnostics-entry-time">{entry.timestamp}</span>
+                    <span data-ui="diagnostics-entry-source">{entry.source}</span>
+                    <span data-ui="diagnostics-entry-event">{entry.event}</span>
                   </div>
-                  <div style={{ fontSize: '13px', lineHeight: 1.45 }}>{entry.message}</div>
+                  <div
+                    className="ph-diagnostics__entry-message"
+                    data-ui="diagnostics-entry-message"
+                  >
+                    {entry.message}
+                  </div>
                   {entry.context !== undefined && (
-                    <pre style={{
-                      marginTop: '8px',
-                      padding: '10px',
-                      borderRadius: '8px',
-                      background: 'rgba(0,0,0,0.28)',
-                      color: '#aab4c8',
-                      fontSize: '11px',
-                      whiteSpace: 'pre-wrap',
-                      overflowWrap: 'anywhere'
-                    }}>
+                    <pre
+                      className="ph-diagnostics__entry-context"
+                      data-ui="diagnostics-entry-context"
+                    >
                       {JSON.stringify(entry.context, null, 2)}
                     </pre>
                   )}
@@ -193,6 +142,6 @@ export default function DiagnosticsPanel() {
           </div>
         </div>
       )}
-    </div>
+    </aside>
   )
 }

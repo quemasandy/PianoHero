@@ -168,8 +168,12 @@ export default function SheetMusic({
 
   return (
     <div
+      className="ph-sheet-music"
+      data-mode={mode}
+      data-note-count={notes.length}
+      data-state={active ? 'active' : 'idle'}
+      data-ui="sheet-music"
       ref={containerRef}
-      style={{ width: '100%', height: '140px', display: 'flex', justifyContent: 'center' }}
     />
   )
 }

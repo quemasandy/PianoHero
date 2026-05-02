@@ -23,22 +23,6 @@ function modeTabStyle(active: boolean): CSSProperties {
   }
 }
 
-export function buttonStyle(background: string, color = '#fff', disabled = false): CSSProperties {
-  return {
-    background,
-    color,
-    border: 'none',
-    borderRadius: '10px',
-    padding: '10px 16px',
-    fontSize: '13px',
-    fontWeight: 700,
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    opacity: disabled ? 0.4 : 1,
-    transition: 'all 0.2s',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-  }
-}
-
 export default function AppNavigation({
   currentMode,
   onNavigateHome,
@@ -46,35 +30,24 @@ export default function AppNavigation({
   children,
 }: AppNavigationProps) {
   return (
-    <div
-      className="glass-panel"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '16px',
-        flexWrap: 'wrap',
-        margin: '16px 32px 24px 32px',
-        padding: '12px 24px',
-        position: 'relative',
-        zIndex: 10,
-      }}
+    <nav
+      aria-label="Navegación principal"
+      className="ph-app-nav ph-glass-panel"
+      data-mode={currentMode}
+      data-ui="app-nav"
     >
       {/* Lado Izquierdo: Navegación Principal */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+      <div className="ph-app-nav__primary" data-ui="app-nav-primary">
         <button
+          type="button"
           onClick={onNavigateHome}
+          aria-label="Volver a inicio"
           title="Volver a Inicio"
-          className="hover-lift"
-          style={{
-            ...buttonStyle('rgba(255,255,255,0.05)', '#c8d1e8'),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '8px 12px',
-          }}
+          className="ph-icon-button ph-hover-lift"
+          data-ui="home-button"
         >
           <svg
+            aria-hidden="true"
             width="18"
             height="18"
             viewBox="0 0 24 24"
@@ -90,29 +63,43 @@ export default function AppNavigation({
         </button>
 
         <div
-          style={{
-            display: 'flex',
-            gap: '6px',
-            padding: '4px',
-            borderRadius: '999px',
-            background: 'var(--bg-deep)',
-            border: '1px solid var(--border-glass)',
-          }}
+          aria-label="Modo de práctica"
+          className="ph-mode-tabs"
+          data-ui="mode-tabs"
+          role="group"
         >
           <button
+            type="button"
             onClick={() => onNavigateMode('scales')}
+            aria-current={currentMode === 'scales' ? 'page' : undefined}
+            className="ph-mode-tab"
+            data-mode="scales"
+            data-state={currentMode === 'scales' ? 'active' : 'idle'}
+            data-ui="mode-tab"
             style={modeTabStyle(currentMode === 'scales')}
           >
             Escalas
           </button>
           <button
+            type="button"
             onClick={() => onNavigateMode('chords')}
+            aria-current={currentMode === 'chords' ? 'page' : undefined}
+            className="ph-mode-tab"
+            data-mode="chords"
+            data-state={currentMode === 'chords' ? 'active' : 'idle'}
+            data-ui="mode-tab"
             style={modeTabStyle(currentMode === 'chords')}
           >
             Acordes
           </button>
           <button
+            type="button"
             onClick={() => onNavigateMode('songs')}
+            aria-current={currentMode === 'songs' ? 'page' : undefined}
+            className="ph-mode-tab"
+            data-mode="songs"
+            data-state={currentMode === 'songs' ? 'active' : 'idle'}
+            data-ui="mode-tab"
             style={modeTabStyle(currentMode === 'songs')}
           >
             Lectura musical
@@ -121,9 +108,9 @@ export default function AppNavigation({
       </div>
 
       {/* Lado Derecho: Controles Contextuales Inyectados */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+      <div className="ph-app-nav__actions" data-ui="app-nav-actions">
         {children}
       </div>
-    </div>
+    </nav>
   )
 }

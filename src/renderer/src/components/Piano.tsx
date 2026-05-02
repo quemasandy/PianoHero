@@ -24,6 +24,8 @@ interface PianoProps {
   wrongNotes?: Set<number>
   keyboardWindow?: KeyboardWindow | null
   compactView?: boolean
+  /** Keep the full keyboard visually centered while still marking the active window. */
+  centerFullKeyboard?: boolean
   /** Synthesia-style: hide top band/markers, stretch to container, add neon glow on hint keys */
   songMode?: boolean
   onNoteOn: (pitch: number) => void
@@ -65,6 +67,7 @@ export default function Piano({
   wrongNotes,
   keyboardWindow,
   compactView = false,
+  centerFullKeyboard = false,
   songMode = false,
   onNoteOn,
   onNoteOff,
@@ -84,6 +87,12 @@ export default function Piano({
     if (compactView && windowBounds) return windowBounds
     return { x: 0, width: TOTAL_WHITE_KEYS }
   }, [compactView, windowBounds])
+  const viewportBounds = useMemo(() => {
+    if (!songMode && compactView && centerFullKeyboard && windowBounds) {
+      return { x: 0, width: TOTAL_WHITE_KEYS }
+    }
+    return viewBounds
+  }, [centerFullKeyboard, compactView, songMode, viewBounds, windowBounds])
   const targetPitches = useMemo(() => [...hintNotes].sort((a, b) => a - b), [hintNotes])
   const visibleRangeLabel = keyboardWindow
     ? `${pitchToPracticeLabel(keyboardWindow.startPitch)}-${pitchToPracticeLabel(keyboardWindow.endPitch)}`
@@ -143,44 +152,38 @@ export default function Piano({
     return key.isWhite ? 0.03 : 0.05
   }
 
+  function keyState(
+    pitch: number,
+    activeNotes: Set<number>,
+    hintNotes: Set<number>,
+    correctNotes?: Set<number>,
+    wrongNotes?: Set<number>
+  ) {
+    if (wrongNotes?.has(pitch)) return 'wrong'
+    if (correctNotes?.has(pitch)) return 'correct'
+    if (activeNotes.has(pitch)) return 'active'
+    if (hintNotes.has(pitch)) return 'target'
+    return 'idle'
+  }
+
   return (
     <div
-      style={{
-        position: 'relative',
-        height: songMode ? '220px' : compactView ? '280px' : '260px',
-        background: songMode ? 'transparent' : 'linear-gradient(180deg, #182030 0%, #0d121c 100%)',
-        borderRadius: songMode ? '0' : '24px 24px 0 0',
-        padding: songMode ? '0' : '24px 24px 24px 24px',
-        boxShadow: songMode
-          ? 'none'
-          : 'inset 0 2px 4px rgba(255,255,255,0.06), inset 0 -6px 12px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.6)',
-        border: songMode ? 'none' : '1px solid #2d3b5e',
-        borderBottom: songMode ? 'none' : '4px solid #06090e',
-        flexShrink: 0,
-      }}
+      className={`ph-piano${compactView ? ' ph-piano--compact' : ''}${songMode ? ' ph-piano--song' : ''}`}
+      data-compact={compactView ? 'true' : 'false'}
+      data-mode={songMode ? 'song' : 'practice'}
+      data-ui="piano"
     >
-      <div
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-          background: songMode ? 'transparent' : '#090d18',
-          borderRadius: songMode ? '0' : '10px',
-          overflow: 'hidden',
-          boxShadow: songMode
-            ? 'none'
-            : 'inset 0 4px 16px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05)',
-          border: songMode ? 'none' : '1px solid #000',
-        }}
-      >
+      <div className="ph-piano__stage" data-ui="piano-stage">
         <svg
+          className="ph-piano__svg"
+          data-range={visibleRangeLabel}
+          data-ui="piano-svg"
           viewBox={
             songMode
-              ? `${viewBounds.x - 0.4} ${KEY_TOP} ${viewBounds.width + 0.8} ${SVG_HEIGHT - KEY_TOP}`
-              : `${viewBounds.x - 0.4} -0.2 ${viewBounds.width + 0.8} ${SVG_HEIGHT + 0.6}`
+              ? `${viewportBounds.x - 0.4} ${KEY_TOP} ${viewportBounds.width + 0.8} ${SVG_HEIGHT - KEY_TOP}`
+              : `${viewportBounds.x - 0.4} -0.2 ${viewportBounds.width + 0.8} ${SVG_HEIGHT + 0.6}`
           }
           preserveAspectRatio={songMode ? 'none' : undefined}
-          style={{ width: '100%', height: '100%', display: 'block' }}
           shapeRendering="geometricPrecision"
         >
           <defs>
@@ -328,7 +331,13 @@ export default function Piano({
               const color = markerColor(pitch, activeNotes, hintNotes, correctNotes, wrongNotes)
 
               return (
-                <g key={`marker-${pitch}`}>
+                <g
+                  key={`marker-${pitch}`}
+                  data-note={label}
+                  data-pitch={pitch}
+                  data-state={keyState(pitch, activeNotes, hintNotes, correctNotes, wrongNotes)}
+                  data-ui="piano-target-marker"
+                >
                   <line
                     x1={centerX}
                     y1={y + 0.48}
@@ -368,6 +377,13 @@ export default function Piano({
             return (
               <rect
                 key={key.pitch}
+                aria-label={`Tecla ${pitchToPracticeLabel(key.pitch)}`}
+                className="ph-piano__key ph-piano__key--white"
+                data-key-kind="white"
+                data-note={pitchToPracticeLabel(key.pitch)}
+                data-pitch={key.pitch}
+                data-state={keyState(key.pitch, activeNotes, hintNotes, correctNotes, wrongNotes)}
+                data-ui="piano-key"
                 x={key.whiteIndex + 0.03}
                 y={KEY_TOP}
                 width={0.94}
@@ -378,7 +394,6 @@ export default function Piano({
                 strokeWidth={strokeWidth(key)}
                 vectorEffect="non-scaling-stroke"
                 filter={isHintGlow ? 'url(#neonGlow)' : undefined}
-                style={{ cursor: 'pointer' }}
                 onMouseDown={() => onNoteOn(key.pitch)}
                 onMouseUp={() => onNoteOff(key.pitch)}
                 onMouseLeave={() => onNoteOff(key.pitch)}
@@ -396,6 +411,13 @@ export default function Piano({
             return (
               <rect
                 key={key.pitch}
+                aria-label={`Tecla ${pitchToPracticeLabel(key.pitch)}`}
+                className="ph-piano__key ph-piano__key--black"
+                data-key-kind="black"
+                data-note={pitchToPracticeLabel(key.pitch)}
+                data-pitch={key.pitch}
+                data-state={keyState(key.pitch, activeNotes, hintNotes, correctNotes, wrongNotes)}
+                data-ui="piano-key"
                 x={x}
                 y={KEY_TOP}
                 width={w}
@@ -406,7 +428,6 @@ export default function Piano({
                 strokeWidth={strokeWidth(key)}
                 vectorEffect="non-scaling-stroke"
                 filter={isHintGlow ? 'url(#neonGlow)' : 'url(#keyShadow)'}
-                style={{ cursor: 'pointer' }}
                 onMouseDown={(e) => {
                   e.stopPropagation()
                   onNoteOn(key.pitch)

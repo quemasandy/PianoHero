@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import type { PlayerState } from '../types'
 
 interface ControlsProps {
@@ -22,74 +23,124 @@ const SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2]
 
 function formatTime(sec: number): string {
   const m = Math.floor(sec / 60)
-  const s = Math.floor(sec % 60).toString().padStart(2, '0')
+  const s = Math.floor(sec % 60)
+    .toString()
+    .padStart(2, '0')
   return `${m}:${s}`
 }
 
 const TRACK_COLORS = ['#4cc9f0', '#f72585', '#7209b7', '#3a0ca3', '#4361ee', '#06d6a0']
 
 export default function Controls({
-  state, duration, trackCount, midiStatusLabel, midiStatusColor, rangeStatusLabel, rangeStatusColor,
-  onPlay, onPause, onStop, onSeek,
-  onSpeedChange, onToggleLearning, onToggleTrack, onBack
+  state,
+  duration,
+  trackCount,
+  midiStatusLabel,
+  midiStatusColor,
+  rangeStatusLabel,
+  rangeStatusColor,
+  onPlay,
+  onPause,
+  onStop,
+  onSeek,
+  onSpeedChange,
+  onToggleLearning,
+  onToggleTrack,
+  onBack,
 }: ControlsProps) {
   const isPlaying = state.status === 'playing' || state.status === 'waiting'
 
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '12px',
-      padding: '8px 16px',
-      background: '#0f1b2d',
-      borderTop: '1px solid #223',
-      flexWrap: 'wrap',
-      flexShrink: 0,
-      minHeight: '52px'
-    }}>
+    <div className="ph-controls" data-ui="controls">
       {/* Back */}
-      <button onClick={onBack} style={btnStyle('#334')}>← Biblioteca</button>
+      <button
+        type="button"
+        className="ph-control-button"
+        data-ui="back-button"
+        onClick={onBack}
+        style={btnStyle('#334')}
+      >
+        ← Biblioteca
+      </button>
 
       {/* Transport */}
-      <button onClick={onStop} style={btnStyle('#334')}>⏹</button>
-      {isPlaying
-        ? <button onClick={onPause} style={btnStyle('#e94560')}>⏸</button>
-        : <button onClick={onPlay} style={btnStyle('#06d6a0', '#000')}>▶</button>
-      }
+      <button
+        type="button"
+        aria-label="Detener"
+        className="ph-control-button"
+        data-ui="stop-button"
+        onClick={onStop}
+        style={btnStyle('#334')}
+      >
+        ⏹
+      </button>
+      {isPlaying ? (
+        <button
+          type="button"
+          aria-label="Pausar"
+          className="ph-control-button"
+          data-state="playing"
+          data-ui="pause-button"
+          onClick={onPause}
+          style={btnStyle('#e94560')}
+        >
+          ⏸
+        </button>
+      ) : (
+        <button
+          type="button"
+          aria-label="Reproducir"
+          className="ph-control-button"
+          data-state="idle"
+          data-ui="play-button"
+          onClick={onPlay}
+          style={btnStyle('#06d6a0', '#000')}
+        >
+          ▶
+        </button>
+      )}
 
       {/* Progress bar */}
-      <span style={{ fontSize: '12px', color: '#8892a4', minWidth: '40px' }}>
+      <span className="ph-controls__time" data-ui="current-time">
         {formatTime(state.currentTime)}
       </span>
       <input
+        aria-label="Progreso de la canción"
+        className="ph-controls__progress"
+        data-ui="progress-slider"
         type="range"
         min={0}
         max={duration}
         step={0.5}
         value={state.currentTime}
-        onChange={e => onSeek(parseFloat(e.target.value))}
-        style={{ flex: 1, minWidth: '80px', accentColor: '#4cc9f0' }}
+        onChange={(e) => onSeek(parseFloat(e.target.value))}
       />
-      <span style={{ fontSize: '12px', color: '#8892a4', minWidth: '40px' }}>
+      <span className="ph-controls__time" data-ui="duration-time">
         {formatTime(duration)}
       </span>
 
       {/* Speed */}
       <select
+        aria-label="Velocidad de reproducción"
+        className="ph-select ph-controls__speed-select"
+        data-ui="speed-select"
         value={state.speed}
-        onChange={e => onSpeedChange(parseFloat(e.target.value))}
-        style={{
-          background: '#334', color: '#fff', border: 'none',
-          borderRadius: '6px', padding: '4px 8px', fontSize: '13px', cursor: 'pointer'
-        }}
+        onChange={(e) => onSpeedChange(parseFloat(e.target.value))}
       >
-        {SPEEDS.map(s => (
-          <option key={s} value={s}>{s}×</option>
+        {SPEEDS.map((s) => (
+          <option key={s} value={s}>
+            {s}×
+          </option>
         ))}
       </select>
 
       {/* Learning mode */}
       <button
+        type="button"
+        aria-pressed={state.learningMode}
+        className="ph-control-button"
+        data-state={state.learningMode ? 'on' : 'off'}
+        data-ui="learning-mode-toggle"
         onClick={onToggleLearning}
         style={btnStyle(state.learningMode ? '#f72585' : '#334')}
         title="Modo aprendizaje: espera a que pulses la tecla correcta"
@@ -98,12 +149,10 @@ export default function Controls({
       </button>
 
       <span
-        style={{
-          color: midiStatusColor,
-          fontSize: '12px',
-          fontWeight: 700,
-          whiteSpace: 'nowrap'
-        }}
+        className="ph-status-text"
+        data-ui="midi-status"
+        role="status"
+        style={{ '--ph-status-color': midiStatusColor } as CSSProperties}
         title={midiStatusLabel}
       >
         {midiStatusLabel}
@@ -111,12 +160,10 @@ export default function Controls({
 
       {rangeStatusLabel && (
         <span
-          style={{
-            color: rangeStatusColor ?? '#4cc9f0',
-            fontSize: '12px',
-            fontWeight: 700,
-            whiteSpace: 'nowrap'
-          }}
+          className="ph-status-text"
+          data-ui="range-status"
+          role="status"
+          style={{ '--ph-status-color': rangeStatusColor ?? '#4cc9f0' } as CSSProperties}
           title={rangeStatusLabel}
         >
           {rangeStatusLabel}
@@ -124,16 +171,22 @@ export default function Controls({
       )}
 
       {/* Track toggles */}
-      <div style={{ display: 'flex', gap: '4px' }}>
+      <div className="ph-track-toggle-list" data-ui="track-toggle-list">
         {Array.from({ length: trackCount }, (_, i) => (
           <button
             key={i}
+            type="button"
+            aria-pressed={Boolean(state.activeTrackMask[i])}
+            className="ph-track-toggle"
+            data-state={state.activeTrackMask[i] ? 'on' : 'off'}
+            data-track-index={i}
+            data-ui="track-toggle"
             onClick={() => onToggleTrack(i)}
             style={{
               ...btnStyle(TRACK_COLORS[i % TRACK_COLORS.length], '#000'),
               opacity: state.activeTrackMask[i] ? 1 : 0.3,
               fontSize: '11px',
-              padding: '4px 8px'
+              padding: '4px 8px',
             }}
             title={`Pista ${i + 1}`}
           >
@@ -144,10 +197,7 @@ export default function Controls({
 
       {/* Wait indicator */}
       {state.status === 'waiting' && (
-        <span style={{
-          color: '#f72585', fontWeight: 'bold', fontSize: '13px',
-          animation: 'pulse 1s infinite'
-        }}>
+        <span className="ph-waiting-indicator" data-ui="waiting-indicator" role="status">
           ⏳ Toca la nota...
         </span>
       )}
@@ -155,7 +205,7 @@ export default function Controls({
   )
 }
 
-function btnStyle(bg: string, color = '#fff'): React.CSSProperties {
+function btnStyle(bg: string, color = '#fff'): CSSProperties {
   return {
     background: bg,
     color,
@@ -165,6 +215,6 @@ function btnStyle(bg: string, color = '#fff'): React.CSSProperties {
     fontWeight: 600,
     border: 'none',
     cursor: 'pointer',
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
   }
 }

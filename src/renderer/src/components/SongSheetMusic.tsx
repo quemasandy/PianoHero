@@ -149,17 +149,15 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
 
   return (
     <div
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
+      className="ph-song-sheet-music"
+      data-current-event-index={currentEventIndex}
+      data-measure-id={measure.id}
+      data-ui="song-sheet-music"
     >
       <div
+        className="ph-song-sheet-music__surface"
+        data-ui="song-sheet-music-surface"
         ref={containerRef}
-        style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '12px', padding: '10px' }}
       />
     </div>
   )

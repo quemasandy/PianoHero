@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import type { KeyboardWindow, ParsedSong, PlayerState } from '../types'
 import {
   PIANO_MAX_PITCH,
@@ -65,7 +65,7 @@ export default function Waterfall({
   const stateRef = useRef(playerState)
   stateRef.current = playerState
 
-  function draw() {
+  const draw = useCallback(() => {
     const canvas = canvasRef.current
     const container = containerRef.current
     if (!canvas || !container) return
@@ -137,12 +137,12 @@ export default function Waterfall({
     } catch (error) {
       console.error('Waterfall draw failed', error)
     }
-  }
+  }, [compactView, keyboardWindow, song])
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     draw()
   }, [
+    draw,
     compactView,
     keyboardWindow,
     playerState.currentTime,
@@ -158,31 +158,16 @@ export default function Waterfall({
     ro.observe(container)
     draw()
     return () => ro.disconnect()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [compactView, keyboardWindow, song])
+  }, [draw])
 
   return (
     <div
+      className="ph-waterfall"
+      data-compact={compactView ? 'true' : 'false'}
+      data-ui="waterfall"
       ref={containerRef}
-      style={{
-        width: '100%',
-        height: '100%',
-        overflow: 'hidden',
-        position: 'relative',
-        minHeight: 0,
-      }}
     >
-      <canvas
-        ref={canvasRef}
-        style={{
-          display: 'block',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-        }}
-      />
+      <canvas className="ph-waterfall__canvas" data-ui="waterfall-canvas" ref={canvasRef} />
     </div>
   )
 }

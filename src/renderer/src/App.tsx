@@ -5,7 +5,9 @@ import DiagnosticsPanel from './components/DiagnosticsPanel'
 
 export default function App() {
   const [route, setRoute] = useState<'practice' | 'song'>('practice')
-  const [practiceView, setPracticeView] = useState<'practice_home' | 'scale_session' | 'chord_session'>('practice_home')
+  const [practiceView, setPracticeView] = useState<
+    'practice_home' | 'scale_session' | 'chord_session'
+  >('practice_home')
 
   function handleNavigateMode(mode: 'scales' | 'chords' | 'songs') {
     if (mode === 'songs') {
@@ -25,33 +27,21 @@ export default function App() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', overflow: 'hidden' }}>
+    <div className="ph-app-shell" data-route={route} data-ui="app-shell">
       {/* Title Bar nativo global de la app para controles de macOS */}
-      <div 
-        style={{ 
-          height: '38px', 
-          width: '100%', 
-          backgroundColor: 'transparent',
-          WebkitAppRegion: 'drag', 
-          flexShrink: 0,
-          zIndex: 9999
-        } as React.CSSProperties} 
-      />
-      
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+      <div className="ph-app-drag-region" data-ui="app-drag-region" />
+
+      <main className="ph-app-main" data-ui="app-main">
         {route === 'practice' ? (
-        <Practice 
-          currentView={practiceView} 
-          onViewChange={setPracticeView}
-          onNavigateMode={handleNavigateMode} 
-        />
-      ) : (
-        <SongPractice 
-          onNavigateHome={handleNavigateHome} 
-          onNavigateMode={handleNavigateMode}
-        />
-      )}
-      </div>
+          <Practice
+            currentView={practiceView}
+            onViewChange={setPracticeView}
+            onNavigateMode={handleNavigateMode}
+          />
+        ) : (
+          <SongPractice onNavigateHome={handleNavigateHome} onNavigateMode={handleNavigateMode} />
+        )}
+      </main>
       <DiagnosticsPanel />
     </div>
   )

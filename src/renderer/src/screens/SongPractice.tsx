@@ -228,14 +228,11 @@ export default function SongPractice({
   const hintNotes = new Set(expectedPitches)
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        backgroundColor: '#000814',
-        boxSizing: 'border-box',
-      }}
+    <main
+      className="ph-song-practice"
+      data-measure-index={state.measureIndex}
+      data-song-id={song.id}
+      data-ui="song-practice-screen"
     >
       {/* Header */}
       <AppNavigation
@@ -243,10 +240,15 @@ export default function SongPractice({
         onNavigateHome={onNavigateHome}
         onNavigateMode={onNavigateMode}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: '#8892a4' }}>Canción:</span>
+        <div className="ph-song-practice__controls" data-ui="song-practice-controls">
+          <label className="ph-field ph-song-practice__song-field" data-ui="song-field">
+            <span className="ph-field__label" data-ui="song-select-label">
+              Canción:
+            </span>
             <select
+              className="ph-select ph-song-practice__song-select"
+              data-song-id={song.id}
+              data-ui="song-select"
               value={song.id}
               onChange={(e) => {
                 const s = SONG_CATALOG.find((s) => s.id === e.target.value)
@@ -261,17 +263,6 @@ export default function SongPractice({
                   }))
                 }
               }}
-              style={{
-                background: '#101a2d',
-                color: '#4cc9f0',
-                border: '1px solid rgba(76, 201, 240, 0.3)',
-                padding: '6px 12px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 600,
-                outline: 'none',
-                cursor: 'pointer',
-              }}
             >
               {SONG_CATALOG.map((s) => (
                 <option key={s.id} value={s.id} style={{ color: '#000' }}>
@@ -279,39 +270,13 @@ export default function SongPractice({
                 </option>
               ))}
             </select>
-          </div>
+          </label>
 
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              backgroundColor: '#0a101d',
-              padding: '6px 12px',
-              borderRadius: '12px',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
-            <span
-              style={{
-                fontSize: '11px',
-                color: '#8892a4',
-                textTransform: 'uppercase',
-                fontWeight: 800,
-              }}
-            >
+          <div className="ph-song-practice__octave-badge" data-ui="song-octave-badge">
+            <span className="ph-song-practice__octave-label" data-ui="song-octave-label">
               Octava
             </span>
-            <span
-              style={{
-                color: '#fff',
-                background: 'var(--neon-cyan)',
-                padding: '2px 8px',
-                borderRadius: '6px',
-                fontWeight: 800,
-                fontSize: '12px',
-              }}
-            >
+            <span className="ph-song-practice__octave-value" data-ui="song-octave-value">
               {`C${Math.floor(activeWindow.startPitch / 12) - 1}-C${Math.floor(activeWindow.endPitch / 12) - 1}`}
             </span>
           </div>
@@ -319,49 +284,20 @@ export default function SongPractice({
       </AppNavigation>
 
       {/* Sheet Music Section */}
-      <div style={{ flexShrink: 0, height: '220px', marginBottom: '8px', padding: '0 24px' }}>
+      <section className="ph-song-practice__sheet" data-ui="song-sheet-section">
         {currentMeasure ? (
           <SongSheetMusic measure={currentMeasure} currentEventIndex={state.eventIndex} />
         ) : (
-          <div
-            style={{
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#06d6a0',
-              fontSize: '24px',
-              fontWeight: 700,
-            }}
-          >
+          <div className="ph-song-practice__complete" data-ui="song-complete-message" role="status">
             ¡Canción Completada!
           </div>
         )}
-      </div>
+      </section>
 
       {/* Shared wrapper — common horizontal padding keeps FallingNotesView and Piano SVGs pixel-aligned */}
-      <div
-        style={{
-          flexGrow: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
-          padding: '0 24px',
-          boxSizing: 'border-box',
-        }}
-      >
+      <div className="ph-song-practice__playfield" data-ui="song-playfield">
         {/* Falling Notes */}
-        <div
-          style={{
-            flexGrow: 1,
-            minHeight: 0,
-            borderRadius: '24px 24px 0 0',
-            overflow: 'hidden',
-            boxShadow: '0 -10px 40px rgba(0,0,0,0.4)',
-            position: 'relative',
-            backgroundColor: '#050a14',
-          }}
-        >
+        <div className="ph-song-practice__falling-notes" data-ui="song-falling-notes-region">
           <FallingNotesView
             song={song}
             currentMeasureIndex={state.measureIndex}
@@ -371,7 +307,7 @@ export default function SongPractice({
         </div>
 
         {/* Piano (songMode: no outer padding/border so it aligns edge-to-edge with FallingNotesView) */}
-        <div style={{ flexShrink: 0, zIndex: 10 }}>
+        <div className="ph-song-practice__piano" data-ui="song-piano-region">
           <Piano
             activeNotes={pianoActiveNotes}
             hintNotes={hintNotes}
@@ -383,6 +319,6 @@ export default function SongPractice({
           />
         </div>
       </div>
-    </div>
+    </main>
   )
 }

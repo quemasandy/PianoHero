@@ -11,7 +11,7 @@ interface ErrorBoundaryState {
 
 export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   state: ErrorBoundaryState = {
-    error: null
+    error: null,
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
@@ -21,7 +21,7 @@ export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, E
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     logRendererEvent('error', 'react.error-boundary', 'React render error captured', {
       error,
-      componentStack: errorInfo.componentStack
+      componentStack: errorInfo.componentStack,
     })
   }
 
@@ -29,32 +29,18 @@ export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, E
     if (!this.state.error) return this.props.children
 
     return (
-      <div style={{
-        minHeight: '100vh',
-        background: '#1a1a2e',
-        color: '#fff',
-        padding: '32px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        gap: '16px'
-      }}>
-        <h1 style={{ fontSize: '28px' }}>La interfaz falló al renderizar</h1>
-        <p style={{ color: '#8892a4', maxWidth: '720px', lineHeight: 1.5 }}>
-          Se capturó el error en el renderer para que no quede una pantalla vacía. Abre el panel
-          de logs y revisa los últimos eventos antes del fallo.
+      <main className="ph-error-boundary" data-ui="error-boundary" role="alert">
+        <h1 className="ph-error-boundary__title" data-ui="error-title">
+          La interfaz falló al renderizar
+        </h1>
+        <p className="ph-error-boundary__message" data-ui="error-message">
+          Se capturó el error en el renderer para que no quede una pantalla vacía. Abre el panel de
+          logs y revisa los últimos eventos antes del fallo.
         </p>
-        <pre style={{
-          background: 'rgba(0,0,0,0.3)',
-          border: '1px solid #334',
-          borderRadius: '12px',
-          padding: '16px',
-          overflow: 'auto',
-          whiteSpace: 'pre-wrap'
-        }}>
+        <pre className="ph-error-boundary__stack" data-ui="error-stack">
           {this.state.error.stack || this.state.error.message}
         </pre>
-      </div>
+      </main>
     )
   }
 }
