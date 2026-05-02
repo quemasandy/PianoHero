@@ -1,9 +1,9 @@
 export interface ParsedNote {
-  pitch: number        // MIDI note number 0-127
-  startTime: number    // seconds from song start
-  duration: number     // seconds
-  velocity: number     // 0-127
-  track: number        // track index
+  pitch: number // MIDI note number 0-127
+  startTime: number // seconds from song start
+  duration: number // seconds
+  velocity: number // 0-127
+  track: number // track index
 }
 
 export interface TempoEvent {
@@ -13,7 +13,7 @@ export interface TempoEvent {
 
 export interface ParsedSong {
   notes: ParsedNote[]
-  duration: number     // total duration in seconds
+  duration: number // total duration in seconds
   title: string
   trackCount: number
   ticksPerBeat: number
@@ -24,10 +24,10 @@ export interface PlayerState {
   status: 'idle' | 'playing' | 'paused' | 'waiting'
   currentTime: number
   speed: number
-  activeNotes: Set<number>       // pitches currently sounding
-  hintNotes: Set<number>         // pitches to press next (learning mode)
+  activeNotes: Set<number> // pitches currently sounding
+  hintNotes: Set<number> // pitches to press next (learning mode)
   learningMode: boolean
-  activeTrackMask: boolean[]     // which tracks are visible/active
+  activeTrackMask: boolean[] // which tracks are visible/active
 }
 
 export type Screen = 'library' | 'play'
@@ -40,9 +40,18 @@ export interface ScaleExerciseDefinition {
   id: string
   name: string
   description: string
+  patternName: string
+  rootPitch: number
+  nameStyle?: 'rootPrefix' | 'parentheticalKey'
   noteSequence: number[]
   startLabel: string
   endLabel: string
+}
+
+export interface ScaleRootOption {
+  pitchClass: number
+  label: string
+  localizedLabel: string
 }
 
 export interface ChordPrompt {

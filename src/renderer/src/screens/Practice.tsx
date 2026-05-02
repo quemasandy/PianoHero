@@ -8,7 +8,11 @@ import {
   CHORD_EXERCISES,
   PRACTICE_KEYBOARD_WINDOW,
   SCALE_EXERCISES,
+  SCALE_ROOT_OPTIONS,
+  getDefaultScaleRootPitchClass,
+  getScaleRootOption,
   pitchToPracticeLabel,
+  transposeScaleExercise,
 } from '../lib/practiceCatalog'
 import {
   CHORD_SIMULTANEITY_MS,
@@ -70,8 +74,17 @@ export default function Practice({
 }) {
   const view = currentView
   const [scaleIndex, setScaleIndex] = useState(0)
+  const [scaleRootSelections, setScaleRootSelections] = useState<Record<string, number>>(() =>
+    Object.fromEntries(
+      SCALE_EXERCISES.map((exercise) => [exercise.id, getDefaultScaleRootPitchClass(exercise)])
+    )
+  )
   const [chordIndex, setChordIndex] = useState(0)
-  const [scaleSession, setScaleSession] = useState(() => createScaleSession(SCALE_EXERCISES[0]))
+  const [scaleSession, setScaleSession] = useState(() =>
+    createScaleSession(
+      transposeScaleExercise(SCALE_EXERCISES[0], getDefaultScaleRootPitchClass(SCALE_EXERCISES[0]))
+    )
+  )
   const [chordSession, setChordSession] = useState(() => createChordSession(CHORD_EXERCISES[0]))
   const [feedback, setFeedback] = useState<FeedbackState>({
     kind: 'neutral',
@@ -150,13 +163,10 @@ export default function Practice({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scaleSession.status, chordSession.status, view, rhythm.isPlaying, rhythm.bpm])
 
-  const activeScaleExercise = SCALE_EXERCISES[scaleIndex]
-  const activeChordExercise = CHORD_EXERCISES[chordIndex]
-
   const activeSession =
     view === 'scale_session' ? scaleSession : view === 'chord_session' ? chordSession : null
 
-  const activeExpectedNotes = activeSession?.expectedNotes ?? []
+  const activeExpectedNotes = useMemo(() => activeSession?.expectedNotes ?? [], [activeSession])
   const targetNotes = useMemo(() => new Set(activeExpectedNotes), [activeExpectedNotes])
   const correctPressedNotes = useMemo(() => {
     if (!activeSession) return new Set<number>()
@@ -211,8 +221,28 @@ export default function Practice({
           ? '#ffd166'
           : '#f72585'
 
-  function resetScaleSession(index = scaleIndex) {
-    const exercise = SCALE_EXERCISES[index]
+  const baseScaleExercise = SCALE_EXERCISES[scaleIndex]
+  const selectedScaleRootPitchClass =
+    scaleRootSelections[baseScaleExercise.id] ?? getDefaultScaleRootPitchClass(baseScaleExercise)
+  const selectedScaleRoot = getScaleRootOption(selectedScaleRootPitchClass)
+  const activeScaleExercise = useMemo(
+    () => transposeScaleExercise(baseScaleExercise, selectedScaleRootPitchClass),
+    [baseScaleExercise, selectedScaleRootPitchClass]
+  )
+  const activeChordExercise = CHORD_EXERCISES[chordIndex]
+
+  function getScaleExerciseForSession(index = scaleIndex, rootPitchClass?: number) {
+    const baseExercise = SCALE_EXERCISES[index]
+    const selectedRootPitchClass =
+      rootPitchClass ??
+      scaleRootSelections[baseExercise.id] ??
+      getDefaultScaleRootPitchClass(baseExercise)
+
+    return transposeScaleExercise(baseExercise, selectedRootPitchClass)
+  }
+
+  function resetScaleSession(index = scaleIndex, rootPitchClass?: number) {
+    const exercise = getScaleExerciseForSession(index, rootPitchClass)
     setScaleSession(createScaleSession(exercise))
     lastScaleAdvanceRef.current = null
     setFeedback({
@@ -222,6 +252,7 @@ export default function Practice({
     logRendererEvent('info', 'practice.scale.reset', 'Scale exercise reset', {
       exerciseId: exercise.id,
       exerciseName: exercise.name,
+      rootPitchClass: getDefaultScaleRootPitchClass(exercise),
     })
   }
 
@@ -262,6 +293,7 @@ export default function Practice({
     resetScaleSession(scaleIndex)
     logRendererEvent('info', 'practice.view.scales', 'Opened scale practice session', {
       exerciseId: activeScaleExercise.id,
+      rootPitchClass: selectedScaleRoot.pitchClass,
     })
   }
 
@@ -277,27 +309,41 @@ export default function Practice({
   function goToPreviousScaleExercise() {
     const nextIndex = (scaleIndex - 1 + SCALE_EXERCISES.length) % SCALE_EXERCISES.length
     setScaleIndex(nextIndex)
-    setView('scale_session')
+    onViewChange('scale_session')
     resetScaleSession(nextIndex)
     logRendererEvent('info', 'practice.scale.previous', 'Moved to previous scale exercise', {
-      exerciseId: SCALE_EXERCISES[nextIndex].id,
+      exerciseId: getScaleExerciseForSession(nextIndex).id,
     })
   }
 
   function goToNextScaleExercise() {
     const nextIndex = (scaleIndex + 1) % SCALE_EXERCISES.length
     setScaleIndex(nextIndex)
-    setView('scale_session')
+    onViewChange('scale_session')
     resetScaleSession(nextIndex)
     logRendererEvent('info', 'practice.scale.next', 'Moved to next scale exercise', {
-      exerciseId: SCALE_EXERCISES[nextIndex].id,
+      exerciseId: getScaleExerciseForSession(nextIndex).id,
+    })
+  }
+
+  function handleScaleRootChange(nextRootPitchClass: number) {
+    const nextRoot = getScaleRootOption(nextRootPitchClass)
+    setScaleRootSelections((prev) => ({
+      ...prev,
+      [baseScaleExercise.id]: nextRoot.pitchClass,
+    }))
+    resetScaleSession(scaleIndex, nextRoot.pitchClass)
+    logRendererEvent('info', 'practice.scale.root.changed', 'Changed scale root', {
+      baseExerciseId: baseScaleExercise.id,
+      rootPitchClass: nextRoot.pitchClass,
+      rootLabel: nextRoot.label,
     })
   }
 
   function goToPreviousChordExercise() {
     const nextIndex = (chordIndex - 1 + CHORD_EXERCISES.length) % CHORD_EXERCISES.length
     setChordIndex(nextIndex)
-    setView('chord_session')
+    onViewChange('chord_session')
     resetChordSession(nextIndex)
     logRendererEvent('info', 'practice.chord.previous', 'Moved to previous chord exercise', {
       exerciseId: CHORD_EXERCISES[nextIndex].id,
@@ -307,7 +353,7 @@ export default function Practice({
   function goToNextChordExercise() {
     const nextIndex = (chordIndex + 1) % CHORD_EXERCISES.length
     setChordIndex(nextIndex)
-    setView('chord_session')
+    onViewChange('chord_session')
     resetChordSession(nextIndex)
     logRendererEvent('info', 'practice.chord.next', 'Moved to next chord exercise', {
       exerciseId: CHORD_EXERCISES[nextIndex].id,
@@ -680,9 +726,8 @@ export default function Practice({
           }
         )
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
-    [activeChordExercise, activeScaleExercise, chordSession.stepIndex, scaleSession.stepIndex, view]
+    [activeChordExercise, activeScaleExercise, chordSession.stepIndex, view]
   )
 
   useMidiDevice(
@@ -852,7 +897,24 @@ export default function Practice({
             gap: '16px',
           }}
         >
-          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{exercise.name}</h2>
+          <div style={scaleTitleGroupStyle}>
+            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{exercise.name}</h2>
+            <div style={scaleRootControlStyle}>
+              <span style={scaleRootLabelStyle}>Tonalidad</span>
+              <select
+                aria-label="Tonalidad de la escala"
+                value={selectedScaleRoot.pitchClass}
+                onChange={(event) => handleScaleRootChange(Number(event.target.value))}
+                style={scaleRootSelectStyle}
+              >
+                {SCALE_ROOT_OPTIONS.map((root) => (
+                  <option key={root.pitchClass} value={root.pitchClass} style={{ color: '#000' }}>
+                    {root.label} · {root.localizedLabel}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
           {/* Controles de Ejercicio Reubicados Abajo */}
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -1450,6 +1512,44 @@ const keyboardLegendStyle: CSSProperties = {
   alignItems: 'center',
   gap: '8px',
   flexWrap: 'wrap',
+}
+
+const scaleTitleGroupStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+  flexWrap: 'wrap',
+  minWidth: 0,
+}
+
+const scaleRootControlStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '6px 10px',
+  borderRadius: '12px',
+  border: '1px solid rgba(76, 201, 240, 0.25)',
+  background: 'rgba(0,0,0,0.28)',
+}
+
+const scaleRootLabelStyle: CSSProperties = {
+  color: '#8be9fd',
+  fontSize: '12px',
+  fontWeight: 800,
+  textTransform: 'uppercase',
+  letterSpacing: '0.08em',
+}
+
+const scaleRootSelectStyle: CSSProperties = {
+  background: '#101a2d',
+  color: '#ffffff',
+  border: '1px solid rgba(255,255,255,0.12)',
+  borderRadius: '8px',
+  padding: '6px 28px 6px 10px',
+  fontSize: '13px',
+  fontWeight: 800,
+  outline: 'none',
+  cursor: 'pointer',
 }
 
 function metaBadgeStyle(color: string): CSSProperties {
