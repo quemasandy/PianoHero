@@ -93,15 +93,20 @@ export default function SheetMusic({
 
           if (active) {
             if (index < currentIndex) {
-              noteColor = '#06d6a0' // played correct (green)
-              strokeColor = '#06d6a0'
+              noteColor = 'var(--neon-cyan)' // played correct
+              strokeColor = 'var(--neon-cyan)'
             } else if (index === currentIndex) {
-              noteColor = color || 'var(--neon-green)' // current
+              noteColor = color || 'var(--neon-cyan)' // current
               strokeColor = '#ffffff'
             }
           }
 
           staveNote.setStyle({ fillStyle: noteColor, strokeStyle: strokeColor })
+          staveNote.setLedgerLineStyle({
+            fillStyle: '#ffffff',
+            strokeStyle: '#ffffff',
+            lineWidth: 1,
+          })
           return staveNote
         })
 
@@ -132,7 +137,7 @@ export default function SheetMusic({
 
         if (active) {
           staveNote.setStyle({
-            fillStyle: color || 'var(--neon-green)',
+            fillStyle: color || 'var(--neon-cyan)',
             strokeStyle: '#ffffff',
           })
         } else {
@@ -141,6 +146,8 @@ export default function SheetMusic({
             strokeStyle: '#8892a4',
           })
         }
+
+        staveNote.setLedgerLineStyle({ fillStyle: '#ffffff', strokeStyle: '#ffffff', lineWidth: 1 })
 
         // 6. Imprimir el Acorde
         const voice = new Voice({ num_beats: 4, beat_value: 4 })

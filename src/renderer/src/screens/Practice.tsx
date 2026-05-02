@@ -962,11 +962,11 @@ export default function Practice({
                     ? '1px solid var(--neon-cyan)'
                     : '1px solid rgba(255,255,255,0.1)',
                   background: completed
-                    ? 'rgba(16,185,129,0.18)'
+                    ? 'rgba(59,130,246,0.18)'
                     : current
                       ? 'rgba(6,182,212,0.12)'
                       : 'var(--bg-panel)',
-                  color: completed ? 'var(--neon-green)' : current ? '#fff' : 'var(--slate-300)',
+                  color: completed ? 'var(--neon-blue)' : current ? '#fff' : 'var(--slate-300)',
                   fontWeight: 800,
                   minWidth: '64px',
                   textAlign: 'center',
@@ -1014,7 +1014,7 @@ export default function Practice({
             </button>
             <button
               onClick={restartActiveSession}
-              style={buttonStyle('var(--neon-green)', '#0F0F23')}
+              style={buttonStyle('var(--neon-cyan)', '#0F0F23')}
             >
               Reiniciar
             </button>
@@ -1028,7 +1028,7 @@ export default function Practice({
           </div>
 
           <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-            <div style={metaBadgeStyle('var(--neon-green)')}>
+            <div style={metaBadgeStyle('var(--neon-cyan)')}>
               {session.status === 'complete'
                 ? 'Progresión completa'
                 : `Compás ${Math.min(session.stepIndex + 1, exercise.progression.length)} / ${exercise.progression.length}`}
@@ -1062,13 +1062,13 @@ export default function Practice({
                   scrollSnapAlign: 'center',
                   padding: '24px',
                   borderRadius: '20px',
-                  border: current ? '2px solid var(--neon-green)' : '1px solid var(--border-glass)',
+                  border: current ? '2px solid var(--neon-cyan)' : '1px solid var(--border-glass)',
                   background: completed
-                    ? 'rgba(16,185,129,0.1)'
+                    ? 'rgba(59,130,246,0.1)'
                     : current
-                      ? 'rgba(16,185,129,0.15)'
+                      ? 'rgba(6,182,212,0.15)'
                       : 'var(--bg-panel)',
-                  boxShadow: current ? '0 0 32px rgba(16,185,129,0.3)' : 'none',
+                  boxShadow: current ? '0 0 32px rgba(6,182,212,0.3)' : 'none',
                   transform: current ? 'scale(1.04)' : 'scale(0.98)',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   opacity: current || completed ? 1 : 0.6,
@@ -1076,7 +1076,7 @@ export default function Practice({
               >
                 <div
                   style={{
-                    color: current ? 'var(--neon-green)' : '#8892a4',
+                    color: current ? 'var(--neon-cyan)' : '#8892a4',
                     fontSize: '13px',
                     marginBottom: '8px',
                     fontWeight: 800,
@@ -1155,7 +1155,7 @@ export default function Practice({
                   mode="sequence"
                   currentIndex={scaleSession.stepIndex}
                   active={true}
-                  color="#ffd166"
+                  color="var(--neon-cyan)"
                   width={Math.max(300, activeScaleExercise.noteSequence.length * 45)}
                 />
               </div>
@@ -1194,8 +1194,8 @@ export default function Practice({
             </div>
 
             <div style={{ ...keyboardLegendStyle, marginTop: '8px', justifyContent: 'flex-end' }}>
-              <LegendPill label="Objetivo actual" background="#ffd166" color="#18131a" />
-              <LegendPill label="Correcta" background="#06d6a0" color="#ffffff" />
+              <LegendPill label="Objetivo actual" background="var(--neon-cyan)" color="#ffffff" />
+              <LegendPill label="Correcta" background="var(--neon-blue)" color="#ffffff" />
               <LegendPill label="Incorrecta" background="#ff6b81" color="#ffffff" />
             </div>
           </div>
