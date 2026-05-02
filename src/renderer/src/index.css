@@ -336,12 +336,14 @@ input[type='range'] {
 }
 
 .ph-piano--song {
-  height: 220px;
+  height: auto;
   padding: 0;
   background: transparent;
   border: none;
   border-radius: 0;
   box-shadow: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .ph-piano__stage {
@@ -358,10 +360,13 @@ input[type='range'] {
 }
 
 .ph-piano--song .ph-piano__stage {
-  background: transparent;
+  position: relative;
+  height: 180px;
+  background: linear-gradient(180deg, #080c16 0%, #040710 100%);
   border: none;
   border-radius: 0;
-  box-shadow: none;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
 }
 
 .ph-piano__svg,
@@ -373,6 +378,63 @@ input[type='range'] {
 
 .ph-piano__key {
   cursor: pointer;
+}
+
+/* ── Song-mode HTML overlay labels (inside white keys) ── */
+.ph-piano__song-labels {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 38px;
+  height: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ph-piano__song-label {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  font-family: 'Quicksand', 'Nunito', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b7a96;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+  transition:
+    color 0.15s ease,
+    text-shadow 0.15s ease;
+}
+
+.ph-piano__song-label--c {
+  color: #4a5a78;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.ph-piano__song-label--hint {
+  color: #0e1526;
+  font-weight: 900;
+}
+
+.ph-piano__song-label--active {
+  color: #ffffff;
+  font-weight: 900;
+  text-shadow:
+    0 0 8px var(--neon-cyan),
+    0 0 16px rgba(6, 182, 212, 0.4);
+}
+
+/* ── Piano body / wood frame (song mode) ── */
+.ph-piano__body {
+  height: 18px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #1a1520 0%, #12101a 40%, #0e0c14 70%, #080610 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
 .ph-sheet-music {
@@ -827,8 +889,8 @@ input[type='range'] {
 }
 
 .ph-song-practice__piano {
-  z-index: 10;
   flex-shrink: 0;
+  position: relative;
 }
 
 .ph-practice {

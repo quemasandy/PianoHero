@@ -239,6 +239,44 @@ export default function Piano({
                 floodOpacity="0.4"
               />
             </filter>
+            {/* Song-mode enhanced gradients */}
+            {songMode && (
+              <>
+                <linearGradient id="songWhiteKey" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#fdfdfd" />
+                  <stop offset="4%" stopColor="#f8f9fb" />
+                  <stop offset="80%" stopColor="#eef0f4" />
+                  <stop offset="95%" stopColor="#d8dce5" />
+                  <stop offset="100%" stopColor="#c4c9d4" />
+                </linearGradient>
+                <linearGradient id="songBlackKey" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#2a2f3d" />
+                  <stop offset="15%" stopColor="#1a1f2e" />
+                  <stop offset="70%" stopColor="#0d1220" />
+                  <stop offset="100%" stopColor="#060a14" />
+                </linearGradient>
+                <linearGradient id="songBlackKeySide" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#0a0e18" />
+                  <stop offset="50%" stopColor="#141a28" />
+                  <stop offset="100%" stopColor="#0a0e18" />
+                </linearGradient>
+                <filter id="songActiveGlow" x="-80%" y="-80%" width="260%" height="260%">
+                  <feGaussianBlur stdDeviation="0.5" result="blur1" />
+                  <feMerge>
+                    <feMergeNode in="blur1" />
+                    <feMergeNode in="blur1" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="songHintGlow" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="0.4" result="blur1" />
+                  <feMerge>
+                    <feMergeNode in="blur1" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </>
+            )}
           </defs>
           {!songMode && (
             <rect
@@ -340,6 +378,14 @@ export default function Piano({
           {/* White keys */}
           {whiteKeys.map((key) => {
             const isHintGlow = songMode && hintNotes.has(key.pitch)
+            const isActive = activeNotes.has(key.pitch)
+            const songFill = songMode
+              ? isActive
+                ? keyColor(key)
+                : isHintGlow
+                  ? keyColor(key)
+                  : 'url(#songWhiteKey)'
+              : keyColor(key)
             return (
               <rect
                 key={key.pitch}
@@ -355,11 +401,17 @@ export default function Piano({
                 width={0.94}
                 height={WHITE_KEY_HEIGHT}
                 rx={0.15}
-                fill={keyColor(key)}
-                stroke={activeNotes.has(key.pitch) ? 'none' : strokeColor(key)}
+                fill={songFill}
+                stroke={isActive ? 'none' : strokeColor(key)}
                 strokeWidth={strokeWidth(key)}
                 vectorEffect="non-scaling-stroke"
-                filter={isHintGlow ? 'url(#neonGlow)' : undefined}
+                filter={
+                  songMode && isActive
+                    ? 'url(#songActiveGlow)'
+                    : isHintGlow
+                      ? 'url(#songHintGlow)'
+                      : undefined
+                }
                 onMouseDown={() => onNoteOn(key.pitch)}
                 onMouseUp={() => onNoteOff(key.pitch)}
                 onMouseLeave={() => onNoteOff(key.pitch)}
@@ -374,57 +426,86 @@ export default function Piano({
             const w = 0.7
             const h = BLACK_KEY_HEIGHT
             const isHintGlow = songMode && hintNotes.has(key.pitch)
+            const isActive = activeNotes.has(key.pitch)
+            const songFill = songMode
+              ? isActive
+                ? keyColor(key)
+                : isHintGlow
+                  ? keyColor(key)
+                  : 'url(#songBlackKey)'
+              : keyColor(key)
             return (
-              <rect
-                key={key.pitch}
-                aria-label={`Tecla ${pitchToPracticeLabel(key.pitch)}`}
-                className="ph-piano__key ph-piano__key--black"
-                data-key-kind="black"
-                data-note={pitchToPracticeLabel(key.pitch)}
-                data-pitch={key.pitch}
-                data-state={keyState(key.pitch, activeNotes, hintNotes, correctNotes, wrongNotes)}
-                data-ui="piano-key"
-                x={x}
-                y={KEY_TOP}
-                width={w}
-                height={h}
-                rx={0.12}
-                fill={keyColor(key)}
-                stroke={activeNotes.has(key.pitch) ? 'none' : strokeColor(key)}
-                strokeWidth={strokeWidth(key)}
-                vectorEffect="non-scaling-stroke"
-                filter={isHintGlow ? 'url(#neonGlow)' : 'url(#keyShadow)'}
-                onMouseDown={(e) => {
-                  e.stopPropagation()
-                  onNoteOn(key.pitch)
-                }}
-                onMouseUp={(e) => {
-                  e.stopPropagation()
-                  onNoteOff(key.pitch)
-                }}
-                onMouseLeave={() => onNoteOff(key.pitch)}
-              />
+              <g key={key.pitch}>
+                {/* Side bevel for 3D depth (song mode only) */}
+                {songMode && (
+                  <rect
+                    x={x - 0.04}
+                    y={KEY_TOP}
+                    width={w + 0.08}
+                    height={h + 0.15}
+                    rx={0.12}
+                    fill="url(#songBlackKeySide)"
+                    style={{ pointerEvents: 'none' }}
+                  />
+                )}
+                <rect
+                  aria-label={`Tecla ${pitchToPracticeLabel(key.pitch)}`}
+                  className="ph-piano__key ph-piano__key--black"
+                  data-key-kind="black"
+                  data-note={pitchToPracticeLabel(key.pitch)}
+                  data-pitch={key.pitch}
+                  data-state={keyState(key.pitch, activeNotes, hintNotes, correctNotes, wrongNotes)}
+                  data-ui="piano-key"
+                  x={x}
+                  y={KEY_TOP}
+                  width={w}
+                  height={h}
+                  rx={0.12}
+                  fill={songFill}
+                  stroke={isActive ? 'none' : strokeColor(key)}
+                  strokeWidth={strokeWidth(key)}
+                  vectorEffect="non-scaling-stroke"
+                  filter={
+                    songMode && isActive
+                      ? 'url(#songActiveGlow)'
+                      : isHintGlow
+                        ? 'url(#songHintGlow)'
+                        : 'url(#keyShadow)'
+                  }
+                  onMouseDown={(e) => {
+                    e.stopPropagation()
+                    onNoteOn(key.pitch)
+                  }}
+                  onMouseUp={(e) => {
+                    e.stopPropagation()
+                    onNoteOff(key.pitch)
+                  }}
+                  onMouseLeave={() => onNoteOff(key.pitch)}
+                />
+              </g>
             )
           })}
 
-          {compactView
+          {/* SVG labels only for non-song compact/full modes (song mode uses HTML overlay) */}
+          {!songMode && compactView
             ? visibleWhiteKeys.map((key) => (
                 <text
                   key={`label-${key.pitch}`}
                   x={0}
                   y={0}
                   textAnchor="middle"
-                  fontSize={songMode ? 0.75 : 0.65}
+                  fontSize={0.65}
                   textRendering="geometricPrecision"
                   fontWeight={hintNotes.has(key.pitch) ? 900 : 700}
                   fill={hintNotes.has(key.pitch) ? '#0b1020' : '#66738f'}
                   style={{ pointerEvents: 'none', userSelect: 'none' }}
-                  transform={`translate(${key.whiteIndex + 0.5}, ${KEY_TOP + WHITE_KEY_HEIGHT - 0.55}) scale(${songMode ? 0.3 : 1}, 1)`}
+                  transform={`translate(${key.whiteIndex + 0.5}, ${KEY_TOP + WHITE_KEY_HEIGHT - 0.55})`}
                 >
                   {pitchToPracticeLabel(key.pitch)}
                 </text>
               ))
-            : whiteKeys
+            : !songMode &&
+              whiteKeys
                 .filter((k) => k.pitch % 12 === 0)
                 .map((k) => (
                   <text
@@ -440,7 +521,35 @@ export default function Piano({
                   </text>
                 ))}
         </svg>
+
+        {/* HTML overlay labels for song mode — immune to preserveAspectRatio distortion */}
+        {songMode && (
+          <div className="ph-piano__song-labels" data-ui="piano-song-labels">
+            {visibleWhiteKeys.map((key) => {
+              const isHint = hintNotes.has(key.pitch)
+              const isActive = activeNotes.has(key.pitch)
+              const isC = key.pitch % 12 === 0
+              // Match exact SVG key center: key center is at whiteIndex + 0.5
+              const viewBoxStart = viewportBounds.x - 0.4
+              const viewBoxWidth = viewportBounds.width + 0.8
+              const pct = ((key.whiteIndex + 0.5 - viewBoxStart) / viewBoxWidth) * 100
+              return (
+                <span
+                  key={`html-label-${key.pitch}`}
+                  className={`ph-piano__song-label${isHint ? ' ph-piano__song-label--hint' : ''}${isActive ? ' ph-piano__song-label--active' : ''}${isC ? ' ph-piano__song-label--c' : ''}`}
+                  style={{ left: `${pct}%` }}
+                  data-note={pitchToPracticeLabel(key.pitch)}
+                >
+                  {pitchToPracticeLabel(key.pitch)}
+                </span>
+              )
+            })}
+          </div>
+        )}
       </div>
+
+      {/* Piano body frame (song mode only) */}
+      {songMode && <div className="ph-piano__body" data-ui="piano-body" />}
     </div>
   )
 }
