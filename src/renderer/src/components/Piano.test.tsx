@@ -48,6 +48,29 @@ describe('Piano viewport alignment', () => {
     expect(width).toBeCloseTo(TOTAL_WHITE_KEYS + 0.8)
   })
 
+  it('raises the compact range header above target note markers', () => {
+    const { container } = renderPiano({
+      centerFullKeyboard: true,
+      hintNotes: new Set([60, 64, 70]),
+    })
+    const [_x, y] = getSvgViewBox(container)
+    const rangeTitle = container.querySelector('[data-ui="piano-range-title"]')
+    const firstTargetMarker = container.querySelector('[data-ui="piano-target-marker"] rect')
+
+    expect(y).toBeLessThan(-0.2)
+    expect(rangeTitle).toHaveAttribute('y', '-0.38')
+    expect(Number(rangeTitle?.getAttribute('y'))).toBeLessThan(
+      Number(firstTargetMarker?.getAttribute('y'))
+    )
+  })
+
+  it('keeps the compact range header in its home position when there are no target markers', () => {
+    const { container } = renderPiano({ centerFullKeyboard: true })
+    const rangeTitle = container.querySelector('[data-ui="piano-range-title"]')
+
+    expect(rangeTitle).toHaveAttribute('y', '0.95')
+  })
+
   it('keeps song mode scoped to the active keyboard window', () => {
     const bounds = getPitchRangeBounds(
       PRACTICE_KEYBOARD_WINDOW.startPitch,

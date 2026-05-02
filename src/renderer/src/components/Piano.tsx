@@ -16,6 +16,7 @@ const SVG_HEIGHT = 12.4
 const KEY_TOP = 1.9
 const WHITE_KEY_HEIGHT = 9.7
 const BLACK_KEY_HEIGHT = 6.35
+const STANDARD_MARKER_Y = 0.25
 
 interface PianoProps {
   activeNotes: Set<number>
@@ -181,7 +182,7 @@ export default function Piano({
           viewBox={
             songMode
               ? `${viewportBounds.x - 0.4} ${KEY_TOP} ${viewportBounds.width + 0.8} ${SVG_HEIGHT - KEY_TOP}`
-              : `${viewportBounds.x - 0.4} -0.2 ${viewportBounds.width + 0.8} ${SVG_HEIGHT + 0.6}`
+              : `${viewportBounds.x - 0.4} 0 ${viewportBounds.width + 0.8} ${SVG_HEIGHT + 0.4}`
           }
           preserveAspectRatio={songMode ? 'none' : undefined}
           shapeRendering="geometricPrecision"
@@ -242,19 +243,10 @@ export default function Piano({
           {!songMode && (
             <rect
               x={viewBounds.x - 0.4}
-              y={-0.2}
+              y={0}
               width={viewBounds.width + 0.8}
-              height={SVG_HEIGHT + 0.6}
+              height={SVG_HEIGHT + 0.4}
               fill="#0b1020"
-            />
-          )}
-          {!songMode && (
-            <rect
-              x={viewBounds.x - 0.4}
-              y={-0.2}
-              width={viewBounds.width + 0.8}
-              height={1.55}
-              fill="rgba(76, 201, 240, 0.08)"
             />
           )}
 
@@ -277,9 +269,9 @@ export default function Piano({
           {compactView && !songMode && (
             <rect
               x={viewBounds.x + 0.1}
-              y={1.45}
+              y={KEY_TOP - 0.3}
               width={viewBounds.width - 0.2}
-              height={SVG_HEIGHT - 1.8}
+              height={SVG_HEIGHT - KEY_TOP + 0.1}
               rx={0.24}
               fill={
                 keyboardWindow?.outOfRange
@@ -292,32 +284,6 @@ export default function Piano({
             />
           )}
 
-          {!songMode && (
-            <>
-              <text
-                x={viewBounds.x + 0.25}
-                y={0.95}
-                fontSize={0.6}
-                fontWeight={700}
-                fill="#8be9fd"
-                style={{ pointerEvents: 'none', userSelect: 'none' }}
-              >
-                {compactView ? 'Teclado 25 teclas' : 'Piano'}
-              </text>
-              <text
-                x={viewBounds.x + viewBounds.width - 0.25}
-                y={0.95}
-                textAnchor="end"
-                fontSize={0.54}
-                fontWeight={700}
-                fill={keyboardWindow?.outOfRange ? '#ffd166' : '#c8d1e8'}
-                style={{ pointerEvents: 'none', userSelect: 'none' }}
-              >
-                {visibleRangeLabel}
-              </text>
-            </>
-          )}
-
           {!songMode &&
             targetPitches.map((pitch, index) => {
               const key = ALL_KEYS.find((candidate) => candidate.pitch === pitch)
@@ -325,7 +291,7 @@ export default function Piano({
 
               const bounds = keyBounds(key)
               const centerX = bounds.x + bounds.width / 2
-              const y = 0.25 + (index % 2) * 0.5
+              const y = STANDARD_MARKER_Y + (index % 2) * 0.5
               const label = pitchToPracticeLabel(pitch)
               const width = Math.max(1.15, 0.42 * label.length + 0.4)
               const color = markerColor(pitch, activeNotes, hintNotes, correctNotes, wrongNotes)
@@ -473,23 +439,6 @@ export default function Piano({
                     C{Math.floor(k.pitch / 12) - 1}
                   </text>
                 ))}
-
-          {windowBounds && keyboardWindow && !compactView && (
-            <text
-              x={windowBounds.x + 0.2}
-              y={0.88}
-              fontSize={0.62}
-              fontWeight={700}
-              fill={keyboardWindow.outOfRange ? '#ffd166' : 'var(--neon-cyan)'}
-              style={{ pointerEvents: 'none', userSelect: 'none' }}
-            >
-              {keyboardWindow.outOfRange
-                ? 'Fuera de rango 25'
-                : compactView
-                  ? 'Teclado 25 teclas'
-                  : 'Ventana 25 teclas'}
-            </text>
-          )}
         </svg>
       </div>
     </div>
