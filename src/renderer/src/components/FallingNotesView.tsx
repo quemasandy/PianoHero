@@ -22,9 +22,8 @@ export default function FallingNotesView({
   song,
   currentMeasureIndex,
   currentEventIndex,
-  keyboardWindow
+  keyboardWindow,
 }: FallingNotesViewProps) {
-  
   // 1. Flatten the song to compute absolute tick bounds
   const { events, currentTick } = useMemo(() => {
     let tickCursor = 0
@@ -38,13 +37,13 @@ export default function FallingNotesView({
           eventIndex: eIdx,
           startTick: tickCursor,
           durationTicks: ev.durationTicks,
-          pitches: ev.pitches
+          pitches: ev.pitches,
         })
-        
+
         if (mIdx === currentMeasureIndex && eIdx === currentEventIndex) {
           currentT = tickCursor
         }
-        
+
         tickCursor += ev.durationTicks
       })
     })
@@ -68,14 +67,16 @@ export default function FallingNotesView({
   const VIEW_HEIGHT = VISIBLE_TICKS * TICK_HEIGHT
 
   return (
-    <div style={{
-      width: '100%',
-      height: '100%',
-      backgroundColor: '#050810',
-      overflow: 'hidden',
-      position: 'relative',
-      boxSizing: 'border-box'
-    }}>
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#050810',
+        overflow: 'hidden',
+        position: 'relative',
+        boxSizing: 'border-box',
+      }}
+    >
       <svg
         viewBox={`${viewBounds.x - 0.4} 0 ${viewBounds.width + 0.8} ${VIEW_HEIGHT}`}
         preserveAspectRatio="none"
@@ -84,15 +85,15 @@ export default function FallingNotesView({
         <defs>
           {/* Gradient for standard unplayed notes (Trail effect: faint top, solid bottom) */}
           <linearGradient id="neonBlue" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#4cc9f0" stopOpacity="0.1" />
-            <stop offset="80%" stopColor="#4cc9f0" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#8be9fd" stopOpacity="1" />
+            <stop offset="0%" stopColor="var(--neon-cyan)" stopOpacity="0.1" />
+            <stop offset="80%" stopColor="var(--neon-cyan)" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#fff" stopOpacity="1" />
           </linearGradient>
           {/* Gradient for active/target notes */}
           <linearGradient id="neonPink" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#f72585" stopOpacity="0.2" />
-            <stop offset="70%" stopColor="#f72585" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#ffb3c6" stopOpacity="1" />
+            <stop offset="0%" stopColor="var(--neon-pink)" stopOpacity="0.2" />
+            <stop offset="70%" stopColor="var(--neon-pink)" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#fff" stopOpacity="1" />
           </linearGradient>
           {/* Subtle glow filter */}
           <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -106,7 +107,7 @@ export default function FallingNotesView({
         <g
           style={{
             transform: `translateY(${currentTick * TICK_HEIGHT}px)`,
-            transition: 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)'
+            transition: 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)',
           }}
         >
           {events.map((ev) => {
@@ -121,27 +122,35 @@ export default function FallingNotesView({
 
             // Absolute Y position (pre-transform). The `<g>` transform slides the group up by currentTick.
             const noteHeight = Math.max(ev.durationTicks * TICK_HEIGHT - 6, 2)
-            const yTopAbsolute = VIEW_HEIGHT - ((ev.startTick + ev.durationTicks) * TICK_HEIGHT) + 3
+            const yTopAbsolute = VIEW_HEIGHT - (ev.startTick + ev.durationTicks) * TICK_HEIGHT + 3
 
             // Determine if it is the active one waiting for input
-            const isActive = ev.measureIndex === currentMeasureIndex && ev.eventIndex === currentEventIndex
+            const isActive =
+              ev.measureIndex === currentMeasureIndex && ev.eventIndex === currentEventIndex
             const isPlayed = ev.startTick < currentTick
 
-            return ev.pitches.map(pitch => {
+            return ev.pitches.map((pitch) => {
               const bounds = getKeyBounds(pitch)
               if (!bounds) return null
 
               return (
-                  <rect
-                    key={`${ev.measureIndex}-${ev.eventIndex}-${pitch}`}
-                    x={bounds.x + 0.15}
-                    y={yTopAbsolute}
-                    width={bounds.width - 0.3}
-                    height={noteHeight}
-                    rx={0.25}
-                    fill={isActive ? 'url(#neonPink)' : isPlayed ? 'rgba(255,255,255,0.05)' : 'url(#neonBlue)'}
-                    opacity={isActive ? 1 : isPlayed ? 0.3 : 0.95}
-                  />
+                <rect
+                  key={`${ev.measureIndex}-${ev.eventIndex}-${pitch}`}
+                  x={bounds.x + 0.15}
+                  y={yTopAbsolute}
+                  width={bounds.width - 0.3}
+                  height={noteHeight}
+                  rx={0.25}
+                  fill={
+                    isActive
+                      ? 'url(#neonPink)'
+                      : isPlayed
+                        ? 'rgba(255,255,255,0.05)'
+                        : 'url(#neonBlue)'
+                  }
+                  opacity={isActive ? 1 : isPlayed ? 0.3 : 0.95}
+                  filter={isActive ? 'url(#neonGlow)' : undefined}
+                />
               )
             })
           })}
@@ -153,10 +162,10 @@ export default function FallingNotesView({
           y1={VIEW_HEIGHT - 0.8}
           x2={viewBounds.x + viewBounds.width + 0.4}
           y2={VIEW_HEIGHT - 0.8}
-          stroke="rgba(76, 201, 240, 0.85)"
+          stroke="var(--neon-cyan)"
           strokeWidth={1.2}
           vectorEffect="non-scaling-stroke"
-          style={{ filter: 'drop-shadow(0 0 4px rgba(76, 201, 240, 0.6))' }}
+          style={{ filter: 'drop-shadow(0 0 6px var(--neon-cyan))' }}
         />
       </svg>
     </div>

@@ -1,24 +1,29 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Righteous&display=swap');
 
 :root {
   /* Core Colors */
-  --slate-900: #0B1120;
-  --slate-800: #0F172A;
-  --slate-700: #1E293B;
+  --slate-900: #0b1120;
+  --slate-800: #0f172a;
+  --slate-700: #1e293b;
   --slate-600: #334155;
-  --slate-400: #94A3B8;
-  --slate-300: #CBD5E1;
-  --text: #F8FAFC;
+  --slate-400: #94a3b8;
+  --slate-300: #cbd5e1;
+  --text: #f8fafc;
+
+  --primary-dark: #1e1b4b;
+  --primary-base: #4338ca;
+  --bg-deep: #0f0f23;
 
   /* Neons */
-  --neon-cyan: #06B6D4;
-  --neon-pink: #F43F5E;
-  --neon-yellow: #FACC15;
-  --neon-green: #10B981;
+  --neon-cyan: #06b6d4;
+  --neon-pink: #f43f5e;
+  --neon-yellow: #facc15;
+  --neon-green: #10b981;
 
   /* Backgrounds & Panels */
-  --bg-app: linear-gradient(135deg, var(--slate-900) 0%, #060912 100%);
-  --bg-panel: rgba(30, 41, 59, 0.4);
+  --bg-app: linear-gradient(135deg, var(--bg-deep) 0%, #05050c 100%);
+  --bg-panel: rgba(30, 27, 75, 0.4);
+  --bg-panel-hover: rgba(30, 27, 75, 0.6);
   --border-glass: rgba(255, 255, 255, 0.08);
 
   --track-colors: var(--neon-cyan), var(--neon-pink), #8b5cf6, #d946ef;
@@ -33,14 +38,22 @@
 body {
   background: var(--bg-app);
   color: var(--text);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Poppins',
+    system-ui,
+    -apple-system,
+    sans-serif;
   overflow: hidden;
   user-select: none;
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4 {
-  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Righteous', 'Poppins', system-ui, sans-serif;
+  font-weight: 400; /* Righteous has only 400 */
 }
 
 button {
@@ -54,7 +67,7 @@ button:active {
   transform: scale(0.96);
 }
 
-input[type="range"] {
+input[type='range'] {
   cursor: pointer;
 }
 
@@ -66,15 +79,41 @@ input[type="range"] {
   -webkit-backdrop-filter: blur(12px);
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.glass-panel:hover {
+  background: var(--bg-panel-hover);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .hover-lift {
   transition: all 0.3s ease;
 }
 .hover-lift:hover {
-  transform: translateY(-4px);
+  transform: translateY(-4px) scale(1.02);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
   border-color: rgba(255, 255, 255, 0.15);
+}
+
+.neon-border-cyan {
+  border-color: var(--neon-cyan) !important;
+  box-shadow:
+    0 0 15px rgba(6, 182, 212, 0.4),
+    inset 0 0 10px rgba(6, 182, 212, 0.2) !important;
+}
+
+.neon-border-pink {
+  border-color: var(--neon-pink) !important;
+  box-shadow:
+    0 0 15px rgba(244, 63, 94, 0.4),
+    inset 0 0 10px rgba(244, 63, 94, 0.2) !important;
+}
+
+.neon-text-glow {
+  text-shadow:
+    0 0 10px var(--neon-cyan),
+    0 0 20px rgba(6, 182, 212, 0.5);
 }
 
 .hide-scrollbar {

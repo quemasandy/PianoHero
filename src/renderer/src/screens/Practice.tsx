@@ -752,7 +752,7 @@ export default function Practice({
       <>
         <div
           style={{
-            padding: '32px 0 48px 0',
+            padding: '0 0 16px 0',
             textAlign: 'center',
             display: 'flex',
             flexDirection: 'column',
@@ -764,21 +764,20 @@ export default function Practice({
               margin: 0,
               padding: '0 20px',
               fontSize: '64px',
-              fontWeight: 900,
-              letterSpacing: '-0.04em',
+              letterSpacing: '2px',
               lineHeight: 1.2,
-              background: 'linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%)',
+              background: 'linear-gradient(135deg, var(--neon-cyan) 0%, var(--primary-base) 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              filter: 'drop-shadow(0 10px 20px rgba(76, 201, 240, 0.4))',
+              filter: 'drop-shadow(0 0 25px rgba(6, 182, 212, 0.6))',
             }}
           >
             PianoHero
           </h1>
           <p
             style={{
-              margin: '16px 0 0',
-              color: '#c8d1e8',
+              margin: '24px 0 0',
+              color: 'var(--slate-300)',
               fontSize: '22px',
               fontWeight: 500,
               lineHeight: 1.4,
@@ -816,7 +815,7 @@ export default function Practice({
           />
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
           <div
             style={{
               display: 'inline-flex',
@@ -897,7 +896,7 @@ export default function Practice({
             gap: '16px',
           }}
         >
-          <div style={scaleTitleGroupStyle}>
+          <div style={{ ...scaleTitleGroupStyle, flex: 1 }}>
             <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{exercise.name}</h2>
             <div style={scaleRootControlStyle}>
               <span style={scaleRootLabelStyle}>Tonalidad</span>
@@ -916,29 +915,31 @@ export default function Practice({
             </div>
           </div>
 
-          {/* Controles y Meta agolpados a la derecha */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <button
-                onClick={goToPreviousScaleExercise}
-                disabled={false}
-                style={buttonStyle('#334', '#fff', false)}
-              >
-                ← Ejercicio
-              </button>
-              <button onClick={restartActiveSession} style={buttonStyle('#4cc9f0', '#001219')}>
-                Reiniciar
-              </button>
-              <button
-                onClick={goToNextScaleExercise}
-                disabled={false}
-                style={buttonStyle('#334', '#fff', false)}
-              >
-                Ejercicio →
-              </button>
-            </div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+            <button
+              onClick={goToPreviousScaleExercise}
+              disabled={false}
+              style={buttonStyle('var(--bg-panel)', '#fff', false)}
+            >
+              ← Ejercicio
+            </button>
+            <button
+              onClick={restartActiveSession}
+              style={buttonStyle('var(--neon-cyan)', '#0F0F23')}
+            >
+              Reiniciar
+            </button>
+            <button
+              onClick={goToNextScaleExercise}
+              disabled={false}
+              style={buttonStyle('var(--bg-panel)', '#fff', false)}
+            >
+              Ejercicio →
+            </button>
+          </div>
 
-            <div style={metaBadgeStyle('#4cc9f0')}>
+          <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={metaBadgeStyle('var(--neon-cyan)')}>
               {session.status === 'complete'
                 ? 'Completada'
                 : `Paso ${Math.min(session.stepIndex + 1, exercise.noteSequence.length)} / ${exercise.noteSequence.length}`}
@@ -957,16 +958,21 @@ export default function Practice({
                 style={{
                   padding: '10px 12px',
                   borderRadius: '10px',
-                  border: current ? '1px solid #4cc9f0' : '1px solid #2d3a56',
+                  border: current
+                    ? '1px solid var(--neon-cyan)'
+                    : '1px solid rgba(255,255,255,0.1)',
                   background: completed
-                    ? 'rgba(6,214,160,0.18)'
+                    ? 'rgba(16,185,129,0.18)'
                     : current
-                      ? 'rgba(76,201,240,0.12)'
-                      : 'rgba(255,255,255,0.03)',
-                  color: completed ? '#06d6a0' : current ? '#8be9fd' : '#c8d1e8',
-                  fontWeight: 700,
+                      ? 'rgba(6,182,212,0.12)'
+                      : 'var(--bg-panel)',
+                  color: completed ? 'var(--neon-green)' : current ? '#fff' : 'var(--slate-300)',
+                  fontWeight: 800,
                   minWidth: '64px',
                   textAlign: 'center',
+                  boxShadow: current ? '0 0 15px rgba(6,182,212,0.4)' : 'none',
+                  transform: current ? 'scale(1.1)' : 'scale(1)',
+                  transition: 'all 0.2s',
                 }}
               >
                 {pitchToPracticeLabel(pitch)}
@@ -994,31 +1000,35 @@ export default function Practice({
             gap: '16px',
           }}
         >
-          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{exercise.name}</h2>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }}>{exercise.name}</h2>
+          </div>
 
-          {/* Controles y Meta agolpados a la derecha */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <button
-                onClick={goToPreviousChordExercise}
-                disabled={isFirst}
-                style={buttonStyle('#334', '#fff', isFirst)}
-              >
-                ← Ejercicio
-              </button>
-              <button onClick={restartActiveSession} style={buttonStyle('#4cc9f0', '#001219')}>
-                Reiniciar
-              </button>
-              <button
-                onClick={goToNextChordExercise}
-                disabled={isLast}
-                style={buttonStyle('#334', '#fff', isLast)}
-              >
-                Ejercicio →
-              </button>
-            </div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+            <button
+              onClick={goToPreviousChordExercise}
+              disabled={isFirst}
+              style={buttonStyle('var(--bg-panel)', '#fff', isFirst)}
+            >
+              ← Ejercicio
+            </button>
+            <button
+              onClick={restartActiveSession}
+              style={buttonStyle('var(--neon-pink)', '#0F0F23')}
+            >
+              Reiniciar
+            </button>
+            <button
+              onClick={goToNextChordExercise}
+              disabled={isLast}
+              style={buttonStyle('var(--bg-panel)', '#fff', isLast)}
+            >
+              Ejercicio →
+            </button>
+          </div>
 
-            <div style={metaBadgeStyle('#f72585')}>
+          <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={metaBadgeStyle('var(--neon-pink)')}>
               {session.status === 'complete'
                 ? 'Progresión completa'
                 : `Compás ${Math.min(session.stepIndex + 1, exercise.progression.length)} / ${exercise.progression.length}`}
@@ -1054,12 +1064,12 @@ export default function Practice({
                   borderRadius: '20px',
                   border: current ? '2px solid var(--neon-pink)' : '1px solid var(--border-glass)',
                   background: completed
-                    ? 'rgba(6,214,160,0.1)'
+                    ? 'rgba(16,185,129,0.1)'
                     : current
-                      ? 'rgba(247,37,133,0.15)'
-                      : 'rgba(255,255,255,0.03)',
-                  boxShadow: current ? '0 0 32px rgba(247,37,133,0.2)' : 'none',
-                  transform: current ? 'scale(1.02)' : 'scale(0.98)',
+                      ? 'rgba(244,63,94,0.15)'
+                      : 'var(--bg-panel)',
+                  boxShadow: current ? '0 0 32px rgba(244,63,94,0.3)' : 'none',
+                  transform: current ? 'scale(1.04)' : 'scale(0.98)',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   opacity: current || completed ? 1 : 0.6,
                 }}
@@ -1313,7 +1323,7 @@ export default function Practice({
 
       {/* Legacy status bar shifts layout when in Home vs nested modes */}
       {view === 'practice_home' && (
-        <div style={{ ...titleBarStyle, padding: '24px 40px 8px 40px', borderBottom: 'none' }}>
+        <div style={{ ...titleBarStyle, padding: '8px 40px 8px 40px', borderBottom: 'none' }}>
           <div
             style={{
               display: 'flex',
@@ -1331,12 +1341,13 @@ export default function Practice({
 
       <div
         style={{
-          padding: '24px 32px',
+          padding: view === 'practice_home' ? '8px 32px' : '24px 32px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '40px',
+          gap: view === 'practice_home' ? '16px' : '40px',
           minHeight: 0,
           overflowY: 'auto',
+          justifyContent: view === 'practice_home' ? 'center' : 'flex-start',
         }}
       >
         {view === 'practice_home' ? (
@@ -1353,7 +1364,7 @@ export default function Practice({
         {renderKeyboardGuide()}
       </div>
 
-      <div style={{ padding: '16px 32px 32px 32px', flexShrink: 0 }}>
+      <div style={{ padding: '4px 32px 8px 32px', flexShrink: 0 }}>
         <Piano
           activeNotes={pianoActiveNotes}
           hintNotes={view === 'practice_home' ? new Set() : targetNotes}
@@ -1451,10 +1462,14 @@ function PracticeCard({
       onClick={onClick}
       className="glass-panel hover-lift"
       style={{
-        padding: '28px',
+        padding: '20px 24px',
         textAlign: 'left',
-        display: 'grid',
+        display: 'flex',
+        flexDirection: 'column',
         gap: '12px',
+        height: '100%',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
       <div
@@ -1469,10 +1484,10 @@ function PracticeCard({
         {subtitle}
       </div>
       <div style={{ color: 'var(--text)', fontSize: '28px', fontWeight: 800 }}>{title}</div>
-      <div style={{ color: 'var(--slate-300)', fontSize: '15px', lineHeight: 1.5 }}>
+      <div style={{ color: 'var(--slate-300)', fontSize: '15px', lineHeight: 1.6, flex: 1 }}>
         {description}
       </div>
-      <span style={{ color: accent, fontWeight: 700 }}>{actionLabel} →</span>
+      <span style={{ color: accent, fontWeight: 700, marginTop: '8px' }}>{actionLabel} →</span>
     </button>
   )
 }
@@ -1500,9 +1515,12 @@ const titleBarStyle: CSSProperties = {
 
 const homeGridStyle: CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-  gap: '24px',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+  gap: '16px',
   alignContent: 'start',
+  maxWidth: '1100px',
+  width: '100%',
+  margin: '0 auto',
 }
 
 const keyboardGuideStyle: CSSProperties = {
