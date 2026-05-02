@@ -1,6 +1,12 @@
 import { useEffect, useRef } from 'react'
 import type { KeyboardWindow, ParsedSong, PlayerState } from '../types'
-import { PIANO_MAX_PITCH, PIANO_MIN_PITCH, TOTAL_WHITE_KEYS, getKeyBounds, getPitchRangeBounds } from '../lib/keyboardLayout'
+import {
+  PIANO_MAX_PITCH,
+  PIANO_MIN_PITCH,
+  TOTAL_WHITE_KEYS,
+  getKeyBounds,
+  getPitchRangeBounds,
+} from '../lib/keyboardLayout'
 
 const TRACK_COLORS = ['#4cc9f0', '#f72585', '#7209b7', '#3a0ca3', '#4361ee', '#06d6a0']
 const PIXELS_PER_SECOND = 220
@@ -52,7 +58,7 @@ export default function Waterfall({
   song,
   playerState,
   keyboardWindow,
-  compactView = false
+  compactView = false,
 }: WaterfallProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -75,11 +81,14 @@ export default function Waterfall({
       if (!ctx) return
       const state = stateRef.current
       const t = state.currentTime
-      const rangeBounds = compactView && keyboardWindow
-        ? getPitchRangeBounds(keyboardWindow.startPitch, keyboardWindow.endPitch)
-        : null
-      const visibleStartPitch = compactView && keyboardWindow ? keyboardWindow.startPitch : PIANO_MIN_PITCH
-      const visibleEndPitch = compactView && keyboardWindow ? keyboardWindow.endPitch : PIANO_MAX_PITCH
+      const rangeBounds =
+        compactView && keyboardWindow
+          ? getPitchRangeBounds(keyboardWindow.startPitch, keyboardWindow.endPitch)
+          : null
+      const visibleStartPitch =
+        compactView && keyboardWindow ? keyboardWindow.startPitch : PIANO_MIN_PITCH
+      const visibleEndPitch =
+        compactView && keyboardWindow ? keyboardWindow.endPitch : PIANO_MAX_PITCH
       const visibleRangeX = rangeBounds?.x ?? 0
       const visibleRangeWidth = rangeBounds?.width ?? TOTAL_WHITE_KEYS
 
@@ -103,7 +112,11 @@ export default function Waterfall({
         const isActive = state.activeNotes.has(note.pitch)
         const isHint = state.hintNotes.has(note.pitch)
         ctx.globalAlpha = isActive ? 1 : 0.85
-        ctx.fillStyle = isActive ? '#06d6a0' : isHint ? '#ffffff' : TRACK_COLORS[note.track % TRACK_COLORS.length]
+        ctx.fillStyle = isActive
+          ? '#06d6a0'
+          : isHint
+            ? '#ffffff'
+            : TRACK_COLORS[note.track % TRACK_COLORS.length]
         fillRoundedRect(ctx, x, ry, w, rh, 3)
         ctx.globalAlpha = 0.4
         ctx.strokeStyle = '#fff'
@@ -126,13 +139,16 @@ export default function Waterfall({
     }
   }
 
-  useEffect(() => { draw() }, [
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    draw()
+  }, [
     compactView,
     keyboardWindow,
     playerState.currentTime,
     playerState.activeNotes,
     playerState.hintNotes,
-    playerState.activeTrackMask
+    playerState.activeTrackMask,
   ])
 
   useEffect(() => {
@@ -142,11 +158,31 @@ export default function Waterfall({
     ro.observe(container)
     draw()
     return () => ro.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [compactView, keyboardWindow, song])
 
   return (
-    <div ref={containerRef} style={{ width: '100%', height: '100%', overflow: 'hidden', position: 'relative', minHeight: 0 }}>
-      <canvas ref={canvasRef} style={{ display: 'block', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+    <div
+      ref={containerRef}
+      style={{
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        position: 'relative',
+        minHeight: 0,
+      }}
+    >
+      <canvas
+        ref={canvasRef}
+        style={{
+          display: 'block',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+        }}
+      />
     </div>
   )
 }

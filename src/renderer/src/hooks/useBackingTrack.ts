@@ -15,23 +15,23 @@ export function useBackingTrack(initialBpm = 110) {
   // Instrumentos
   const bassSynthRef = useRef<Tone.FMSynth | null>(null)
   const cymbalSynthRef = useRef<Tone.MetalSynth | null>(null)
-  
+
   // Secuencias / Loops
-  const loopRef = useRef<Tone.Sequence | null>(null)
+  const _loopRef = useRef<Tone.Sequence | null>(null)
 
   const setupAudio = useCallback(async () => {
     if (isSetupRef.current) return
     logRendererEvent('debug', 'backingTrack.setup', 'Init starting')
     await Tone.start()
     logRendererEvent('debug', 'backingTrack.setup', 'Tone.start passed')
-    
+
     // Crear el Bajo que acompañará
     bassSynthRef.current = new Tone.FMSynth({
       harmonicity: 1,
       modulationIndex: 1,
       oscillator: { type: 'sine' },
       modulation: { type: 'triangle' },
-      envelope: { attack: 0.05, decay: 0.3, sustain: 0.1, release: 1.2 }
+      envelope: { attack: 0.05, decay: 0.3, sustain: 0.1, release: 1.2 },
     }).toDestination()
     bassSynthRef.current.volume.value = -8
 
@@ -42,32 +42,32 @@ export function useBackingTrack(initialBpm = 110) {
       harmonicity: 5.1,
       modulationIndex: 32,
       resonance: 4000,
-      octaves: 1.5
+      octaves: 1.5,
     }).toDestination()
     cymbalSynthRef.current.volume.value = -12
 
     // Ritmo de Swing en corcheas atresilladas (Ride Cymbal)
-    // Usaremos un patrón rítmico básico de 8 notas de 1/8. 
+    // Usaremos un patrón rítmico básico de 8 notas de 1/8.
     // Como Tone.Transport maneja el swing interno si se configura, lanzaremos semicorcheas o corcheas.
     const steps = [
       { time: '0:0:0', type: 'bass', note: 'C2' },
       { time: '0:0:0', type: 'cymbal', velocity: 1 },
       { time: '0:0:2.6', type: 'cymbal', velocity: 0.5 }, // aproximándose al swing-skip (en lugar de triplets estrictos para simpleza)
-      
+
       { time: '0:1:0', type: 'bass', note: 'E2' },
       { time: '0:1:0', type: 'cymbal', velocity: 0.8 },
-      
+
       { time: '0:2:0', type: 'bass', note: 'G2' },
       { time: '0:2:0', type: 'cymbal', velocity: 1 },
       { time: '0:2:2.6', type: 'cymbal', velocity: 0.5 },
-      
+
       { time: '0:3:0', type: 'bass', note: 'A2' },
-      { time: '0:3:0', type: 'cymbal', velocity: 0.8 }
+      { time: '0:3:0', type: 'cymbal', velocity: 0.8 },
     ]
 
     const part = new Tone.Part((time, value) => {
       if (value.type === 'bass' && bassSynthRef.current) {
-        bassSynthRef.current.triggerAttackRelease(value.note!, '8n', time)
+        bassSynthRef.current.triggerAttackRelease(value.note ?? 'C2', '8n', time)
       } else if (value.type === 'cymbal' && cymbalSynthRef.current) {
         cymbalSynthRef.current.triggerAttackRelease('32n', time, value.velocity)
       }
@@ -84,7 +84,9 @@ export function useBackingTrack(initialBpm = 110) {
       Tone.Transport.swing = 0.5
       Tone.Transport.swingSubdivision = '8n'
     } catch (err) {
-      logRendererEvent('error', 'backingTrack.swing', 'Failed to configure swing', { error: String(err) })
+      logRendererEvent('error', 'backingTrack.swing', 'Failed to configure swing', {
+        error: String(err),
+      })
     }
 
     isSetupRef.current = true
@@ -97,11 +99,14 @@ export function useBackingTrack(initialBpm = 110) {
 
   const togglePlay = useCallback(async () => {
     try {
-      logRendererEvent('info', 'backingTrack.toggle', 'Evaluating toggle', { isSetup: isSetupRef.current, isPlaying })
+      logRendererEvent('info', 'backingTrack.toggle', 'Evaluating toggle', {
+        isSetup: isSetupRef.current,
+        isPlaying,
+      })
       if (!isSetupRef.current) {
         await setupAudio()
       }
-      
+
       if (isPlaying) {
         Tone.Transport.pause()
         setIsPlaying(false)
@@ -115,7 +120,9 @@ export function useBackingTrack(initialBpm = 110) {
         logRendererEvent('info', 'backingTrack.started', 'Started successfully')
       }
     } catch (error) {
-      logRendererEvent('error', 'backingTrack.crash', 'Crash matching rhythmic engine', { err: String(error) })
+      logRendererEvent('error', 'backingTrack.crash', 'Crash matching rhythmic engine', {
+        err: String(error),
+      })
       setIsPlaying(false)
     }
   }, [isPlaying, setupAudio])
@@ -128,6 +135,6 @@ export function useBackingTrack(initialBpm = 110) {
     bpm,
     isPlaying,
     togglePlay,
-    updateBpm
+    updateBpm,
   }
 }

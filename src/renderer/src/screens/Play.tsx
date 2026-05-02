@@ -22,7 +22,7 @@ const DEFAULT_WORLDDE_WINDOW: KeyboardWindow = {
   startPitch: 48,
   endPitch: 72,
   targetPitches: [],
-  outOfRange: false
+  outOfRange: false,
 }
 
 function pitchToLabel(pitch: number) {
@@ -37,14 +37,11 @@ function createControllerProfile(deviceName: string): MidiControllerProfile {
     deviceName,
     keyCount: matchedByName ? KEYBOARD_WINDOW_KEY_COUNT : MAX_PITCH - MIN_PITCH + 1,
     isWorlddeProfile: matchedByName,
-    matchedByName
+    matchedByName,
   }
 }
 
-function buildKeyboardWindow(
-  targetGroup: number[],
-  keyCount: number
-): KeyboardWindow | null {
+function buildKeyboardWindow(targetGroup: number[], keyCount: number): KeyboardWindow | null {
   if (targetGroup.length === 0) return null
 
   const sorted = [...new Set(targetGroup)].sort((a, b) => a - b)
@@ -59,7 +56,7 @@ function buildKeyboardWindow(
       startPitch,
       endPitch: startPitch + keyCount - 1,
       targetPitches: sorted,
-      outOfRange: true
+      outOfRange: true,
     }
   }
 
@@ -69,13 +66,13 @@ function buildKeyboardWindow(
     startPitch,
     endPitch: startPitch + keyCount - 1,
     targetPitches: sorted,
-    outOfRange: false
+    outOfRange: false,
   }
 }
 
 function windowCoversTargets(window: KeyboardWindow | null, targetPitches: number[]) {
   if (!window || targetPitches.length === 0) return false
-  return targetPitches.every(pitch => pitch >= window.startPitch && pitch <= window.endPitch)
+  return targetPitches.every((pitch) => pitch >= window.startPitch && pitch <= window.endPitch)
 }
 
 export default function Play({ song, filePath, onBack }: PlayProps) {
@@ -89,7 +86,7 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
     activeNotes: new Set(),
     hintNotes: new Set(),
     learningMode: true,
-    activeTrackMask: Array(song.trackCount).fill(true)
+    activeTrackMask: Array(song.trackCount).fill(true),
   })
   const [midiState, setMidiState] = useState<{
     status: 'checking' | 'connected' | 'unavailable' | 'error'
@@ -98,21 +95,27 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
   }>({
     status: 'checking',
     deviceName: null,
-    profile: null
+    profile: null,
   })
   const [keyboardWindow, setKeyboardWindow] = useState<KeyboardWindow | null>(null)
 
   const midiStatusLabel =
-    midiState.status === 'connected' ? `MIDI: ${midiState.deviceName}` :
-    midiState.status === 'checking' ? 'MIDI: buscando teclado...' :
-    midiState.status === 'unavailable' ? 'MIDI: no detectado' :
-    'MIDI: error de conexión'
+    midiState.status === 'connected'
+      ? `MIDI: ${midiState.deviceName}`
+      : midiState.status === 'checking'
+        ? 'MIDI: buscando teclado...'
+        : midiState.status === 'unavailable'
+          ? 'MIDI: no detectado'
+          : 'MIDI: error de conexión'
 
   const midiStatusColor =
-    midiState.status === 'connected' ? '#06d6a0' :
-    midiState.status === 'checking' ? '#4cc9f0' :
-    midiState.status === 'unavailable' ? '#ffd166' :
-    '#f72585'
+    midiState.status === 'connected'
+      ? '#06d6a0'
+      : midiState.status === 'checking'
+        ? '#4cc9f0'
+        : midiState.status === 'unavailable'
+          ? '#ffd166'
+          : '#f72585'
 
   const rangeStatusLabel = keyboardWindow
     ? keyboardWindow.outOfRange
@@ -122,9 +125,10 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
 
   const rangeStatusColor = keyboardWindow?.outOfRange ? '#ffd166' : '#4cc9f0'
   const compactWorlddeView = !!midiState.profile?.isWorlddeProfile
-  const visibleKeyboardWindow = compactWorlddeView && !keyboardWindow && playerState.currentTime === 0
-    ? DEFAULT_WORLDDE_WINDOW
-    : keyboardWindow
+  const visibleKeyboardWindow =
+    compactWorlddeView && !keyboardWindow && playerState.currentTime === 0
+      ? DEFAULT_WORLDDE_WINDOW
+      : keyboardWindow
 
   // Initialize scheduler
   useEffect(() => {
@@ -133,7 +137,7 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
       title: song.title,
       noteCount: song.notes.length,
       trackCount: song.trackCount,
-      duration: song.duration
+      duration: song.duration,
     })
 
     const scheduler = new Scheduler(song)
@@ -141,44 +145,49 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
     scheduler.setLearningMode(true)
     logRendererEvent('info', 'play.scheduler.ready', 'Scheduler created', {
       duration: song.duration,
-      learningMode: true
+      learningMode: true,
     })
-    logRendererEvent('info', 'play.audio.disabled', 'Internal audio disabled for external DAW workflow', {
-      mode: 'silent',
-      externalAudio: 'GarageBand'
-    })
+    logRendererEvent(
+      'info',
+      'play.audio.disabled',
+      'Internal audio disabled for external DAW workflow',
+      {
+        mode: 'silent',
+        externalAudio: 'GarageBand',
+      }
+    )
 
     const unsubscribe = scheduler.on((event) => {
       if (event.type === 'noteOn') {
         noteTrackMapRef.current.set(event.note.pitch, event.note.track)
-        setPlayerState(prev => ({
+        setPlayerState((prev) => ({
           ...prev,
-          activeNotes: new Set([...prev.activeNotes, event.note.pitch])
+          activeNotes: new Set([...prev.activeNotes, event.note.pitch]),
         }))
       } else if (event.type === 'noteOff') {
         noteTrackMapRef.current.delete(event.note.pitch)
-        setPlayerState(prev => {
+        setPlayerState((prev) => {
           const next = new Set(prev.activeNotes)
           next.delete(event.note.pitch)
           return { ...prev, activeNotes: next }
         })
       } else if (event.type === 'waitForNotes') {
-        setPlayerState(prev => ({
+        setPlayerState((prev) => ({
           ...prev,
           status: 'waiting',
-          hintNotes: new Set(event.notes.map(n => n.pitch))
+          hintNotes: new Set(event.notes.map((n) => n.pitch)),
         }))
       } else if (event.type === 'timeUpdate') {
-        setPlayerState(prev => ({ ...prev, currentTime: event.currentTime }))
+        setPlayerState((prev) => ({ ...prev, currentTime: event.currentTime }))
       } else if (event.type === 'ended') {
         logRendererEvent('info', 'play.ended', 'Playback reached the end of the song')
-        setPlayerState(prev => ({ ...prev, status: 'idle', activeNotes: new Set() }))
+        setPlayerState((prev) => ({ ...prev, status: 'idle', activeNotes: new Set() }))
       }
     })
 
     return () => {
       logRendererEvent('info', 'play.unmount', 'Cleaning up play screen resources', {
-        filePath
+        filePath,
       })
       unsubscribe()
       scheduler.stop()
@@ -193,7 +202,7 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
       setMidiState({
         status: 'checking',
         deviceName: null,
-        profile: null
+        profile: null,
       })
 
       try {
@@ -201,14 +210,14 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
         if (disposed) return
 
         logRendererEvent('info', 'play.midi.detect.result', 'MIDI device list resolved', {
-          devices
+          devices,
         })
 
         if (devices.length === 0) {
           setMidiState({
             status: 'unavailable',
             deviceName: null,
-            profile: null
+            profile: null,
           })
           return
         }
@@ -217,7 +226,7 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
           .map((deviceName, index) => ({
             deviceName,
             index,
-            matchedByName: WORLDDE_DEVICE_PATTERN.test(deviceName)
+            matchedByName: WORLDDE_DEVICE_PATTERN.test(deviceName),
           }))
           .sort((a, b) => {
             if (a.matchedByName === b.matchedByName) return a.index - b.index
@@ -225,7 +234,7 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
           })
 
         logRendererEvent('info', 'play.midi.detect.ordered', 'Ordered MIDI connection candidates', {
-          candidates
+          candidates,
         })
 
         for (const candidate of candidates) {
@@ -240,12 +249,12 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
             setMidiState({
               status: 'connected',
               deviceName: candidate.deviceName,
-              profile
+              profile,
             })
             logRendererEvent('info', 'play.midi.connected', 'Connected MIDI input device', {
               index: candidate.index,
               name: candidate.deviceName,
-              profile
+              profile,
             })
             return
           }
@@ -254,20 +263,25 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
         setMidiState({
           status: 'error',
           deviceName: null,
-          profile: null
+          profile: null,
         })
-        logRendererEvent('error', 'play.midi.connect.failed', 'Failed to connect to any MIDI input device', {
-          devices
-        })
+        logRendererEvent(
+          'error',
+          'play.midi.connect.failed',
+          'Failed to connect to any MIDI input device',
+          {
+            devices,
+          }
+        )
       } catch (error) {
         if (disposed) return
         setMidiState({
           status: 'error',
           deviceName: null,
-          profile: null
+          profile: null,
         })
         logRendererEvent('error', 'play.midi.detect.failed', 'MIDI detection failed', {
-          error
+          error,
         })
       }
     }
@@ -283,13 +297,13 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
   useEffect(() => {
     const profile = midiState.profile
     const scheduler = schedulerRef.current
-    setKeyboardWindow(prev => {
+    setKeyboardWindow((prev) => {
       if (!profile?.isWorlddeProfile || !scheduler) {
         return prev ? null : prev
       }
 
       const pendingGroup = scheduler.getNextPendingNoteGroup()
-      const targetPitches = pendingGroup.map(note => note.pitch)
+      const targetPitches = pendingGroup.map((note) => note.pitch)
       const desiredWindow = buildKeyboardWindow(targetPitches, profile.keyCount)
 
       if (!desiredWindow) {
@@ -322,96 +336,102 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
     playerState.activeTrackMask,
     playerState.currentTime,
     playerState.hintNotes,
-    playerState.learningMode
+    playerState.learningMode,
   ])
 
   useEffect(() => {
     if (!keyboardWindow || !midiState.profile?.isWorlddeProfile) return
     logRendererEvent('info', 'play.keyboardWindow.updated', 'Updated 25-key controller window', {
       keyboardWindow,
-      deviceName: midiState.profile.deviceName
+      deviceName: midiState.profile.deviceName,
     })
   }, [keyboardWindow, midiState.profile])
 
   // MIDI physical device input
-  useMidiDevice(useCallback((pitch: number, velocity: number, isOn: boolean) => {
-    const scheduler = schedulerRef.current
-    if (!scheduler) return
+  useMidiDevice(
+    useCallback((pitch: number, velocity: number, isOn: boolean) => {
+      const scheduler = schedulerRef.current
+      if (!scheduler) return
 
-    if (isOn) {
-      logRendererEvent('debug', 'play.midi.noteOn', 'Received MIDI note on', {
-        pitch,
-        velocity
-      })
-      scheduler.pressMidiNote(pitch)
-      setPlayerState(prev => ({
-        ...prev,
-        activeNotes: new Set([...prev.activeNotes, pitch]),
-        hintNotes: prev.hintNotes.has(pitch)
-          ? (() => { const s = new Set(prev.hintNotes); s.delete(pitch); return s })()
-          : prev.hintNotes
-      }))
-    } else {
-      logRendererEvent('debug', 'play.midi.noteOff', 'Received MIDI note off', {
-        pitch
-      })
-      scheduler.releaseMidiNote(pitch)
-      setPlayerState(prev => {
-        const next = new Set(prev.activeNotes)
-        next.delete(pitch)
-        return { ...prev, activeNotes: next }
-      })
-    }
-  }, []))
+      if (isOn) {
+        logRendererEvent('debug', 'play.midi.noteOn', 'Received MIDI note on', {
+          pitch,
+          velocity,
+        })
+        scheduler.pressMidiNote(pitch)
+        setPlayerState((prev) => ({
+          ...prev,
+          activeNotes: new Set([...prev.activeNotes, pitch]),
+          hintNotes: prev.hintNotes.has(pitch)
+            ? (() => {
+                const s = new Set(prev.hintNotes)
+                s.delete(pitch)
+                return s
+              })()
+            : prev.hintNotes,
+        }))
+      } else {
+        logRendererEvent('debug', 'play.midi.noteOff', 'Received MIDI note off', {
+          pitch,
+        })
+        scheduler.releaseMidiNote(pitch)
+        setPlayerState((prev) => {
+          const next = new Set(prev.activeNotes)
+          next.delete(pitch)
+          return { ...prev, activeNotes: next }
+        })
+      }
+    }, [])
+  )
 
   function handlePlay() {
     logRendererEvent('info', 'play.handlePlay', 'Play requested', {
-      currentTime: playerState.currentTime
+      currentTime: playerState.currentTime,
     })
     schedulerRef.current?.play()
-    setPlayerState(prev => ({ ...prev, status: 'playing' }))
+    setPlayerState((prev) => ({ ...prev, status: 'playing' }))
   }
 
   function handlePause() {
     logRendererEvent('info', 'play.handlePause', 'Pause requested', {
-      currentTime: playerState.currentTime
+      currentTime: playerState.currentTime,
     })
     schedulerRef.current?.pause()
-    setPlayerState(prev => ({ ...prev, status: 'paused' }))
+    setPlayerState((prev) => ({ ...prev, status: 'paused' }))
   }
 
   function handleStop() {
     logRendererEvent('info', 'play.handleStop', 'Stop requested')
     schedulerRef.current?.stop()
-    setPlayerState(prev => ({
+    setPlayerState((prev) => ({
       ...prev,
       status: 'idle',
       currentTime: 0,
       activeNotes: new Set(),
-      hintNotes: new Set()
+      hintNotes: new Set(),
     }))
   }
 
   function handleSeek(time: number) {
     logRendererEvent('info', 'play.handleSeek', 'Seek requested', { time })
     schedulerRef.current?.seekTo(time)
-    setPlayerState(prev => ({ ...prev, currentTime: time, activeNotes: new Set() }))
+    setPlayerState((prev) => ({ ...prev, currentTime: time, activeNotes: new Set() }))
   }
 
   function handleSpeedChange(speed: number) {
     logRendererEvent('info', 'play.handleSpeedChange', 'Speed changed', { speed })
     schedulerRef.current?.setSpeed(speed)
-    setPlayerState(prev => ({ ...prev, speed }))
+    setPlayerState((prev) => ({ ...prev, speed }))
   }
 
   function handleToggleLearning() {
     const enabled = !playerState.learningMode
     logRendererEvent('info', 'play.handleToggleLearning', 'Learning mode toggled', { enabled })
     schedulerRef.current?.setLearningMode(enabled)
-    setPlayerState(prev => ({
+    setPlayerState((prev) => ({
       ...prev,
       learningMode: enabled,
-      hintNotes: enabled ? prev.hintNotes : new Set()
+      hintNotes: enabled ? prev.hintNotes : new Set(),
     }))
   }
 
@@ -420,25 +440,25 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
     mask[index] = !mask[index]
     logRendererEvent('info', 'play.handleToggleTrack', 'Track visibility toggled', {
       index,
-      enabled: mask[index]
+      enabled: mask[index],
     })
     schedulerRef.current?.setActiveTrackMask(mask)
-    setPlayerState(prev => ({ ...prev, activeTrackMask: mask }))
+    setPlayerState((prev) => ({ ...prev, activeTrackMask: mask }))
   }
 
   function handlePianoNoteOn(pitch: number) {
     const scheduler = schedulerRef.current
     scheduler?.pressMidiNote(pitch)
-    setPlayerState(prev => ({
+    setPlayerState((prev) => ({
       ...prev,
-      activeNotes: new Set([...prev.activeNotes, pitch])
+      activeNotes: new Set([...prev.activeNotes, pitch]),
     }))
   }
 
   function handlePianoNoteOff(pitch: number) {
     const scheduler = schedulerRef.current
     scheduler?.releaseMidiNote(pitch)
-    setPlayerState(prev => {
+    setPlayerState((prev) => {
       const next = new Set(prev.activeNotes)
       next.delete(pitch)
       return { ...prev, activeNotes: next }
@@ -446,28 +466,33 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      display: 'grid',
-      gridTemplateRows: 'auto minmax(0, 1fr) auto auto',
-      minHeight: 0,
-      overflow: 'hidden',
-      background: '#1a1a2e'
-    }}>
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        display: 'grid',
+        gridTemplateRows: 'auto minmax(0, 1fr) auto auto',
+        minHeight: 0,
+        overflow: 'hidden',
+        background: '#1a1a2e',
+      }}
+    >
       {/* Title bar */}
-      <div style={{
-        padding: '8px 16px',
-        background: '#0f1b2d',
-        borderBottom: '1px solid #223',
-        fontSize: '14px',
-        color: '#8892a4',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '16px',
-        WebkitAppRegion: 'drag' as any
-      }}>
+      <div
+        style={{
+          padding: '8px 16px',
+          background: '#0f1b2d',
+          borderBottom: '1px solid #223',
+          fontSize: '14px',
+          color: '#8892a4',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          WebkitAppRegion: 'drag' as any,
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <span style={{ color: '#fff', fontWeight: 600 }}>{song.title}</span>
           <span style={{ color: '#ffd166', fontSize: '12px', fontWeight: 700 }}>

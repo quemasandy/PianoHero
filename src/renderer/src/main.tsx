@@ -12,19 +12,25 @@ logRendererEvent('info', 'renderer.bootstrap', 'Bootstrapping React root')
 if (typeof window !== 'undefined' && !window.electronAPI) {
   window.electronAPI = {
     listMidiDevices: async () => ['Simulated Web MIDI Device'],
-    connectMidiDevice: async (index) => true,
+    connectMidiDevice: async (_index) => true,
     disconnectMidiDevice: async () => true,
-    getDiagnosticsSnapshot: async () => ({ entries: [], logPath: '', startTimes: { renderer: 0, platform: 0 } }),
+    getDiagnosticsSnapshot: async () => ({
+      entries: [],
+      logPath: '',
+      startTimes: { renderer: 0, platform: 0 },
+    }),
     clearRendererLogs: async () => {},
     onDiagnosticsUpdated: () => () => {},
     onMidiMessage: () => () => {},
     onMidiNote: () => () => {},
     onMidiDevicesUpdated: () => () => {},
-    platform: 'mock-web'
+    platform: 'mock-web',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any
 }
 // ------------------------------------------------------------------------------------------
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <ErrorBoundary>
     <App />

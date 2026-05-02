@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Renderer, Stave, StaveNote, Accidental, Formatter, Voice, Dot } from 'vexflow'
 import { SongMeasure } from '../lib/songCatalog'
+import { logRendererEvent } from '../lib/diagnostics'
 
 interface SongSheetMusicProps {
   measure: SongMeasure
@@ -14,7 +15,7 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
 
   useEffect(() => {
     if (!containerRef.current) return
-    
+
     containerRef.current.innerHTML = ''
 
     const width = 600
@@ -36,7 +37,7 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
     measure.events.forEach((ev, i) => {
       let keys = ['b/4'] // Default for rest
       if (ev.pitches.length > 0) {
-        keys = ev.pitches.map(pitch => {
+        keys = ev.pitches.map((pitch) => {
           const octave = Math.floor(pitch / 12) - 1
           const noteName = NOTE_NAMES_VEX[pitch % 12]
           return `${noteName}/${octave}`
@@ -52,13 +53,27 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
       const staveNote = new StaveNote({
         clef: measure.clef,
         keys: keys,
-        duration: ev.pitches.length === 0 ? durStr + 'r' : durStr
+        duration: ev.pitches.length === 0 ? durStr + 'r' : durStr,
       })
 
       if (hasDot) {
-        keys.forEach((_, idx) => {
-          staveNote.addModifier(new Dot(), idx)
-        })
+        try {
+          keys.forEach((_, idx) => {
+            staveNote.addModifier(new Dot(), idx)
+          })
+        } catch (err) {
+          logRendererEvent(
+            'warn',
+            'ui.songsheetmusic.dot.failed',
+            'Failed to apply dot modifier to note',
+            {
+              measureId: measure.id,
+              eventIndex: i,
+              durationNotation: ev.durationNotation,
+              error: String(err),
+            }
+          )
+        }
       }
 
       // Add accidentals
@@ -78,11 +93,16 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
 
       if (isCurrent) {
         // Enfoque anatómico: Brillamos la propia cabeza de la nota intensificando el color
-        staveNote.setStyle({ fillStyle: "var(--neon-pink, #f72585)", strokeStyle: "var(--neon-pink, #f72585)", shadowColor: "#f72585", shadowBlur: 10 })
+        staveNote.setStyle({
+          fillStyle: 'var(--neon-pink, #f72585)',
+          strokeStyle: 'var(--neon-pink, #f72585)',
+          shadowColor: '#f72585',
+          shadowBlur: 10,
+        })
       } else if (isPlayed) {
-         staveNote.setStyle({ fillStyle: "#3a465c", strokeStyle: "#3a465c" })
+        staveNote.setStyle({ fillStyle: '#3a465c', strokeStyle: '#3a465c' })
       } else {
-        staveNote.setStyle({ fillStyle: "#ffffff", strokeStyle: "#8892a4" })
+        staveNote.setStyle({ fillStyle: '#ffffff', strokeStyle: '#8892a4' })
       }
 
       vexNotes.push(staveNote)
@@ -125,12 +145,22 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
         // getBoundingBox may throw if the note was not fully laid out — safe to skip the halo.
       }
     }
-
   }, [measure, currentEventIndex])
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <div ref={containerRef} style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '12px', padding: '10px' }} />
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <div
+        ref={containerRef}
+        style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '12px', padding: '10px' }}
+      />
     </div>
   )
 }

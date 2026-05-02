@@ -28,7 +28,7 @@ export default function Library({ onPlay }: LibraryProps) {
       const buffer = await window.electronAPI.readMidiFile(filePath)
       logRendererEvent('info', 'library.loadFile.buffer', 'MIDI buffer loaded', {
         filePath,
-        byteLength: buffer.byteLength
+        byteLength: buffer.byteLength,
       })
       const parsedSong = await parseMidiFile(buffer)
       const prepared = prepareSongForPractice(parsedSong, filePath)
@@ -39,17 +39,20 @@ export default function Library({ onPlay }: LibraryProps) {
         trackCount: prepared.song.trackCount,
         duration: prepared.song.duration,
         adapted: prepared.adapted,
-        preset: prepared.preset
+        preset: prepared.preset,
       })
-      setRecent(prev => {
-        const filtered = prev.filter(r => r.path !== filePath)
-        return [{ path: filePath, title: prepared.song.title, duration: prepared.song.duration }, ...filtered].slice(0, 10)
+      setRecent((prev) => {
+        const filtered = prev.filter((r) => r.path !== filePath)
+        return [
+          { path: filePath, title: prepared.song.title, duration: prepared.song.duration },
+          ...filtered,
+        ].slice(0, 10)
       })
       onPlay(prepared.song, filePath)
     } catch (e) {
       logRendererEvent('error', 'library.loadFile.failed', 'MIDI load failed', {
         filePath,
-        error: e
+        error: e,
       })
       setError(`Error al leer el archivo: ${e}`)
     } finally {
@@ -61,62 +64,73 @@ export default function Library({ onPlay }: LibraryProps) {
     logRendererEvent('info', 'library.openDialog', 'Requesting MIDI file dialog')
     const paths = await window.electronAPI.openMidiFile()
     logRendererEvent('info', 'library.openDialog.result', 'MIDI file dialog resolved', {
-      fileCount: paths?.length ?? 0
+      fileCount: paths?.length ?? 0,
     })
     if (!paths || paths.length === 0) return
     await loadFile(paths[0])
   }
 
-  const handleDrop = useCallback(async (e: React.DragEvent) => {
-    e.preventDefault()
-    setDragging(false)
-    const files = Array.from(e.dataTransfer.files)
-    const midi = files.find(f => f.name.match(/\.(mid|midi)$/i))
-    if (!midi) return setError('Solo se aceptan archivos .mid o .midi')
-    logRendererEvent('info', 'library.drop', 'MIDI file dropped into library', {
-      name: midi.name,
-      path: (midi as any).path
-    })
-    await loadFile((midi as any).path)
-  }, [])
+  const handleDrop = useCallback(
+    async (e: React.DragEvent) => {
+      e.preventDefault()
+      setDragging(false)
+      const files = Array.from(e.dataTransfer.files)
+      const midi = files.find((f) => f.name.match(/\.(mid|midi)$/i))
+      if (!midi) return setError('Solo se aceptan archivos .mid o .midi')
+      const filePath = (midi as unknown as { path: string }).path
+      logRendererEvent('info', 'library.drop', 'MIDI file dropped into library', {
+        name: midi.name,
+        path: filePath,
+      })
+      await loadFile(filePath)
+    },
+    [loadFile]
+  )
 
   function formatDuration(sec: number): string {
     const m = Math.floor(sec / 60)
-    const s = Math.floor(sec % 60).toString().padStart(2, '0')
+    const s = Math.floor(sec % 60)
+      .toString()
+      .padStart(2, '0')
     return `${m}:${s}`
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100vh',
-      background: '#1a1a2e',
-      padding: '32px'
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: '#1a1a2e',
+        padding: '32px',
+      }}
+    >
       {/* Logo */}
       <div style={{ marginBottom: '32px', textAlign: 'center' }}>
-        <h1 style={{
-          fontSize: '48px',
-          fontWeight: 800,
-          background: 'linear-gradient(135deg, #4cc9f0, #f72585)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          letterSpacing: '-1px'
-        }}>
+        <h1
+          style={{
+            fontSize: '48px',
+            fontWeight: 800,
+            background: 'linear-gradient(135deg, #4cc9f0, #f72585)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            letterSpacing: '-1px',
+          }}
+        >
           PianoHero
         </h1>
-        <p style={{ color: '#8892a4', marginTop: '8px' }}>
-          Aprende piano con archivos MIDI
-        </p>
+        <p style={{ color: '#8892a4', marginTop: '8px' }}>Aprende piano con archivos MIDI</p>
       </div>
 
       {/* Drop zone */}
       <div
         onDrop={handleDrop}
-        onDragOver={e => { e.preventDefault(); setDragging(true) }}
+        onDragOver={(e) => {
+          e.preventDefault()
+          setDragging(true)
+        }}
         onDragLeave={() => setDragging(false)}
         onClick={handleOpenDialog}
         style={{
@@ -129,7 +143,7 @@ export default function Library({ onPlay }: LibraryProps) {
           cursor: 'pointer',
           background: dragging ? 'rgba(76,201,240,0.05)' : 'rgba(255,255,255,0.02)',
           transition: 'all 0.2s',
-          marginBottom: '24px'
+          marginBottom: '24px',
         }}
       >
         <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎹</div>
@@ -147,18 +161,24 @@ export default function Library({ onPlay }: LibraryProps) {
         )}
       </div>
 
-      {error && (
-        <p style={{ color: '#e94560', fontSize: '14px', marginBottom: '16px' }}>{error}</p>
-      )}
+      {error && <p style={{ color: '#e94560', fontSize: '14px', marginBottom: '16px' }}>{error}</p>}
 
       {/* Recent files */}
       {recent.length > 0 && (
         <div style={{ width: '100%', maxWidth: '500px' }}>
-          <h3 style={{ color: '#8892a4', fontSize: '13px', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+          <h3
+            style={{
+              color: '#8892a4',
+              fontSize: '13px',
+              marginBottom: '12px',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+            }}
+          >
             Archivos recientes
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {recent.map(file => (
+            {recent.map((file) => (
               <button
                 key={file.path}
                 onClick={() => loadFile(file.path)}
@@ -173,13 +193,15 @@ export default function Library({ onPlay }: LibraryProps) {
                   color: '#fff',
                   cursor: 'pointer',
                   transition: 'background 0.15s',
-                  textAlign: 'left'
+                  textAlign: 'left',
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(76,201,240,0.1)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(76,201,240,0.1)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
               >
                 <span style={{ fontWeight: 600, fontSize: '14px' }}>🎵 {file.title}</span>
-                <span style={{ color: '#8892a4', fontSize: '12px' }}>{formatDuration(file.duration)}</span>
+                <span style={{ color: '#8892a4', fontSize: '12px' }}>
+                  {formatDuration(file.duration)}
+                </span>
               </button>
             ))}
           </div>

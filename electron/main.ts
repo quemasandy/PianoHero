@@ -22,7 +22,7 @@ function serializeDetails(value: unknown): unknown {
     return {
       name: value.name,
       message: value.message,
-      stack: value.stack
+      stack: value.stack,
     }
   }
   if (Array.isArray(value)) {
@@ -58,13 +58,13 @@ function diagnosticsSnapshot() {
   ensureDiagnosticsLogPath()
   return {
     logPath: diagnosticsLogPath,
-    entries: recentDiagnostics.slice(-200)
+    entries: recentDiagnostics.slice(-200),
   }
 }
 
 function broadcastDiagnostics() {
   const snapshot = diagnosticsSnapshot()
-  BrowserWindow.getAllWindows().forEach(win => {
+  BrowserWindow.getAllWindows().forEach((win) => {
     if (win.isDestroyed()) return
     try {
       win.webContents.send('diag:updated', snapshot)
@@ -88,7 +88,7 @@ function writeDiagnostic(
     source,
     event,
     message,
-    context: context === undefined ? undefined : serializeDetails(context)
+    context: context === undefined ? undefined : serializeDetails(context),
   }
 
   recentDiagnostics.push(entry)
@@ -102,98 +102,101 @@ function attachWindowDiagnostics(win: BrowserWindow) {
   const { webContents } = win
 
   writeDiagnostic('info', 'main', 'window.created', 'BrowserWindow created', {
-    id: webContents.id
+    id: webContents.id,
   })
 
   win.on('ready-to-show', () => {
     writeDiagnostic('info', 'main', 'window.ready-to-show', 'Window ready to show', {
-      id: webContents.id
+      id: webContents.id,
     })
   })
 
   win.on('unresponsive', () => {
     writeDiagnostic('warn', 'main', 'window.unresponsive', 'Window became unresponsive', {
       id: webContents.id,
-      url: webContents.getURL()
+      url: webContents.getURL(),
     })
   })
 
   win.on('responsive', () => {
     writeDiagnostic('info', 'main', 'window.responsive', 'Window became responsive again', {
       id: webContents.id,
-      url: webContents.getURL()
+      url: webContents.getURL(),
     })
   })
 
   webContents.on('dom-ready', () => {
     writeDiagnostic('info', 'renderer', 'dom-ready', 'Renderer DOM ready', {
       id: webContents.id,
-      url: webContents.getURL()
+      url: webContents.getURL(),
     })
   })
 
   webContents.on('did-start-loading', () => {
     writeDiagnostic('info', 'renderer', 'did-start-loading', 'Renderer started loading', {
       id: webContents.id,
-      url: webContents.getURL()
+      url: webContents.getURL(),
     })
   })
 
   webContents.on('did-stop-loading', () => {
     writeDiagnostic('info', 'renderer', 'did-stop-loading', 'Renderer stopped loading', {
       id: webContents.id,
-      url: webContents.getURL()
+      url: webContents.getURL(),
     })
   })
 
   webContents.on('did-finish-load', () => {
     writeDiagnostic('info', 'renderer', 'did-finish-load', 'Renderer finished load', {
       id: webContents.id,
-      url: webContents.getURL()
+      url: webContents.getURL(),
     })
   })
 
-  webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL, isMainFrame) => {
-    writeDiagnostic('error', 'renderer', 'did-fail-load', 'Renderer failed to load', {
-      id: webContents.id,
-      errorCode,
-      errorDescription,
-      validatedURL,
-      isMainFrame
-    })
-  })
+  webContents.on(
+    'did-fail-load',
+    (_event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+      writeDiagnostic('error', 'renderer', 'did-fail-load', 'Renderer failed to load', {
+        id: webContents.id,
+        errorCode,
+        errorDescription,
+        validatedURL,
+        isMainFrame,
+      })
+    }
+  )
 
-  webContents.on('did-start-navigation', (_event, navigationUrl, isInPlace, isMainFrame, frameProcessId, frameRoutingId) => {
-    writeDiagnostic('info', 'renderer', 'did-start-navigation', 'Renderer started navigation', {
-      id: webContents.id,
-      navigationUrl,
-      isInPlace,
-      isMainFrame,
-      frameProcessId,
-      frameRoutingId
-    })
-  })
+  webContents.on(
+    'did-start-navigation',
+    (_event, navigationUrl, isInPlace, isMainFrame, frameProcessId, frameRoutingId) => {
+      writeDiagnostic('info', 'renderer', 'did-start-navigation', 'Renderer started navigation', {
+        id: webContents.id,
+        navigationUrl,
+        isInPlace,
+        isMainFrame,
+        frameProcessId,
+        frameRoutingId,
+      })
+    }
+  )
 
   webContents.on('did-navigate', (_event, navigationUrl, httpResponseCode, httpStatusText) => {
     writeDiagnostic('warn', 'renderer', 'did-navigate', 'Renderer navigated', {
       id: webContents.id,
       navigationUrl,
       httpResponseCode,
-      httpStatusText
+      httpStatusText,
     })
   })
 
   webContents.on('console-message', (_event, level, message, line, sourceId) => {
-    const mappedLevel: DiagnosticLevel =
-      level >= 3 ? 'error' :
-      level === 2 ? 'warn' :
-      'info'
+    const mappedLevel: DiagnosticLevel = level >= 3 ? 'error' : level === 2 ? 'warn' : 'info'
 
     writeDiagnostic(mappedLevel, 'renderer.console', 'console-message', message, {
       id: webContents.id,
       line,
       sourceId,
-      url: webContents.getURL()
+      url: webContents.getURL(),
     })
   })
 
@@ -201,13 +204,13 @@ function attachWindowDiagnostics(win: BrowserWindow) {
     writeDiagnostic('error', 'electron', 'render-process-gone', 'Renderer process terminated', {
       id: webContents.id,
       url: webContents.getURL(),
-      ...details
+      ...details,
     })
   })
 
   webContents.on('destroyed', () => {
     writeDiagnostic('warn', 'renderer', 'destroyed', 'Renderer webContents destroyed', {
-      id: webContents.id
+      id: webContents.id,
     })
   })
 }
@@ -222,8 +225,8 @@ function createWindow(): void {
     titleBarStyle: 'hiddenInset',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
-    }
+      sandbox: false,
+    },
   })
 
   attachWindowDiagnostics(win)
@@ -249,7 +252,7 @@ app.on('child-process-gone', (_event, details) => {
 
 app.whenReady().then(() => {
   writeDiagnostic('info', 'main', 'app.ready', 'Electron app ready', {
-    pid: process.pid
+    pid: process.pid,
   })
   createWindow()
   app.on('activate', () => {
@@ -268,11 +271,11 @@ ipcMain.handle('midi:open-file', async () => {
   const result = await dialog.showOpenDialog({
     title: 'Abrir archivo MIDI',
     filters: [{ name: 'MIDI', extensions: ['mid', 'midi'] }],
-    properties: ['openFile', 'multiSelections']
+    properties: ['openFile', 'multiSelections'],
   })
   writeDiagnostic('info', 'main', 'midi.open-file.result', 'MIDI file dialog resolved', {
     canceled: result.canceled,
-    fileCount: result.filePaths.length
+    fileCount: result.filePaths.length,
   })
   if (result.canceled) return null
   return result.filePaths
@@ -284,7 +287,7 @@ ipcMain.handle('midi:read-file', async (_event, filePath: string) => {
   const buffer = readFileSync(filePath)
   writeDiagnostic('info', 'main', 'midi.read-file.done', 'MIDI file read', {
     filePath,
-    byteLength: buffer.byteLength
+    byteLength: buffer.byteLength,
   })
   return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
 })
@@ -292,7 +295,7 @@ ipcMain.handle('midi:read-file', async (_event, filePath: string) => {
 // IPC: Get MIDI input devices
 ipcMain.handle('midi:get-devices', () => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const midi = require('@julusian/midi')
     const input = new midi.Input()
     const count = input.getPortCount()
@@ -301,7 +304,7 @@ ipcMain.handle('midi:get-devices', () => {
       devices.push(input.getPortName(i))
     }
     writeDiagnostic('info', 'main', 'midi.get-devices', 'Fetched MIDI devices', {
-      count: devices.length
+      count: devices.length,
     })
     input.closePort?.()
     return devices
@@ -316,7 +319,7 @@ let midiInput: { closePort: () => void } | null = null
 
 ipcMain.handle('midi:connect-device', (_event, portIndex: number) => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const midi = require('@julusian/midi')
     if (midiInput) midiInput.closePort()
     const input = new midi.Input()
@@ -324,49 +327,55 @@ ipcMain.handle('midi:connect-device', (_event, portIndex: number) => {
     input.on('message', (_deltaTime: number, message: number[]) => {
       const [status, note, velocity] = message
       const type = status & 0xf0
-      BrowserWindow.getAllWindows().forEach(w =>
+      BrowserWindow.getAllWindows().forEach((w) =>
         w.webContents.send('midi:note', { type, note, velocity })
       )
     })
     midiInput = input
     writeDiagnostic('info', 'main', 'midi.connect-device', 'Connected MIDI device', {
-      portIndex
+      portIndex,
     })
     return true
   } catch {
-    writeDiagnostic('error', 'main', 'midi.connect-device.failed', 'Failed to connect MIDI device', {
-      portIndex
-    })
+    writeDiagnostic(
+      'error',
+      'main',
+      'midi.connect-device.failed',
+      'Failed to connect MIDI device',
+      {
+        portIndex,
+      }
+    )
     return false
   }
 })
 
 ipcMain.handle('midi:disconnect-device', () => {
   if (midiInput) {
-    (midiInput as any).closePort?.()
+    ;(midiInput as unknown as { closePort?: () => void }).closePort?.()
     midiInput = null
     writeDiagnostic('info', 'main', 'midi.disconnect-device', 'Disconnected MIDI device')
   }
 })
 
-ipcMain.on('diag:log', (event, payload: {
-  level?: DiagnosticLevel
-  event: string
-  message: string
-  context?: unknown
-}) => {
-  writeDiagnostic(
-    payload.level ?? 'info',
-    'renderer.event',
-    payload.event,
-    payload.message,
-    {
+ipcMain.on(
+  'diag:log',
+  (
+    event,
+    payload: {
+      level?: DiagnosticLevel
+      event: string
+      message: string
+      context?: unknown
+    }
+  ) => {
+    writeDiagnostic(payload.level ?? 'info', 'renderer.event', payload.event, payload.message, {
       senderId: event.sender.id,
       url: event.sender.getURL(),
-      ...serializeDetails(payload.context)
-    }
-  )
-})
+      ...serializeDetails(payload.context),
+    })
+  }
+)
 
 ipcMain.handle('diag:get-snapshot', () => diagnosticsSnapshot())
 
