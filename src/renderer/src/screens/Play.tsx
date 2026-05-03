@@ -110,12 +110,12 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
 
   const midiStatusColor =
     midiState.status === 'connected'
-      ? '#06d6a0'
+      ? 'var(--neon-green)'
       : midiState.status === 'checking'
-        ? '#4cc9f0'
+        ? 'var(--neon-cyan)'
         : midiState.status === 'unavailable'
-          ? '#ffd166'
-          : '#f72585'
+          ? 'var(--neon-yellow)'
+          : 'var(--neon-pink)'
 
   const rangeStatusLabel = keyboardWindow
     ? keyboardWindow.outOfRange
@@ -123,7 +123,7 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
       : `Rango activo: ${pitchToLabel(keyboardWindow.startPitch)}–${pitchToLabel(keyboardWindow.endPitch)}`
     : undefined
 
-  const rangeStatusColor = keyboardWindow?.outOfRange ? '#ffd166' : '#4cc9f0'
+  const rangeStatusColor = keyboardWindow?.outOfRange ? 'var(--neon-yellow)' : 'var(--neon-cyan)'
   const compactWorlddeView = !!midiState.profile?.isWorlddeProfile
   const visibleKeyboardWindow =
     compactWorlddeView && !keyboardWindow && playerState.currentTime === 0

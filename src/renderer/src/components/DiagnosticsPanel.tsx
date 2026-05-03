@@ -7,10 +7,10 @@ const emptySnapshot: DiagnosticsSnapshot = {
 }
 
 function entryColor(level: DiagnosticEntry['level']) {
-  if (level === 'error') return '#ff6b6b'
-  if (level === 'warn') return '#ffd166'
-  if (level === 'info') return '#4cc9f0'
-  return '#8892a4'
+  if (level === 'error') return 'var(--neon-pink)'
+  if (level === 'warn') return 'var(--neon-yellow)'
+  if (level === 'info') return 'var(--neon-cyan)'
+  return 'var(--slate-400)'
 }
 
 export default function DiagnosticsPanel() {

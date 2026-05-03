@@ -55,8 +55,8 @@ export default function SheetMusic({
       stave.addClef(clef)
       if (!active) {
         // Estilizar oscuro si está inactivo
-        context.setFillStyle('#4a5568')
-        context.setStrokeStyle('#4a5568')
+        context.setFillStyle('var(--slate-600)')
+        context.setStrokeStyle('var(--slate-600)')
       } else {
         context.setFillStyle('#ffffff')
         context.setStrokeStyle('#ffffff')
@@ -88,8 +88,8 @@ export default function SheetMusic({
             staveNote.addModifier(new Accidental('#'), 0)
           }
 
-          let noteColor = '#4a5568' // unplayed
-          let strokeColor = '#8892a4'
+          let noteColor = 'var(--slate-300)' // unplayed
+          let strokeColor = 'var(--slate-300)'
 
           if (active) {
             if (index < currentIndex) {
@@ -142,8 +142,8 @@ export default function SheetMusic({
           })
         } else {
           staveNote.setStyle({
-            fillStyle: '#4a5568',
-            strokeStyle: '#8892a4',
+            fillStyle: 'var(--slate-300)',
+            strokeStyle: 'var(--slate-300)',
           })
         }
 

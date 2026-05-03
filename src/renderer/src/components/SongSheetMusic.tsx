@@ -25,8 +25,8 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
     const context = renderer.getContext()
     context.scale(1.5, 1.5)
 
-    context.setFillStyle('#cbd5e1')
-    context.setStrokeStyle('#cbd5e1')
+    context.setFillStyle('var(--slate-300)')
+    context.setStrokeStyle('var(--slate-300)')
     // El pentagrama se dibuja más abajo (y=45) para centrarlo y dejar espacio a líneas adicionales
     const stave = new Stave(10, 45, width / 1.5 - 20)
     stave.addClef(measure.clef)
@@ -94,15 +94,15 @@ export default function SongSheetMusic({ measure, currentEventIndex }: SongSheet
       if (isCurrent) {
         // Enfoque anatómico: Brillamos la propia cabeza de la nota intensificando el color
         staveNote.setStyle({
-          fillStyle: 'var(--neon-cyan, #06b6d4)',
-          strokeStyle: 'var(--neon-cyan, #06b6d4)',
-          shadowColor: '#06b6d4',
+          fillStyle: 'var(--neon-green)',
+          strokeStyle: 'var(--neon-green)',
+          shadowColor: 'var(--neon-green)',
           shadowBlur: 10,
         })
       } else if (isPlayed) {
-        staveNote.setStyle({ fillStyle: '#3a465c', strokeStyle: '#3a465c' })
+        staveNote.setStyle({ fillStyle: 'var(--slate-600)', strokeStyle: 'var(--slate-600)' })
       } else {
-        staveNote.setStyle({ fillStyle: '#ffffff', strokeStyle: '#8892a4' })
+        staveNote.setStyle({ fillStyle: '#ffffff', strokeStyle: 'var(--slate-400)' })
       }
 
       vexNotes.push(staveNote)

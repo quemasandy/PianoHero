@@ -29,7 +29,14 @@ function formatTime(sec: number): string {
   return `${m}:${s}`
 }
 
-const TRACK_COLORS = ['#4cc9f0', '#f72585', '#7209b7', '#3a0ca3', '#4361ee', '#06d6a0']
+const TRACK_COLORS = [
+  'var(--neon-cyan)',
+  'var(--neon-pink)',
+  'var(--primary-base)',
+  'var(--neon-purple)',
+  'var(--neon-blue)',
+  'var(--neon-green)',
+]
 
 export default function Controls({
   state,
@@ -58,7 +65,7 @@ export default function Controls({
         className="ph-control-button"
         data-ui="back-button"
         onClick={onBack}
-        style={btnStyle('#334')}
+        style={btnStyle('var(--slate-700)')}
       >
         ← Biblioteca
       </button>
@@ -70,7 +77,7 @@ export default function Controls({
         className="ph-control-button"
         data-ui="stop-button"
         onClick={onStop}
-        style={btnStyle('#334')}
+        style={btnStyle('var(--slate-700)')}
       >
         ⏹
       </button>
@@ -82,7 +89,7 @@ export default function Controls({
           data-state="playing"
           data-ui="pause-button"
           onClick={onPause}
-          style={btnStyle('#e94560')}
+          style={btnStyle('var(--neon-pink)')}
         >
           ⏸
         </button>
@@ -94,7 +101,7 @@ export default function Controls({
           data-state="idle"
           data-ui="play-button"
           onClick={onPlay}
-          style={btnStyle('#06d6a0', '#000')}
+          style={btnStyle('var(--neon-green)', '#000')}
         >
           ▶
         </button>
@@ -142,7 +149,7 @@ export default function Controls({
         data-state={state.learningMode ? 'on' : 'off'}
         data-ui="learning-mode-toggle"
         onClick={onToggleLearning}
-        style={btnStyle(state.learningMode ? '#f72585' : '#334')}
+        style={btnStyle(state.learningMode ? 'var(--neon-pink)' : 'var(--slate-700)')}
         title="Modo aprendizaje: espera a que pulses la tecla correcta"
       >
         {state.learningMode ? '🎓 ON' : '🎓 OFF'}
@@ -163,7 +170,7 @@ export default function Controls({
           className="ph-status-text"
           data-ui="range-status"
           role="status"
-          style={{ '--ph-status-color': rangeStatusColor ?? '#4cc9f0' } as CSSProperties}
+          style={{ '--ph-status-color': rangeStatusColor ?? 'var(--neon-cyan)' } as CSSProperties}
           title={rangeStatusLabel}
         >
           {rangeStatusLabel}

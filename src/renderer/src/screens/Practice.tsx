@@ -215,12 +215,12 @@ export default function Practice({
 
   const midiStatusColor =
     midiState.status === 'connected'
-      ? '#06d6a0'
+      ? 'var(--neon-green)'
       : midiState.status === 'checking'
-        ? '#4cc9f0'
+        ? 'var(--neon-cyan)'
         : midiState.status === 'unavailable'
-          ? '#ffd166'
-          : '#f72585'
+          ? 'var(--neon-yellow)'
+          : 'var(--neon-pink)'
 
   const baseScaleExercise = SCALE_EXERCISES[scaleIndex]
   const selectedScaleRootPitchClass =
@@ -843,7 +843,7 @@ export default function Practice({
               border: '1px solid var(--border-glass)',
               borderRadius: '999px',
               fontSize: '13px',
-              color: '#8892a4',
+              color: 'var(--slate-400)',
               backdropFilter: 'blur(10px)',
               transition: 'all 0.2s',
             }}
@@ -857,7 +857,8 @@ export default function Practice({
                   width: 8,
                   height: 8,
                   borderRadius: '50%',
-                  background: midiState.status === 'connected' ? '#06d6a0' : '#ff6b81',
+                  background:
+                    midiState.status === 'connected' ? 'var(--neon-green)' : 'var(--neon-pink)',
                   boxShadow: `0 0 8px ${midiState.status === 'connected' ? 'rgba(6,214,160,0.5)' : 'rgba(255,107,129,0.5)'}`,
                 }}
               />
@@ -876,7 +877,7 @@ export default function Practice({
               style={{
                 width: '100px',
                 textAlign: 'center',
-                color: activeChordName || lastMidiLabel ? '#8be9fd' : '#8892a4',
+                color: activeChordName || lastMidiLabel ? 'var(--neon-cyan)' : 'var(--slate-400)',
                 fontWeight: activeChordName || lastMidiLabel ? 700 : 500,
               }}
             >
@@ -900,7 +901,7 @@ export default function Practice({
                 width: '70px',
                 textAlign: 'center',
                 fontWeight: monitorPressedNotes.size > 0 ? 600 : 500,
-                color: monitorPressedNotes.size > 0 ? '#fff' : '#8892a4',
+                color: monitorPressedNotes.size > 0 ? '#fff' : 'var(--slate-400)',
               }}
             >
               {monitorPressedNotes.size} activa{monitorPressedNotes.size !== 1 ? 's' : ''}
@@ -1189,7 +1190,7 @@ export default function Practice({
                   className="ph-chord-card__bar"
                   data-ui="chord-card-bar"
                   style={{
-                    color: current ? 'var(--neon-green)' : '#8892a4',
+                    color: current ? 'var(--neon-green)' : 'var(--slate-400)',
                     fontSize: '13px',
                     marginBottom: '8px',
                     fontWeight: 800,
@@ -1300,7 +1301,7 @@ export default function Practice({
               className="ph-keyboard-guide__eyebrow"
               data-ui="keyboard-guide-eyebrow"
               style={{
-                color: '#8be9fd',
+                color: 'var(--neon-cyan)',
                 fontSize: '13px',
                 fontWeight: 800,
                 textTransform: 'uppercase',
@@ -1349,7 +1350,10 @@ export default function Practice({
             onClick={() => {
               void refreshMidiConnection('manual')
             }}
-            style={{ ...buttonStyle('#223a5e', '#8be9fd'), padding: '6px 16px' }}
+            style={{
+              ...buttonStyle('rgba(6,182,212,0.15)', 'var(--neon-cyan)'),
+              padding: '6px 16px',
+            }}
           >
             Reconectar MIDI
           </button>
@@ -1381,7 +1385,7 @@ export default function Practice({
             data-ui="backing-track-toggle"
             onClick={() => rhythm.togglePlay()}
             style={{
-              ...buttonStyle(rhythm.isPlaying ? 'var(--neon-pink)' : '#06d6a0', '#000'),
+              ...buttonStyle(rhythm.isPlaying ? 'var(--neon-pink)' : 'var(--neon-green)', '#000'),
               padding: '2px 10px',
               fontSize: '12px',
               minWidth: '70px',
@@ -1401,7 +1405,7 @@ export default function Practice({
               max="240"
               value={rhythm.bpm}
               onChange={(e) => rhythm.updateBpm(Number(e.target.value))}
-              style={{ width: '80px', accentColor: '#4cc9f0' }}
+              style={{ width: '80px', accentColor: 'var(--neon-cyan)' }}
             />
             <span className="ph-bpm-control__value" data-ui="bpm-value">
               {rhythm.bpm} BPM
@@ -1425,7 +1429,7 @@ export default function Practice({
             className="ph-status-text"
             data-ui="range-status"
             role="status"
-            style={{ '--ph-status-color': '#4cc9f0' } as CSSProperties}
+            style={{ '--ph-status-color': 'var(--neon-cyan)' } as CSSProperties}
           >
             {RANGE_STATUS_LABEL}
           </span>
@@ -1552,12 +1556,12 @@ export default function Practice({
 function FeedbackBanner({ feedback }: { feedback: FeedbackState }) {
   const color =
     feedback.kind === 'wrong'
-      ? '#ff6b81'
+      ? 'var(--neon-pink)'
       : feedback.kind === 'correct'
-        ? '#06d6a0'
+        ? 'var(--neon-green)'
         : feedback.kind === 'complete'
-          ? '#ffd166'
-          : '#8be9fd'
+          ? 'var(--neon-yellow)'
+          : 'var(--neon-cyan)'
 
   const background =
     feedback.kind === 'wrong'
@@ -1752,7 +1756,7 @@ const scaleRootControlStyle: CSSProperties = {
 }
 
 const scaleRootLabelStyle: CSSProperties = {
-  color: '#8be9fd',
+  color: 'var(--neon-cyan)',
   fontSize: '12px',
   fontWeight: 800,
   textTransform: 'uppercase',
@@ -1760,7 +1764,7 @@ const scaleRootLabelStyle: CSSProperties = {
 }
 
 const scaleRootSelectStyle: CSSProperties = {
-  background: '#101a2d',
+  background: 'var(--bg-panel)',
   color: '#ffffff',
   border: '1px solid rgba(255,255,255,0.12)',
   borderRadius: '8px',

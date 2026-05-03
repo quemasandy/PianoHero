@@ -8,7 +8,7 @@ import {
   getPitchRangeBounds,
 } from '../lib/keyboardLayout'
 
-const TRACK_COLORS = ['#4cc9f0', '#f72585', '#7209b7', '#3a0ca3', '#4361ee', '#06d6a0']
+const TRACK_COLORS = ['#06b6d4', '#f43f5e', '#7c3aed', '#8b5cf6', '#3b82f6', '#10b981']
 const PIXELS_PER_SECOND = 220
 const LOOKAHEAD = 6
 
@@ -92,7 +92,7 @@ export default function Waterfall({
       const visibleRangeX = rangeBounds?.x ?? 0
       const visibleRangeWidth = rangeBounds?.width ?? TOTAL_WHITE_KEYS
 
-      ctx.fillStyle = '#1a1a2e'
+      ctx.fillStyle = '#0f0f23' // --bg-deep
       ctx.fillRect(0, 0, W, H)
 
       for (const note of song.notes) {
@@ -113,7 +113,7 @@ export default function Waterfall({
         const isHint = state.hintNotes.has(note.pitch)
         ctx.globalAlpha = isActive ? 1 : 0.85
         ctx.fillStyle = isActive
-          ? '#06d6a0'
+          ? '#10b981' // target = green
           : isHint
             ? '#ffffff'
             : TRACK_COLORS[note.track % TRACK_COLORS.length]
