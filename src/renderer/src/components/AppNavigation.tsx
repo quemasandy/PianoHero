@@ -1,6 +1,6 @@
 import { CSSProperties, ReactNode } from 'react'
 
-export type AppMode = 'scales' | 'chords' | 'songs'
+export type AppMode = 'home' | 'scales' | 'chords' | 'songs'
 
 interface AppNavigationProps {
   currentMode: AppMode
@@ -45,6 +45,7 @@ export default function AppNavigation({
           title="Volver a Inicio"
           className="ph-icon-button ph-hover-lift"
           data-ui="home-button"
+          style={currentMode === 'home' ? { background: 'var(--neon-cyan)', color: '#0F0F23' } : {}}
         >
           <svg
             aria-hidden="true"

@@ -855,7 +855,7 @@ input[type='range'] {
 .ph-song-practice__sheet {
   height: 220px;
   flex-shrink: 0;
-  padding: 0 24px;
+  padding: 0 32px;
   margin-bottom: 8px;
 }
 
@@ -875,7 +875,7 @@ input[type='range'] {
   flex-grow: 1;
   flex-direction: column;
   box-sizing: border-box;
-  padding: 0 24px;
+  padding: 0 32px 16px 32px;
 }
 
 .ph-song-practice__falling-notes {

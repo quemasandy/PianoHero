@@ -1086,7 +1086,11 @@ export default function Practice({
             gap: '16px',
           }}
         >
-          <div className="ph-practice-session__title-group" data-ui="chord-title-group">
+          <div
+            className="ph-practice-session__title-group"
+            data-ui="chord-title-group"
+            style={{ flex: 1 }}
+          >
             <h2
               className="ph-practice-session__title"
               data-ui="chord-title"
@@ -1128,7 +1132,11 @@ export default function Practice({
             </button>
           </div>
 
-          <div className="ph-practice-session__meta" data-ui="chord-session-meta">
+          <div
+            className="ph-practice-session__meta"
+            data-ui="chord-session-meta"
+            style={{ display: 'flex', flex: 1, justifyContent: 'flex-end' }}
+          >
             <div
               className="ph-meta-badge"
               data-ui="chord-progress-badge"
@@ -1151,8 +1159,8 @@ export default function Practice({
             overflowX: 'auto',
             scrollSnapType: 'x mandatory',
             scrollBehavior: 'smooth',
-            padding: '16px 24px',
-            margin: '0 -16px',
+            padding: '16px 32px',
+            margin: '0 -32px',
           }}
         >
           {exercise.progression.map((prompt, index) => {
@@ -1468,49 +1476,24 @@ export default function Practice({
 
   return (
     <main className="ph-practice" data-ui="practice-screen" data-view={view} style={rootStyle}>
-      {/* AppNavigation at the absolute top for sessions to perfectly match SongPractice alignment */}
-      {view !== 'practice_home' && (
-        <AppNavigation
-          currentMode={view === 'scale_session' ? 'scales' : 'chords'}
-          onNavigateHome={openHome}
-          onNavigateMode={onNavigateMode}
-        >
-          {renderGlobalStatusControls()}
-        </AppNavigation>
-      )}
-
-      {/* Legacy status bar shifts layout when in Home vs nested modes */}
-      {view === 'practice_home' && (
-        <header
-          className="ph-practice__home-statusbar"
-          data-ui="practice-home-statusbar"
-          style={{ ...titleBarStyle, padding: '8px 40px 8px 40px', borderBottom: 'none' }}
-        >
-          <div
-            className="ph-practice__home-statusbar-inner"
-            data-ui="practice-home-statusbar-inner"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              flexWrap: 'wrap',
-              justifyContent: 'flex-end',
-              width: '100%',
-            }}
-          >
-            {renderGlobalStatusControls()}
-          </div>
-        </header>
-      )}
+      <AppNavigation
+        currentMode={
+          view === 'scale_session' ? 'scales' : view === 'chord_session' ? 'chords' : 'home'
+        }
+        onNavigateHome={openHome}
+        onNavigateMode={onNavigateMode}
+      >
+        {renderGlobalStatusControls()}
+      </AppNavigation>
 
       <section
         className="ph-practice__content"
         data-ui="practice-content"
         style={{
-          padding: view === 'practice_home' ? '8px 32px' : '24px 32px',
+          padding: '0px 32px 24px 32px',
           display: 'flex',
           flexDirection: 'column',
-          gap: view === 'practice_home' ? '16px' : '40px',
+          gap: view === 'practice_home' ? '24px' : '32px',
           minHeight: 0,
           overflowY: 'auto',
           justifyContent: view === 'practice_home' ? 'center' : 'flex-start',
@@ -1533,7 +1516,7 @@ export default function Practice({
       <section
         className="ph-practice__piano"
         data-ui="practice-piano-region"
-        style={{ padding: '4px 32px 8px 32px', flexShrink: 0 }}
+        style={{ padding: '0 32px 16px 32px', flexShrink: 0 }}
       >
         <Piano
           activeNotes={pianoActiveNotes}
@@ -1701,23 +1684,10 @@ const rootStyle: CSSProperties = {
   gridTemplateRows: 'auto minmax(0, 1fr) auto',
 }
 
-const titleBarStyle: CSSProperties = {
-  padding: '16px 320px 8px 80px',
-  borderBottom: '1px solid var(--border-glass)',
-  background: 'rgba(11, 17, 32, 0.4)',
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'space-between',
-  gap: '16px',
-  flexWrap: 'wrap',
-}
-
 const homeGridStyle: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-  gap: '16px',
+  gap: '24px',
   alignContent: 'start',
   maxWidth: '1100px',
   width: '100%',

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Free open-source Synthesia clone",
   "main": "out/main/index.js",
+  "type": "module",
   "scripts": {
     "dev": "electron-vite dev",
     "dev:debug": "electron-vite dev -- --remote-debugging-port=9222",
