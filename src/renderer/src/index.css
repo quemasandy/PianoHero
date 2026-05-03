@@ -11,7 +11,7 @@
   --text: #f8fafc;
 
   --primary-dark: #1e1b4b;
-  --primary-base: #4338ca;
+  --primary-base: #7c3aed;
   --bg-deep: #0f0f23;
 
   /* Neons */
@@ -25,8 +25,8 @@
 
   /* Backgrounds & Panels */
   --bg-app: linear-gradient(135deg, var(--bg-deep) 0%, #05050c 100%);
-  --bg-panel: rgba(30, 27, 75, 0.4);
-  --bg-panel-hover: rgba(30, 27, 75, 0.6);
+  --bg-panel: linear-gradient(145deg, rgba(30, 27, 75, 0.6) 0%, rgba(30, 27, 75, 0.3) 100%);
+  --bg-panel-hover: linear-gradient(145deg, rgba(30, 27, 75, 0.8) 0%, rgba(30, 27, 75, 0.4) 100%);
   --border-glass: rgba(255, 255, 255, 0.08);
 
   --track-colors: var(--neon-cyan), var(--neon-pink), #8b5cf6, #d946ef;

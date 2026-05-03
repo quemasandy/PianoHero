@@ -1037,18 +1037,18 @@ export default function Practice({
                   padding: '10px 12px',
                   borderRadius: '10px',
                   border: current
-                    ? '1px solid var(--neon-cyan)'
+                    ? '1px solid var(--neon-green)'
                     : '1px solid rgba(255,255,255,0.1)',
                   background: completed
-                    ? 'rgba(59,130,246,0.18)'
+                    ? 'rgba(6,182,212,0.18)'
                     : current
-                      ? 'rgba(6,182,212,0.12)'
+                      ? 'rgba(16,185,129,0.12)'
                       : 'var(--bg-panel)',
-                  color: completed ? 'var(--neon-blue)' : current ? '#fff' : 'var(--slate-300)',
+                  color: completed ? 'var(--neon-cyan)' : current ? '#fff' : 'var(--slate-300)',
                   fontWeight: 800,
                   minWidth: '64px',
                   textAlign: 'center',
-                  boxShadow: current ? '0 0 15px rgba(6,182,212,0.4)' : 'none',
+                  boxShadow: current ? '0 0 15px rgba(16,185,129,0.4)' : 'none',
                   transform: current ? 'scale(1.1)' : 'scale(1)',
                   transition: 'all 0.2s',
                 }}
@@ -1173,13 +1173,13 @@ export default function Practice({
                   scrollSnapAlign: 'center',
                   padding: '24px',
                   borderRadius: '20px',
-                  border: current ? '2px solid var(--neon-cyan)' : '1px solid var(--border-glass)',
+                  border: current ? '2px solid var(--neon-green)' : '1px solid var(--border-glass)',
                   background: completed
-                    ? 'rgba(59,130,246,0.1)'
+                    ? 'rgba(6,182,212,0.1)'
                     : current
-                      ? 'rgba(6,182,212,0.15)'
+                      ? 'rgba(16,185,129,0.15)'
                       : 'var(--bg-panel)',
-                  boxShadow: current ? '0 0 32px rgba(6,182,212,0.3)' : 'none',
+                  boxShadow: current ? '0 0 32px rgba(16,185,129,0.3)' : 'none',
                   transform: current ? 'scale(1.04)' : 'scale(0.98)',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   opacity: current || completed ? 1 : 0.6,
@@ -1189,7 +1189,7 @@ export default function Practice({
                   className="ph-chord-card__bar"
                   data-ui="chord-card-bar"
                   style={{
-                    color: current ? 'var(--neon-cyan)' : '#8892a4',
+                    color: current ? 'var(--neon-green)' : '#8892a4',
                     fontSize: '13px',
                     marginBottom: '8px',
                     fontWeight: 800,
@@ -1200,7 +1200,11 @@ export default function Practice({
                   Compás {prompt.barIndex + 1}
                 </div>
 
-                <SheetMusic notes={prompt.targetNotes} active={current || completed} />
+                <SheetMusic
+                  notes={prompt.targetNotes}
+                  active={current || completed}
+                  color={current ? 'var(--neon-green)' : 'var(--neon-cyan)'}
+                />
 
                 <div
                   className="ph-chord-card__name"
@@ -1274,7 +1278,7 @@ export default function Practice({
                   mode="sequence"
                   currentIndex={scaleSession.stepIndex}
                   active={true}
-                  color="var(--neon-cyan)"
+                  color="var(--neon-green)"
                   width={Math.max(300, activeScaleExercise.noteSequence.length * 45)}
                 />
               </div>
@@ -1321,9 +1325,9 @@ export default function Practice({
               data-ui="keyboard-legend"
               style={{ ...keyboardLegendStyle, marginTop: '8px', justifyContent: 'flex-end' }}
             >
-              <LegendPill label="Objetivo actual" background="var(--neon-cyan)" color="#ffffff" />
-              <LegendPill label="Correcta" background="var(--neon-blue)" color="#ffffff" />
-              <LegendPill label="Incorrecta" background="#ff6b81" color="#ffffff" />
+              <LegendPill label="Objetivo actual" background="var(--neon-green)" color="#000000" />
+              <LegendPill label="Correcta" background="var(--neon-cyan)" color="#ffffff" />
+              <LegendPill label="Incorrecta" background="var(--neon-pink)" color="#ffffff" />
             </div>
           </div>
         </div>

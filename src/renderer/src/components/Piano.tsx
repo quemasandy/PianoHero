@@ -135,7 +135,7 @@ export default function Piano({
     if (wrongNotes?.has(key.pitch)) return 'var(--neon-pink)'
     if (activeNotes.has(key.pitch) && inWindow) return '#ffffff'
     if (correctNotes?.has(key.pitch) && inWindow) return '#ffffff'
-    if (hintNotes.has(key.pitch) && inWindow) return 'var(--neon-cyan)'
+    if (hintNotes.has(key.pitch) && inWindow) return 'var(--neon-green)'
     if (key.isWhite) return '#555'
     return activeNotes.has(key.pitch) || hintNotes.has(key.pitch) ? 'none' : '#000'
   }
@@ -223,12 +223,12 @@ export default function Piano({
             </filter>
             <linearGradient id="hintKeyGlowWhite" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#ffffff" />
-              <stop offset="60%" stopColor="var(--neon-cyan)" />
-              <stop offset="100%" stopColor="#0891b2" />
+              <stop offset="60%" stopColor="var(--neon-green)" />
+              <stop offset="100%" stopColor="#059669" />
             </linearGradient>
             <linearGradient id="hintKeyGlowBlack" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--neon-cyan)" />
-              <stop offset="100%" stopColor="#0891b2" />
+              <stop offset="0%" stopColor="var(--neon-green)" />
+              <stop offset="100%" stopColor="#059669" />
             </linearGradient>
             <filter id="keyShadow" x="-10%" y="-10%" width="120%" height="120%">
               <feDropShadow
