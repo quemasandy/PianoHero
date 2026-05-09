@@ -289,6 +289,56 @@ export const SCALE_EXERCISES: ScaleExerciseDefinition[] = [
   },
 ]
 
+// ---------------------------------------------------------------------------
+// Random Key Bag — Domain logic for non-repeating random tonality selection
+// Draws from all 12 pitch classes without repetition. When the bag is empty
+// it automatically refills, allowing a new full cycle.
+// ---------------------------------------------------------------------------
+
+const ALL_PITCH_CLASSES = SCALE_ROOT_OPTIONS.map((r) => r.pitchClass)
+
+export interface RandomKeyBagState {
+  /** Pitch classes still available for drawing in this cycle */
+  remaining: number[]
+  /** Pitch classes already drawn in this cycle */
+  used: number[]
+}
+
+/** Create a fresh bag with all 12 keys available */
+export function createRandomKeyBag(): RandomKeyBagState {
+  return { remaining: [...ALL_PITCH_CLASSES], used: [] }
+}
+
+/**
+ * Draw a random pitch class from the bag.
+ * Returns the drawn pitchClass and the updated bag state.
+ * When the bag is exhausted, it refills automatically before drawing.
+ */
+export function drawRandomKey(bag: RandomKeyBagState): {
+  pitchClass: number
+  bag: RandomKeyBagState
+} {
+  const remaining = bag.remaining.length > 0 ? [...bag.remaining] : [...ALL_PITCH_CLASSES]
+  let used = bag.remaining.length > 0 ? [...bag.used] : []
+
+  const index = Math.floor(Math.random() * remaining.length)
+  const pitchClass = remaining[index]
+  remaining.splice(index, 1)
+  used = [...used, pitchClass]
+
+  return { pitchClass, bag: { remaining, used } }
+}
+
+/** How many keys remain in the current cycle */
+export function remainingKeysCount(bag: RandomKeyBagState): number {
+  return bag.remaining.length
+}
+
+/** How many keys have been used in the current cycle */
+export function usedKeysCount(bag: RandomKeyBagState): number {
+  return bag.used.length
+}
+
 export const CHORD_EXERCISES: ChordExerciseDefinition[] = [
   {
     id: 'c-jam-blues-shells',

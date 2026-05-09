@@ -9,11 +9,14 @@ import {
   PRACTICE_KEYBOARD_WINDOW,
   SCALE_EXERCISES,
   SCALE_ROOT_OPTIONS,
+  createRandomKeyBag,
+  drawRandomKey,
   getDefaultScaleRootPitchClass,
   getScaleRootOption,
   pitchToPracticeLabel,
   transposeScaleExercise,
 } from '../lib/practiceCatalog'
+import type { RandomKeyBagState } from '../lib/practiceCatalog'
 import {
   CHORD_SIMULTANEITY_MS,
   createChordSession,
@@ -81,6 +84,7 @@ export default function Practice({
       SCALE_EXERCISES.map((exercise) => [exercise.id, getDefaultScaleRootPitchClass(exercise)])
     )
   )
+  const [randomKeyBag, setRandomKeyBag] = useState<RandomKeyBagState>(createRandomKeyBag)
   const [chordIndex, setChordIndex] = useState(0)
   const [scaleSession, setScaleSession] = useState(() =>
     createScaleSession(
@@ -339,6 +343,19 @@ export default function Practice({
       baseExerciseId: baseScaleExercise.id,
       rootPitchClass: nextRoot.pitchClass,
       rootLabel: nextRoot.label,
+    })
+  }
+
+  function handleRandomKey() {
+    const result = drawRandomKey(randomKeyBag)
+    setRandomKeyBag(result.bag)
+    handleScaleRootChange(result.pitchClass)
+    const root = getScaleRootOption(result.pitchClass)
+    logRendererEvent('info', 'practice.scale.root.random', 'Random tonality selected', {
+      pitchClass: result.pitchClass,
+      rootLabel: root.label,
+      remaining: result.bag.remaining.length,
+      used: result.bag.used.length,
     })
   }
 
@@ -974,6 +991,43 @@ export default function Practice({
                 ))}
               </select>
             </label>
+            <button
+              type="button"
+              className="ph-button ph-random-key-button"
+              data-ui="random-key-button"
+              onClick={handleRandomKey}
+              title={`Tonalidad al azar (${randomKeyBag.used.length}/12 usadas)`}
+              style={{
+                ...buttonStyle('var(--neon-yellow)', '#0F0F23'),
+                padding: '6px 12px',
+                fontSize: '13px',
+                fontWeight: 800,
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+            >
+              🎲 Azar
+              <span
+                className="ph-random-key-badge"
+                data-ui="random-key-badge"
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  padding: '2px 6px',
+                  borderRadius: '999px',
+                  background: 'rgba(0,0,0,0.3)',
+                  color: randomKeyBag.remaining.length === 0 ? 'var(--neon-green)' : '#fff',
+                  minWidth: '32px',
+                  textAlign: 'center',
+                }}
+              >
+                {randomKeyBag.used.length}/12
+              </span>
+            </button>
           </div>
 
           <div className="ph-practice-session__actions" data-ui="scale-session-actions">
