@@ -8,30 +8,38 @@ export default defineConfig({
     build: {
       rollupOptions: {
         input: {
-          index: resolve(__dirname, 'electron/main.ts')
-        }
-      }
-    }
+          index: resolve(__dirname, 'electron/main.ts'),
+        },
+        output: {
+          format: 'cjs',
+          entryFileNames: '[name].cjs',
+        },
+      },
+    },
   },
   preload: {
     plugins: [externalizeDepsPlugin()],
     build: {
       rollupOptions: {
         input: {
-          index: resolve(__dirname, 'electron/preload.ts')
-        }
-      }
-    }
+          index: resolve(__dirname, 'electron/preload.ts'),
+        },
+        output: {
+          format: 'cjs',
+          entryFileNames: '[name].cjs',
+        },
+      },
+    },
   },
   renderer: {
     root: resolve(__dirname, 'src/renderer'),
     build: {
       rollupOptions: {
         input: {
-          index: resolve(__dirname, 'src/renderer/index.html')
-        }
-      }
+          index: resolve(__dirname, 'src/renderer/index.html'),
+        },
+      },
     },
-    plugins: [react()]
-  }
+    plugins: [react()],
+  },
 })

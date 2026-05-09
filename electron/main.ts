@@ -224,7 +224,7 @@ function createWindow(): void {
     backgroundColor: '#1a1a2e',
     titleBarStyle: 'hiddenInset',
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: join(__dirname, '../preload/index.cjs'),
       sandbox: false,
     },
   })
@@ -305,11 +305,13 @@ ipcMain.handle('midi:get-devices', () => {
     }
     writeDiagnostic('info', 'main', 'midi.get-devices', 'Fetched MIDI devices', {
       count: devices.length,
+      devices,
     })
-    input.closePort?.()
     return devices
-  } catch {
-    writeDiagnostic('warn', 'main', 'midi.get-devices.failed', 'Failed to fetch MIDI devices')
+  } catch (error) {
+    writeDiagnostic('warn', 'main', 'midi.get-devices.failed', 'Failed to fetch MIDI devices', {
+      error,
+    })
     return []
   }
 })

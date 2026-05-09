@@ -6,6 +6,7 @@ import { useMidiDevice } from '../hooks/useMidiDevice'
 import { SONG_CATALOG, Song } from '../lib/songCatalog'
 import AppNavigation, { AppMode } from '../components/AppNavigation'
 import { logRendererEvent } from '../lib/diagnostics'
+import { rendererMidiApi } from '../lib/rendererMidiAdapter'
 
 interface PracticeState {
   measureIndex: number
@@ -31,7 +32,7 @@ function getWindowForPitches(pitches: number[]): { startPitch: number; endPitch:
   return { startPitch: baseC, endPitch: baseC + 24 }
 }
 
-const WORLDDE_DEVICE_PATTERN = /worldde|easykey/i
+const WORLDDE_DEVICE_PATTERN = /worlde|worldde|easykey/i
 
 export default function SongPractice({
   onNavigateHome,
@@ -55,7 +56,7 @@ export default function SongPractice({
 
     async function connectMidi() {
       try {
-        const devices = await window.electronAPI.getMidiDevices()
+        const devices = await rendererMidiApi.getMidiDevices()
         if (cancelled || devices.length === 0) {
           setMidiConnected(false)
           return
@@ -74,9 +75,9 @@ export default function SongPractice({
           )
 
         for (const candidate of candidates) {
-          const ok = await window.electronAPI.connectMidiDevice(candidate.index)
+          const ok = await rendererMidiApi.connectMidiDevice(candidate.index)
           if (cancelled) {
-            if (ok) await window.electronAPI.disconnectMidiDevice().catch(() => {})
+            if (ok) await rendererMidiApi.disconnectMidiDevice().catch(() => {})
             return
           }
           if (ok) {
@@ -106,7 +107,7 @@ export default function SongPractice({
 
     return () => {
       cancelled = true
-      window.electronAPI.disconnectMidiDevice().catch(() => {})
+      rendererMidiApi.disconnectMidiDevice().catch(() => {})
     }
   }, [])
 

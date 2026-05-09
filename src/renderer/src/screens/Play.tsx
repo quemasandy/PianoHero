@@ -6,6 +6,7 @@ import Piano from '../components/Piano'
 import Controls from '../components/Controls'
 import { useMidiDevice } from '../hooks/useMidiDevice'
 import { logRendererEvent } from '../lib/diagnostics'
+import { rendererMidiApi } from '../lib/rendererMidiAdapter'
 
 interface PlayProps {
   song: ParsedSong
@@ -13,7 +14,7 @@ interface PlayProps {
   onBack: () => void
 }
 
-const WORLDDE_DEVICE_PATTERN = /worldde|easykey/i
+const WORLDDE_DEVICE_PATTERN = /worlde|worldde|easykey/i
 const KEYBOARD_WINDOW_KEY_COUNT = 25
 const MIN_PITCH = 21
 const MAX_PITCH = 108
@@ -206,7 +207,7 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
       })
 
       try {
-        const devices = await window.electronAPI.getMidiDevices()
+        const devices = await rendererMidiApi.getMidiDevices()
         if (disposed) return
 
         logRendererEvent('info', 'play.midi.detect.result', 'MIDI device list resolved', {
@@ -238,9 +239,9 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
         })
 
         for (const candidate of candidates) {
-          const ok = await window.electronAPI.connectMidiDevice(candidate.index)
+          const ok = await rendererMidiApi.connectMidiDevice(candidate.index)
           if (disposed) {
-            if (ok) await window.electronAPI.disconnectMidiDevice().catch(() => {})
+            if (ok) await rendererMidiApi.disconnectMidiDevice().catch(() => {})
             return
           }
 
@@ -290,7 +291,7 @@ export default function Play({ song, filePath, onBack }: PlayProps) {
 
     return () => {
       disposed = true
-      window.electronAPI.disconnectMidiDevice().catch(() => {})
+      rendererMidiApi.disconnectMidiDevice().catch(() => {})
     }
   }, [])
 

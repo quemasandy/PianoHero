@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { rendererMidiApi } from '../lib/rendererMidiAdapter'
 
 type NoteCallback = (pitch: number, velocity: number, isOn: boolean) => void
 
@@ -7,9 +8,7 @@ export function useMidiDevice(onNote: NoteCallback) {
   cbRef.current = onNote
 
   useEffect(() => {
-    if (!window.electronAPI) return
-
-    const unsubscribe = window.electronAPI.onMidiNote(({ type, note, velocity }) => {
+    const unsubscribe = rendererMidiApi.onMidiNote(({ type, note, velocity }) => {
       const isNoteOn = (type & 0xf0) === 0x90 && velocity > 0
       const isNoteOff = (type & 0xf0) === 0x80 || ((type & 0xf0) === 0x90 && velocity === 0)
       if (isNoteOn) cbRef.current(note, velocity, true)

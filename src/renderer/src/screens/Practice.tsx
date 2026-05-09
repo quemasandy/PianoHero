@@ -30,10 +30,11 @@ import type {
   ScaleExerciseDefinition,
 } from '../types'
 import { detectChord } from '../lib/chordDetection'
+import { rendererMidiApi } from '../lib/rendererMidiAdapter'
 import AppNavigation, { AppMode } from '../components/AppNavigation'
 import { buttonStyle } from '../components/uiStyles'
 
-const WORLDDE_DEVICE_PATTERN = /worldde|easykey/i
+const WORLDDE_DEVICE_PATTERN = /worlde|worldde|easykey/i
 const WORLDDE_KEY_COUNT = 25
 const FULL_KEYBOARD_COUNT = 88
 const RANGE_STATUS_LABEL = `Rango de práctica: ${pitchToPracticeLabel(PRACTICE_KEYBOARD_WINDOW.startPitch)}–${pitchToPracticeLabel(PRACTICE_KEYBOARD_WINDOW.endPitch)}`
@@ -389,9 +390,9 @@ export default function Practice({
       })
 
       try {
-        await window.electronAPI.disconnectMidiDevice().catch(() => {})
+        await rendererMidiApi.disconnectMidiDevice().catch(() => {})
 
-        const devices = await window.electronAPI.getMidiDevices()
+        const devices = await rendererMidiApi.getMidiDevices()
         if (!isMountedRef.current) return
 
         logRendererEvent('info', 'practice.midi.detect.result', 'MIDI device list resolved', {
@@ -429,9 +430,9 @@ export default function Practice({
           })
 
         for (const candidate of candidates) {
-          const ok = await window.electronAPI.connectMidiDevice(candidate.index)
+          const ok = await rendererMidiApi.connectMidiDevice(candidate.index)
           if (!isMountedRef.current) {
-            if (ok) await window.electronAPI.disconnectMidiDevice().catch(() => {})
+            if (ok) await rendererMidiApi.disconnectMidiDevice().catch(() => {})
             return
           }
 
@@ -507,7 +508,7 @@ export default function Practice({
     return () => {
       isMountedRef.current = false
       window.removeEventListener('focus', handleWindowFocus)
-      window.electronAPI.disconnectMidiDevice().catch(() => {})
+      rendererMidiApi.disconnectMidiDevice().catch(() => {})
     }
   }, [refreshMidiConnection])
 
