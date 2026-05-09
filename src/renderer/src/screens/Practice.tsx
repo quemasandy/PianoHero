@@ -998,7 +998,7 @@ export default function Practice({
               onClick={handleRandomKey}
               title={`Tonalidad al azar (${randomKeyBag.used.length}/12 usadas)`}
               style={{
-                ...buttonStyle('var(--neon-yellow)', '#0F0F23'),
+                ...buttonStyle('var(--neon-green)', '#0F0F23'),
                 padding: '6px 12px',
                 fontSize: '13px',
                 fontWeight: 800,
